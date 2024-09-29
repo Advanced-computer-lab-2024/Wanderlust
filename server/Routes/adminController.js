@@ -9,6 +9,32 @@ const createAdmin = async (req, res) => {
 
 };
 
+//admin deleting account
+const deleteAccount = async (req, res) => {
+    try {
+        const { username } = req.body;
+        const account = await adminModel.findOne({ username });
+        if (!account) {
+            return res.status(404).json({ message: 'Account not found' });
+        }
+        await account.remove();
+        res.status(200).json({ message: 'Account deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+// helper to know all admin usernames on system
+const getAllUsernames = async (req, res) => {
+    try {
+        const accounts = await adminModel.find({}, 'username'); 
+        const usernames = accounts.map(account => account.username);
+        res.status(200).json(usernames);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
+
 // Create a new tourism governor
 const addTourismGovernor = async (req, res) => {
     try {
@@ -35,4 +61,4 @@ const addTourismGovernor = async (req, res) => {
 
 
 //add a , then the name of ur mehtod below.
-module.exports = { createAdmin, addTourismGovernor };
+module.exports = { createAdmin, addTourismGovernor, deleteAccount, getAllUsernames };

@@ -4,7 +4,9 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 //Make sure to add your MongoDB URI in the .env file as MONGO_URI="your mongodb uri"
 //Check db connection links in README file
-const {addTourismGovernor} = require("./Routes/adminController");
+
+//calling admin controllers
+const { createAdmin, deleteAccount, getAllUsernames, addTourismGovernor } = require("./Routes/adminController");
 const MongoURI =
   "mongodb+srv://alimousa2003:33Dt6AmBI1uV9DG7@mernapp.l0tdo.mongodb.net/?retryWrites=true&w=majority&appName=MernApp";
 
@@ -27,4 +29,7 @@ mongoose
 
 
 app.use(express.json())
+//routes
 app.post("/admin/addTourismGovernor",addTourismGovernor);
+app.delete("/admin/delete", deleteAccount);
+app.get("/admin/usernames", getAllUsernames);
