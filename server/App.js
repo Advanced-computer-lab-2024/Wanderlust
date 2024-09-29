@@ -1,6 +1,7 @@
 // External variables
 const express = require("express");
 const mongoose = require("mongoose");
+const tourist = require("./Routes/touristRoutes");
 require("dotenv").config();
 //Make sure to add your MongoDB URI in the .env file as MONGO_URI="your mongodb uri"
 //Check db connection links in README file
@@ -10,6 +11,9 @@ const MongoURI =
 //App variables
 const app = express();
 const port = process.env.PORT || "8000";
+
+app.use(express.json());
+app.use("/api/tourist", tourist);
 
 // configurations
 // Mongo DB
