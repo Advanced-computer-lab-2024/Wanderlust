@@ -33,3 +33,4 @@ app.use(express.json())
 app.post("/admin/addTourismGovernor",addTourismGovernor);
 app.delete("/admin/delete", deleteAccount);
 app.get("/admin/usernames", getAllUsernames);
+app.put("/admin/create", createAdmin);

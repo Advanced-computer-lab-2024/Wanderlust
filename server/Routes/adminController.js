@@ -5,7 +5,25 @@ const tourismGovernorModel = require('../Models/TourismGovernor.js');
 //each one add a method that is needed based on the requirements
 //Create or add a new admin - Amgad
 const createAdmin = async (req, res) => {
+    try {
+        const { name, email, password, role, username } = req.body;
 
+        // Check if the username already exists
+        const existingAdmin = await adminModel.findOne({ username });
+        if (existingAdmin) {
+            return res.status(400).json({ message: 'Username already exists' });
+        }
+
+        // Create a new admin
+        const newAdmin = new adminModel({ name, email, password, role, username });
+
+        // Save the new admin to the database
+        await newAdmin.save();
+
+        res.status(201).json({ message: 'Admin created successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
 
 };
 
@@ -17,7 +35,7 @@ const deleteAccount = async (req, res) => {
         if (!account) {
             return res.status(404).json({ message: 'Account not found' });
         }
-        await account.remove();
+        await account.deleteOne();
         res.status(200).json({ message: 'Account deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });
