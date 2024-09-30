@@ -8,8 +8,7 @@ require("dotenv").config();
 
 //calling for controllers
 const {createTourGuide,getTourGuide, updateTourGuide, deleteTourGuide} = require("./Controllers/tourGuideController");
-const {createAdvertiser,
-  getAdvertiser,
+const {createAdvertiser,getAdvertiser,
   updateAdvertiser,createActivity, getActivity, updateActivity, deleteActivity} = require("./Controllers/advertiserController");
 const { createCategory, getAllCategories, updateCategory, deleteCategory } = require("./Controllers/ActivityCategoryController");
 const { createAdmin, deleteAccount, getAllUsernames, addTourismGovernor } = require("./Controllers/adminController");
@@ -57,10 +56,10 @@ app.get("/admin/usernames", getAllUsernames);
 app.put("/admin/create", createAdmin);
 //routes for activity category
 app.use(express.json())
-app.post("/ActivityCategory/CreateCategory",createCategory);
-app.get("/ActivityCategory/GetAllCategories",getAllCategories);
-app.put("/ActivityCategory/UpdateCategory",updateCategory);
-app.delete("/ActivityCategory/DeleteCategory",deleteCategory);
+app.post("/ActivityCategory/createCat",createCategory);
+app.get("/ActivityCategory/allCat",getAllCategories);
+app.put("/ActivityCategory/UpdateCat",updateCategory);
+app.delete("/ActivityCategory/DeleteCat",deleteCategory);
 //routes for activity
 app.use(express.json())
 app.post('/createActivity', createActivity);
