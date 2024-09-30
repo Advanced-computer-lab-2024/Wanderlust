@@ -5,16 +5,16 @@ const activityCategoryModel = require('../Models/ActivityCategory.js');
 const createCategory = async (req, res) => {
     try {
         const { name } = req.body;
-        const existingCategory = await activityCategoryModel.findOne({ name });
-        if (existingCategory) {
-            return res.status(400).json({ message: 'Category already exists' });
-        }
-        const newCategory = new activityCategoryModel({ name });
-        await newCategory.save();
+        //const existingCategory = await activityCategoryModel.findOne({ name });
+        //if (existingCategory) {
+            //return res.status(400).json({ message: 'Category already exists' });
+        //}
+        const newCategory = await activityCategoryModel.create({ name });
+        //await newCategory.save();
 
         res.status(201).json({ message: 'Category created successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        res.status(500).json({ message: error.message });
     }
 };
 
