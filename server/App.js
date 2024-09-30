@@ -1,6 +1,10 @@
 // External variables
 const express = require("express");
 const mongoose = require("mongoose");
+
+const bodyParser = require("body-parser");
+const preferenceTagRoutes = require("./Routes/PreferenceTagRoutes");
+
 const tourist = require("./Routes/touristRoutes");
 require("dotenv").config();
 //Make sure to add your MongoDB URI in the .env file as MONGO_URI="your mongodb uri"
@@ -37,6 +41,9 @@ mongoose
   })
   .catch((err) => console.log(err));
 
+//for tags 
+app.use(bodyParser.json());
+app.use("/api", preferenceTagRoutes);
 //routes for tour guide
 app.use(express.json())
 app.post("/createtgprofile",createTourGuide);

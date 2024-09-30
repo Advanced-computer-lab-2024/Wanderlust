@@ -30,6 +30,10 @@ const TouristSchema = new Schema({
     type: String,
     required: true,
   },
+  wallet: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const Tourist = mongoose.model("Tourist", TouristSchema);
