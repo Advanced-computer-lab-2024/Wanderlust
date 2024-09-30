@@ -6,7 +6,7 @@ const {
 } = require("../Controllers/touristController");
 const router = express.Router();
 
-router.get("/", getTourist);
-router.post("/", createTourist);
+router.get("/getTourist", getTourist);
+router.post("/createTourist", createTourist);
 router.put("/updateTourist/:touristId", updateTourist);
 module.exports = router;
