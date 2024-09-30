@@ -29,7 +29,7 @@ const updateTourGuide = async (req, res) => {
       const { userName } = req.body; 
       const { mobileNumber,YOE,previousWork  } = req.body;
       try {
-         const tourguide = await tourGuideModel.findOneAndUpdate({userName }, { mobileNumber,YOE, previousWork}, { new: true });
+         const tourGuide = await tourGuideModel.findOneAndUpdate({userName }, { mobileNumber,YOE, previousWork}, { new: true });
          res.status(200).json(tourGuide); 
       } catch (error) {
          res.status(400).json({ error: error.message }); 
