@@ -1,6 +1,10 @@
 // External variables
 const express = require("express");
 const mongoose = require("mongoose");
+
+const bodyParser = require("body-parser");
+const preferenceTagRoutes = require("./Routes/PreferenceTagRoutes");
+
 const tourist = require("./Routes/touristRoutes");
 require("dotenv").config();
 //Make sure to add your MongoDB URI in the .env file as MONGO_URI="your mongodb uri"
@@ -50,6 +54,10 @@ app.post("/createtgprofile",createTourGuide);
 app.get("/gettgprofile", getTourGuide);
 app.put("/updatetgprofile", updateTourGuide);
 app.delete("/deletetgprofile", deleteTourGuide);
+
+//for tags 
+app.use(bodyParser.json());
+app.use("/api", preferenceTagRoutes);
 
 
 app.use(express.json())
