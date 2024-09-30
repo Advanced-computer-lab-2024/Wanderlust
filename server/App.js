@@ -6,6 +6,9 @@ require("dotenv").config();
 //Make sure to add your MongoDB URI in the .env file as MONGO_URI="your mongodb uri"
 //Check db connection links in README file
 
+const {createTourGuide,getTourGuide, updateTourGuide, deleteTourGuide} = require("./Routes/tourGuideController");
+
+
 const {createAdvertiser,
   getAdvertiser,
   updateAdvertiser,
@@ -14,6 +17,7 @@ const {createAdvertiser,
 
 //calling admin controllers
 const { createAdmin, deleteAccount, getAllUsernames, addTourismGovernor } = require("./Routes/adminController");
+
 
 const MongoURI =
   "mongodb+srv://alimousa2003:33Dt6AmBI1uV9DG7@mernapp.l0tdo.mongodb.net/?retryWrites=true&w=majority&appName=MernApp";
@@ -40,6 +44,13 @@ mongoose
 
 
 app.use(express.json())
+app.post("/createtgprofile",createTourGuide);
+app.get("/gettgprofile", getTourGuide);
+app.put("/updatetgprofile", updateTourGuide);
+app.delete("/deletetgprofile", deleteTourGuide);
+
+
+app.use(express.json())
 app.post("/createAdvertiserProfile",createAdvertiser);
 app.get("/getAdvertiser", getAdvertiser);
 app.put("/updateAdvertiser", updateAdvertiser);
@@ -51,4 +62,5 @@ app.post("/admin/addTourismGovernor",addTourismGovernor);
 app.delete("/admin/delete", deleteAccount);
 app.get("/admin/usernames", getAllUsernames);
 app.put("/admin/create", createAdmin);
+
 
