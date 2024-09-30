@@ -41,20 +41,20 @@ const updateAdvertiser = async (req, res) => {
   }
 };
 
-const deleteAdvertiser = async (req, res) => {
-  const { username } = req.params;
+// const deleteAdvertiser = async (req, res) => {
+//   const { username } = req.params;
 
-  try {
-      await Advertiser.findOneAndDelete(username);
-      res.status(200).json({ message: 'Advertiser deleted successfully' });
-  } catch (error) {
-      res.status(400).json({ error: error.message });
-  }
-};
+//   try {
+//       await Advertiser.findOneAndDelete(username);
+//       res.status(200).json({ message: 'Advertiser deleted successfully' });
+//   } catch (error) {
+//       res.status(400).json({ error: error.message });
+//   }
+// };
 
 module.exports = {
   createAdvertiser,
   getAdvertiser,
-  updateAdvertiser,
-  deleteAdvertiser
+  updateAdvertiser
+  
 };

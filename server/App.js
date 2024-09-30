@@ -32,4 +32,3 @@ app.use(express.json())
 app.post("/createAdvertiserProfile",createAdvertiser);
 app.get("/getAdvertiser", getAdvertiser);
 app.put("/updateAdvertiser", updateAdvertiser);
-app.delete("/deleteAdvertiser", deleteAdvertiser);
