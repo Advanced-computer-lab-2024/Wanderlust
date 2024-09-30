@@ -27,29 +27,44 @@ const createAdmin = async (req, res) => {
 
 };
 
-//admin deleting account
+//deleting account based on the username
 const deleteAccount = async (req, res) => {
     try {
-        const { username } = req.body;
-        const account = await adminModel.findOne({ username });
-        if (!account) {
-            return res.status(404).json({ message: 'Account not found' });
-        }
-        await account.deleteOne();
-        res.status(200).json({ message: 'Account deleted successfully' });
+      const { username } = req.body;
+      const adminAccount = await adminModel.findOne({ username });
+      const tourismGovernorAccount = await tourismGovernorModel.findOne({ username });
+  
+      if (adminAccount) {
+        await adminAccount.deleteOne();
+        res.status(200).json({ message: 'Admin account deleted successfully' });
+      } else if (tourismGovernorAccount) {
+        await tourismGovernorAccount.deleteOne();
+        res.status(200).json({ message: 'Tourism governor account deleted successfully' });
+      } else {
+        res.status(404).json({ message: 'Account not found' });
+      }
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+      res.status(500).json({ message: 'Server error', error });
     }
-};
+  };
 
-// helper to know all admin usernames on system
+// helper get all usernames on system and account type
 const getAllUsernames = async (req, res) => {
     try {
-        const accounts = await adminModel.find({}, 'username'); 
-        const usernames = accounts.map(account => account.username);
-        res.status(200).json(usernames);
+        const adminAccounts = await adminModel.find({}, 'username role');
+        const tourismGovernorAccounts = await tourismGovernorModel.find({}, 'username role');
+
+
+        const accounts = [
+            ...adminAccounts.map(account => ({ username: account.username, accountType: 'admin' })),
+            //...userAccounts.map(account => ({ username: account.username, accountType: 'user' })),
+            ...tourismGovernorAccounts.map(account => ({ username: account.username, accountType: 'tourismGovernor' }))
+        ];
+
+        res.status(200).json(accounts);
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        console.error('Error fetching usernames:', error); // Log the error for debugging
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
