@@ -6,17 +6,16 @@ require("dotenv").config();
 //Make sure to add your MongoDB URI in the .env file as MONGO_URI="your mongodb uri"
 //Check db connection links in README file
 
-const {createTourGuide,getTourGuide, updateTourGuide, deleteTourGuide} = require("./Routes/tourGuideController");
+const {createTourGuide,getTourGuide, updateTourGuide, deleteTourGuide} = require("./Controllers/tourGuideController");
 
 
 const {createAdvertiser,
   getAdvertiser,
-  updateAdvertiser,
-  deleteAdvertiser} = require("./Routes/advertiserController");
+  updateAdvertiser,createActivity, getActivity, updateActivity, deleteActivity} = require("./Controllers/advertiserController");
 
 
 //calling admin controllers
-const { createAdmin, deleteAccount, getAllUsernames, addTourismGovernor } = require("./Routes/adminController");
+const { createAdmin, deleteAccount, getAllUsernames, addTourismGovernor } = require("./Controllers/adminController");
 
 
 const MongoURI =
@@ -63,4 +62,7 @@ app.delete("/admin/delete", deleteAccount);
 app.get("/admin/usernames", getAllUsernames);
 app.put("/admin/create", createAdmin);
 
-
+app.post('/createActivity', createActivity);
+app.get('/getActivity', getActivity);
+app.put('/updateActivity/:id', updateActivity);
+app.delete('/deleteActivity/:id', deleteActivity);
