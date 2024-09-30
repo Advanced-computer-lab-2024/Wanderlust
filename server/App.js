@@ -15,6 +15,9 @@ const {createAdvertiser,
 
 
 //calling admin controllers
+
+//calling activity category controllers
+const { createCategory, getAllCategories, updateCategory, deleteCategory } = require("./Controllers/ActivityCategoryController");
 const { createAdmin, deleteAccount, getAllUsernames, addTourismGovernor } = require("./Controllers/adminController");
 
 
@@ -62,6 +65,16 @@ app.delete("/admin/delete", deleteAccount);
 app.get("/admin/usernames", getAllUsernames);
 app.put("/admin/create", createAdmin);
 
+app.use(express.json())
+//routes for activity category
+app.post("/ActivityCategory/CreateCategory",createCategory);
+app.get("/ActivityCategory/GetAllCategories",getAllCategories);
+app.put("/ActivityCategory/UpdateCategory",updateCategory);
+app.delete("/ActivityCategory/DeleteCategory",deleteCategory);
+
+
+
+app.use(express.json())
 app.post('/createActivity', createActivity);
 app.get('/getActivity', getActivity);
 app.put('/updateActivity/:id', updateActivity);
