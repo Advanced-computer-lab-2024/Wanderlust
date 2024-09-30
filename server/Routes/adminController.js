@@ -3,7 +3,7 @@ const { default: mongoose } = require('mongoose');
 const tourismGovernorModel = require('../Models/TourismGovernor.js');
 
 //each one add a method that is needed based on the requirements
-//Create or add a new admin - Amgad
+//Create or add a new admin
 const createAdmin = async (req, res) => {
     try {
         const { name, email, password, role, username } = req.body;
