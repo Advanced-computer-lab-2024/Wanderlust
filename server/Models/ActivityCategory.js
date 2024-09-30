@@ -5,12 +5,6 @@ const ActivityCategorySchema = new Schema({
     name: {
         type: String,
         required: true,
-        unique: true
-    },
-    customId: {
-        type: Number,
-        required: true,
-        unique: true
     }
 });
 

@@ -2,30 +2,21 @@
 const { default: mongoose } = require('mongoose');
 const activityCategoryModel = require('../Models/ActivityCategory.js');
 
-//CRUD Mehthods
-//Create or add a new activity category
 const createCategory = async (req, res) => {
     try {
-        const { name, customId } = req.body;
-        if (!name) {
-          return res.status(400).json({ message: 'Name is required' });
-        }
-    
-        if (!mongoose.Types.ObjectId.isValid(customId)) {
-          return res.status(400).json({ message: 'Invalid category ID' });
-        }
-    
-        const newCategory = new activityCategoryModel({
-          customId: customId,
-          name
-        });
-    
+        const { name } = req.body;
+        const newCategory = new activityCategoryModel({ name });
         await newCategory.save();
-        res.status(201).json(newCategory);
-      } catch (error) {
-        res.status(500).json({ message: error.message });
-      }
-}
+        res.status(201).json({ message: 'Category created successfully', category: newCategory });
+    } catch (error) {
+        if (error.code === 11000) {
+            res.status(400).json({ message: 'Category already exists' });
+        } else {
+            console.error('Error creating category:', error);
+            res.status(500).json({ message: 'Server error', error: error.message });
+        }
+    }
+};
 
 //Get all activity categories
 const getAllCategories = async (req, res) => {
@@ -37,55 +28,42 @@ const getAllCategories = async (req, res) => {
     }
 }
 
-//update activity category - still not working
 const updateCategory = async (req, res) => {
     try {
-        const { customId, name } = req.body;
-
-        //if (!mongoose.Types.ObjectId.isValid(customId)) {
-          //  return res.status(400).json({ message: 'Invalid category ID' });
-        //}
-
-        if (!name) {
-            return res.status(400).json({ message: 'Name is required' });
-        }
-
-        const updatedCategory = await activityCategoryModel.findByIdAndUpdate(
-            customId,
-            { name },
-            { new: true }
-        );
-
-        if (!updatedCategory) {
-            return res.status(404).json({ message: 'Category not found' });
-        }
-
-        res.status(200).json(updatedCategory);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-}
-
-//delete activity category - still not working 
-const deleteCategory = async (req, res) => {
-    try {
-        const { customId } = req.body;
-
-        if (!mongoose.Types.ObjectId.isValid(customId)) {
+        const { id, name } = req.body;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ message: 'Invalid category ID' });
         }
 
-        const deletedCategory = await activityCategoryModel.findByIdAndDelete(customId);
+        const category = await activityCategoryModel.findByIdAndUpdate(id, { name }, { new: true });
+        if (!category) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
 
-        if (!deletedCategory) {
+        res.status(200).json(category);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const deleteCategory = async (req, res) => {
+    try {
+        const { id } = req.body;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid category ID' });
+        }
+
+        const category = await activityCategoryModel.findByIdAndDelete(id);
+        if (!category) {
             return res.status(404).json({ message: 'Category not found' });
         }
 
         res.status(200).json({ message: 'Category deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
-    }   
-}
+    }
+};
+
 
 module.exports = { createCategory, getAllCategories, updateCategory, deleteCategory };
 
