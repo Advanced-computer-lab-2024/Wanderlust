@@ -16,7 +16,10 @@ const {createAdvertiser,
 
 
 //calling admin controllers
-const { createAdmin, deleteAccount, getAllUsernames, addTourismGovernor } = require("./Routes/adminController");
+const { createAdmin, deleteAccount, getAllUsernames, addTourismGovernor } = require("./Routes/AdminController");
+
+//calling activity category controllers
+const { createCategory, getAllCategories, updateCategory, deleteCategory } = require("./Controllers/ActivityCategoryController");
 
 
 const MongoURI =
@@ -62,5 +65,12 @@ app.post("/admin/addTourismGovernor",addTourismGovernor);
 app.delete("/admin/delete", deleteAccount);
 app.get("/admin/usernames", getAllUsernames);
 app.put("/admin/create", createAdmin);
+
+app.use(express.json())
+//routes for activity category
+app.post("/ActivityCategory/CreateCategory",createCategory);
+app.get("/ActivityCategory/GetAllCategories",getAllCategories);
+app.put("/ActivityCategory/UpdateCategory",updateCategory);
+app.delete("/ActivityCategory/DeleteCategory",deleteCategory);
 
 
