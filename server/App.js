@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 //Make sure to add your MongoDB URI in the .env file as MONGO_URI="your mongodb uri"
 //Check db connection links in README file
+const {createTourGuide,getTourGuide, updateTourGuide, deleteTourGuide} = require("./Routes/tourGuideController");
 const MongoURI =
   "mongodb+srv://alimousa2003:33Dt6AmBI1uV9DG7@mernapp.l0tdo.mongodb.net/?retryWrites=true&w=majority&appName=MernApp";
 
@@ -23,3 +24,9 @@ mongoose
     });
   })
   .catch((err) => console.log(err));
+
+app.use(express.json())
+app.post("/createtgprofile",createTourGuide);
+app.get("/gettgprofile", getTourGuide);
+app.put("/updatetgprofile", updateTourGuide);
+app.delete("/deletetgprofile", deleteTourGuide);
