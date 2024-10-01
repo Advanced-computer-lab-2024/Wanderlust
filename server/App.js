@@ -7,6 +7,9 @@ const cors = require('cors');
 const bodyParser = require("body-parser");
 const preferenceTagRoutes = require("./Routes/PreferenceTagRoutes");
 
+const productRoutes = require('./Routes/productRoutes');
+
+
 const tourist = require("./Routes/touristRoutes");
 require("dotenv").config();
 //Make sure to add your MongoDB URI in the .env file as MONGO_URI="your mongodb uri"
@@ -18,6 +21,7 @@ const {createAdvertiser,getAdvertiser,
   updateAdvertiser,createActivity, getActivity, updateActivity, deleteActivity} = require("./Controllers/advertiserController");
 const { createCategory, getAllCategories, updateCategory, deleteCategory } = require("./Controllers/ActivityCategoryController");
 const { createAdmin, deleteAccount, getAllUsernames, addTourismGovernor } = require("./Controllers/adminController");
+const { addProduct} = require("./Controllers/productController");
 
 
 const MongoURI =
@@ -29,6 +33,9 @@ const port = process.env.PORT || "8000";
 
 app.use(express.json());
 app.use("/api/tourist", tourist);
+
+app.use('/api', productRoutes);
+
 app.use(cors());
 // configurations
 // Mongo DB
@@ -75,3 +82,4 @@ app.post('/createActivity', createActivity);
 app.get('/getActivity', getActivity);
 app.put('/updateActivity/:id', updateActivity);
 app.delete('/deleteActivity/:id', deleteActivity);
+
