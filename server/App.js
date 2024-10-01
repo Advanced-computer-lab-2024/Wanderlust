@@ -21,7 +21,7 @@ const {createAdvertiser,getAdvertiser,
   updateAdvertiser,createActivity, getActivity, updateActivity, deleteActivity} = require("./Controllers/advertiserController");
 const { createCategory, getAllCategories, updateCategory, deleteCategory } = require("./Controllers/ActivityCategoryController");
 const { createAdmin, deleteAccount, getAllUsernames, addTourismGovernor } = require("./Controllers/adminController");
-const { addProduct} = require("./Controllers/productController");
+const { addProduct,filterProductsByPrice,searchProductByName} = require("./Controllers/productController");
 
 
 const MongoURI =
@@ -82,4 +82,6 @@ app.post('/createActivity', createActivity);
 app.get('/getActivity', getActivity);
 app.put('/updateActivity/:id', updateActivity);
 app.delete('/deleteActivity/:id', deleteActivity);
+
+
 

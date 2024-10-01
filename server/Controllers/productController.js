@@ -47,9 +47,51 @@ const updateProductByName = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+const searchProductByName = async (req, res) => {
+    try {
+        const { name } = req.body; // Change from req.query to req.body
+        if (!name) {
+            return res.status(400).json({ message: 'Product name is required' });
+        }
 
+        const products = await Product.find({ name: new RegExp(name, 'i') });
+        if (products.length === 0) {
+            return res.status(404).json({ message: 'No products found' });
+        }
+
+        res.status(200).json({ products });
+    } catch (error) {
+        console.error('Error searching products:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+// Filter products by price
+const filterProductsByPrice = async (req, res) => {
+    try {
+        const { minPrice, maxPrice } = req.body; // Change from req.query to req.body
+        if (!minPrice && !maxPrice) {
+            return res.status(400).json({ message: 'At least one of minPrice or maxPrice is required' });
+        }
+
+        const query = {};
+        if (minPrice) query.price = { $gte: Number(minPrice) };
+        if (maxPrice) query.price = { ...query.price, $lte: Number(maxPrice) };
+
+        const products = await Product.find(query);
+        if (products.length === 0) {
+            return res.status(404).json({ message: 'No products found' });
+        }
+
+        res.status(200).json({ products });
+    } catch (error) {
+        console.error('Error filtering products:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
 
 module.exports = {
     addProduct,
-    updateProductByName
+    updateProductByName,
+    searchProductByName,
+    filterProductsByPrice,
 };
