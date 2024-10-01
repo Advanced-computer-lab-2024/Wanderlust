@@ -1,6 +1,8 @@
 // External variables
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require('cors');
+
 
 const bodyParser = require("body-parser");
 const preferenceTagRoutes = require("./Routes/PreferenceTagRoutes");
@@ -27,7 +29,7 @@ const port = process.env.PORT || "8000";
 
 app.use(express.json());
 app.use("/api/tourist", tourist);
-
+app.use(cors());
 // configurations
 // Mongo DB
 mongoose
