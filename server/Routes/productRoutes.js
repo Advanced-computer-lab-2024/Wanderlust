@@ -7,6 +7,7 @@ router.post('/addProduct', productController.addProduct);
 router.put('/updateProductByName', productController.updateProductByName);
 router.get('/searchProductByName', productController.searchProductByName);
 router.get('/filterProductsByPrice', productController.filterProductsByPrice);
+router.get('/sortedByRating',productController.getProductsSortedByRating);
 
 
 module.exports = router;

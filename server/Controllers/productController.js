@@ -3,8 +3,8 @@ const Product = require('../Models/Products.js');
 // Add a new product
 const addProduct = async (req, res) => {
     try {
-        const { name, description, price, quantity } = req.body;
-        if (!name || !description || !price || !quantity) {
+        const { name, description, price, quantity, rating } = req.body;
+        if (!name || !description || !price || !quantity || !rating) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
@@ -14,7 +14,7 @@ const addProduct = async (req, res) => {
             return res.status(400).json({ message: 'Product with this name already exists' });
         }
 
-        const newProduct = new Product({ name, description, price, quantity });
+        const newProduct = new Product({ name, description, price, quantity, rating });
         await newProduct.save();
         res.status(201).json({ message: 'Product added successfully', product: newProduct });
     } catch (error) {
@@ -68,7 +68,7 @@ const searchProductByName = async (req, res) => {
 // Filter products by price
 const filterProductsByPrice = async (req, res) => {
     try {
-        const { minPrice, maxPrice } = req.body; // Change from req.query to req.body
+        const { minPrice, maxPrice } = req.body; 
         if (!minPrice && !maxPrice) {
             return res.status(400).json({ message: 'At least one of minPrice or maxPrice is required' });
         }
@@ -88,10 +88,21 @@ const filterProductsByPrice = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+//sort product by rating
+const getProductsSortedByRating = async (req, res) => {
+    try {
+        const products = await Product.find().sort({ rating: -1 }); 
+        res.status(200).json(products);
+    } catch (error) {
+        console.error('Error fetching products:', error); 
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
 
 module.exports = {
     addProduct,
     updateProductByName,
     searchProductByName,
     filterProductsByPrice,
+    getProductsSortedByRating
 };

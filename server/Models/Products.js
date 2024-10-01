@@ -18,7 +18,14 @@ const ProductSchema = new Schema({
     quantity: {
         type: Number,
         required: true
+    },
+    rating: {
+        type: Number,
+        min: 1,
+        max: 5,
+        required: true
     }
+
 });
 
 const Product = mongoose.model('Product', ProductSchema);
