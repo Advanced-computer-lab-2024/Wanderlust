@@ -4,6 +4,7 @@ const tourismGovernorModel = require('../Models/TourismGovernor.js');
 const tourguideModel = require('../Models/tourGuide'); 
 const touristModel = require('../Models/Tourist.js');
 const advertiserModel = require('../Models/Advertiser'); 
+const sellerModel = require('../Models/Seller.js');
 
 //each one add a method that is needed based on the requirements
 //Create or add a new admin
@@ -32,6 +33,7 @@ const deleteAccount = async (req, res) => {
         const tourguideAccount = await tourguideModel.findOne({ username });
         const touristAccount = await touristModel.findOne({ username });
         const advertiserAccount = await advertiserModel.findOne({ username });
+        const sellerAccount = await sellerModel.findOne({ username }); 
 
       if (adminAccount) {
         await adminAccount.deleteOne();
@@ -48,6 +50,9 @@ const deleteAccount = async (req, res) => {
     } else if (advertiserAccount) {
         await advertiserAccount.deleteOne();
         res.status(200).json({ message: 'Advertiser account deleted successfully' });
+    }else if (sellerAccount) { 
+        await sellerAccount.deleteOne();
+        res.status(200).json({ message: 'Seller account deleted successfully' });
     }else {
         res.status(404).json({ message: 'Account not found' });
     }
@@ -63,7 +68,8 @@ const getAllUsernames = async (req, res) => {
         const tourismGovernorAccounts = await tourismGovernorModel.find({}, 'username role');
         const tourguideAccounts = await tourguideModel.find({}, 'userName role');
         const touristAccounts = await touristModel.find({}, 'username role');
-        const advertiserAccounts = await advertiserModel.find({}, 'username role'); 
+        const advertiserAccounts = await advertiserModel.find({}, 'username role');
+        const sellerAccounts = await sellerModel.find({}, 'username role');
 
         const accounts = [
             ...adminAccounts.map(account => ({ username: account.username, accountType: 'admin' })),
@@ -71,6 +77,7 @@ const getAllUsernames = async (req, res) => {
             ...tourguideAccounts.filter(account => account.userName).map(account => ({ username: account.userName, accountType: 'tourguide' })),
             ...touristAccounts.map(account => ({ username: account.username, accountType: 'tourist' })),
             ...advertiserAccounts.map(account => ({ username: account.username, accountType: 'advertiser' })),
+            ...sellerAccounts.map(account => ({ username: account.username, accountType: 'seller' }))
             
         ];
         res.status(200).json(accounts);
