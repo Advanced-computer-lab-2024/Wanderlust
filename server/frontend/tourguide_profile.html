@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tour Guide Profiles</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .tour-guide {
+      background-color: #fff;
+      padding: 15px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .tour-guide h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .tour-guide p {
+      margin: 5px 0;
+    }
+
+    .tour-guide .contact {
+      font-style: italic;
+    }
+
+    .tour-guide .experience {
+      color: #007BFF;
+    }
+
+    .update-form {
+      display: none;
+      background-color: #f9f9f9;
+      padding: 15px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .update-form input[type="text"] {
+      margin-bottom: 10px;
+      padding: 8px;
+      width: calc(100% - 20px);
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .update-form button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .update-form button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Styles for the navigation bar */
+    nav {
+      background-color: #333;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+      margin-right: 10px;
+      display: inline-block;
+    }
+
+    nav a:hover {
+      background-color: #575757;
+      border-radius: 4px;
+    }
+
+    /* Add margin to the search box */
+    #search-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 250px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #007BFF;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav>
+    <a>Tour Guide</a>
+    <a href="tourguide_profile.html">Profile</a>
+    <a href="tourguide_Itinerary.html">Itinerary</a>
+  </nav>
+
+  <h1>Tour Guide Profile</h1>
+
+  <!-- No need for the search box since we're always searching for "ah1" -->
+  <div id="tourGuideContainer">
+    <!-- Profile will be loaded here -->
+  </div>
+
+  <script>
+    // Function to fetch a Tour Guide profile for username "ah1"
+   // Function to fetch a Tour Guide profile by username
+async function searchTourGuide() {
+  const userName = "ah1"; // Replace with hardcoded username
+
+  try {
+    const response = await fetch(`http://localhost:8000/gettgprofile`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userName }) // Send userName in the body
+    });
+
+    const tourGuide = await response.json(); // Parse the response to JSON
+
+    const container = document.getElementById('tourGuideContainer');
+    container.innerHTML = ''; // Clear any existing data
+
+    if (response.ok) {
+      const guideElement = document.createElement('div');
+      guideElement.className = 'tour-guide';
+
+      // Creating elements dynamically for the profile
+      guideElement.innerHTML = `
+        <h2>${tourGuide.userName}</h2>
+        <p><span class="experience">Years of Experience:</span> ${tourGuide.YOE}</p>
+        <p>Previous Work: ${tourGuide.previousWork || 'N/A'}</p>
+        <p class="contact">Contact: ${tourGuide.mobileNumber}</p>
+        <button onclick="showUpdateForm('${tourGuide.userName}', '${tourGuide.mobileNumber}', '${tourGuide.YOE}', '${tourGuide.previousWork}')">Update</button>
+        
+        <div id="updateForm-${tourGuide.userName}" class="update-form">
+          <h3>Update Tour Guide</h3>
+          <input type="text" id="updateMobile-${tourGuide.userName}" placeholder="Mobile Number" value="${tourGuide.mobileNumber}">
+          <input type="text" id="updateYOE-${tourGuide.userName}" placeholder="Years of Experience" value="${tourGuide.YOE}">
+          <input type="text" id="updateWork-${tourGuide.userName}" placeholder="Previous Work" value="${tourGuide.previousWork}">
+          <button onclick="updateTourGuide('${tourGuide.userName}')">Save</button>
+        </div>
+      `;
+
+      container.appendChild(guideElement);
+    } else {
+      container.innerHTML = '<p>Tour guide not found.</p>';
+    }
+  } catch (error) {
+    console.error('Error fetching tour guide:', error);
+    document.getElementById('tourGuideContainer').innerHTML = '<p>Failed to load tour guide profile.</p>';
+  }
+}
+    // Show the update form
+    function showUpdateForm(userName, mobileNumber, YOE, previousWork) {
+      const form = document.getElementById(`updateForm-${userName}`);
+      form.style.display = form.style.display === 'block' ? 'none' : 'block'; // Toggle the form's visibility
+    }
+
+    // Function to update a tour guide
+    async function updateTourGuide(userName) {
+      const mobileNumber = document.getElementById(`updateMobile-${userName}`).value;
+      const YOE = document.getElementById(`updateYOE-${userName}`).value;
+      const previousWork = document.getElementById(`updateWork-${userName}`).value;
+
+      try {
+        const response = await fetch('http://localhost:8000/updatetgprofile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userName,
+            mobileNumber,
+            YOE,
+            previousWork
+          }),
+        });
+
+        if (response.ok) {
+          alert('Tour guide updated successfully!');
+          searchTourGuide(); // Refresh the profile after update
+        } else {
+          const errorData = await response.json();
+          alert(`Error: ${errorData.error}`);
+        }
+      } catch (error) {
+        console.error('Error updating tour guide:', error);
+        alert('Failed to update tour guide.');
+      }
+    }
+
+    // Automatically load the profile for user "ah1" on page load
+    window.onload = searchTourGuide;
+
+  </script>
+
+</body>
+</html>
