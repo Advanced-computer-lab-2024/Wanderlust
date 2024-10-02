@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advertiser Profiles</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .advertiser {
+      background-color: #fff;
+      padding: 15px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .advertiser h2 {
+      margin: 0;
+      font-size: 24px;
+      cursor: pointer;
+      color: #007BFF;
+    }
+
+    .advertiser h2:hover {
+      text-decoration: underline;
+    }
+
+    .advertiser p {
+      margin: 5px 0;
+    }
+
+    .advertiser .contact {
+      font-style: italic;
+    }
+
+    .advertiser .hotline {
+      color: #007BFF;
+    }
+
+    .update-form {
+      display: none;
+      background-color: #f9f9f9;
+      padding: 15px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .update-form input[type="text"] {
+      margin-bottom: 10px;
+      padding: 8px;
+      width: calc(100% - 20px);
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .update-form button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .update-form button:hover {
+      background-color: #0056b3;
+    }
+
+  </style>
+</head>
+<body>
+
+  <h1>Advertiser Profiles</h1>
+
+  <div id="advertiserContainer">
+    <!-- Profiles will be loaded here -->
+  </div>
+
+  <script>
+    // Function to fetch Advertiser profiles
+    async function fetchAdvertisers() {
+      try {
+        const response = await fetch('http://localhost:8000/getAdvertiser'); // Fetch data from the API
+        const data = await response.json(); // Parse the response to JSON
+
+        const container = document.getElementById('advertiserContainer');
+        container.innerHTML = ''; // Clear any existing data
+
+        if (response.ok && data.length > 0) {
+          data.forEach(advertiser => {
+            const advertiserElement = document.createElement('div');
+            advertiserElement.className = 'advertiser';
+
+            // Creating elements dynamically for each profile
+            advertiserElement.innerHTML = `
+              <h2 onclick="redirectToProfile('${advertiser.username}')">${advertiser.username}</h2>
+              <p><span class="hotline">Hotline:</span> ${advertiser.hotline}</p>
+              <p>Company Website: <a href="${advertiser.companyWebsite}" target="_blank">${advertiser.companyWebsite}</a></p>
+              <p>Company Profile: <a href="${advertiser.companyProfile}" target="_blank">${advertiser.companyProfile}</a></p>
+              <button onclick="showUpdateForm('${advertiser.username}', '${advertiser.hotline}', '${advertiser.companyWebsite}', '${advertiser.companyProfile}')">Update</button>
+              
+              <div id="updateForm-${advertiser.username}" class="update-form">
+                <h3>Update Advertiser</h3>
+                <input type="text" id="updateHotline-${advertiser.username}" placeholder="Hotline" value="${advertiser.hotline}">
+                <input type="text" id="updateWebsite-${advertiser.username}" placeholder="Company Website" value="${advertiser.companyWebsite}">
+                <input type="text" id="updateProfile-${advertiser.username}" placeholder="Company Profile" value="${advertiser.companyProfile}">
+                <button onclick="updateAdvertiser('${advertiser.username}')">Save</button>
+              </div>
+            `;
+
+            container.appendChild(advertiserElement);
+          });
+        } else {
+          container.innerHTML = '<p>No advertisers available at the moment.</p>';
+        }
+      } catch (error) {
+        console.error('Error fetching advertisers:', error);
+        document.getElementById('advertiserContainer').innerHTML = '<p>Failed to load advertisers.</p>';
+      }
+    }
+
+    // Redirect to the advertiser's profile page
+    function redirectToProfile(username) {
+      // Redirect to the advertiser profile page, passing the username in the query string
+      window.location.href = `advertiserProfile.html?username=${username}`;
+    }
+
+    // Show the update form
+    function showUpdateForm(username, hotline, companyWebsite, companyProfile) {
+      const form = document.getElementById(`updateForm-${username}`);
+      form.style.display = form.style.display === 'block' ? 'none' : 'block'; // Toggle the form's visibility
+    }
+
+    // Function to update an advertiser
+    async function updateAdvertiser(username) {
+      const hotline = document.getElementById(`updateHotline-${username}`).value;
+      const companyWebsite = document.getElementById(`updateWebsite-${username}`).value;
+      const companyProfile = document.getElementById(`updateProfile-${username}`).value;
+
+      try {
+        const response = await fetch('http://localhost:8000/updateAdvertiser', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username,
+            hotline,
+            companyWebsite,
+            companyProfile
+          }),
+        });
+
+        if (response.ok) {
+          alert('Advertiser updated successfully!');
+          fetchAdvertisers(); // Refresh the profiles after update
+        } else {
+          const errorData = await response.json();
+          alert(`Error: ${errorData.error}`);
+        }
+      } catch (error) {
+        console.error('Error updating advertiser:', error);
+        alert('Failed to update advertiser.');
+      }
+    }
+
+    // Load Advertiser profiles when the page is loaded
+    window.onload = fetchAdvertisers;
+    window.onfocus = fetchAdvertisers;
+  </script>
+
+</body>
+</html>

@@ -22,6 +22,20 @@ const getAdvertiser = async (req, res) => {
       res.status(400).json({ error: error.message });
   }
 };
+const getAdvertiserByUsername = async (req, res) => {
+  const { username } = req.body;
+
+  try {
+    const advertiser = await Advertiser.findOne({ username });
+    if (!advertiser) {
+      return res.status(404).json({ error: 'Advertiser not found' });
+    }
+    res.status(200).json(advertiser);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 
 const updateAdvertiser = async (req, res) => {
   const { username } = req.body; 
@@ -124,6 +138,7 @@ const deleteActivity = async (req, res) => {
 module.exports = {
   createAdvertiser,
   getAdvertiser,
+  getAdvertiserByUsername,
   updateAdvertiser,
   createActivity,
   getActivity,

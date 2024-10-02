@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activities List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .activity {
+      background-color: #fff;
+      padding: 15px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .activity h2 {
+      margin: 0;
+      font-size: 24px;
+      cursor: pointer;
+      color: #007BFF;
+    }
+
+    .activity h2:hover {
+      text-decoration: underline;
+    }
+
+    .create-form, .update-form {
+      display: none; /* Initially hidden */
+      background-color: #f9f9f9;
+      padding: 15px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .create-form input[type="text"],
+    .create-form input[type="date"],
+    .create-form input[type="time"],
+    .create-form input[type="number"],
+    .create-form select,
+    .update-form input[type="text"],
+    .update-form input[type="date"],
+    .update-form input[type="time"],
+    .update-form input[type="number"],
+    .update-form select {
+      margin-bottom: 10px;
+      padding: 8px;
+      width: calc(100% - 20px);
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .create-form button,
+    .update-form button,
+    .toggle-button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .create-form button:hover,
+    .update-form button:hover,
+    .toggle-button:hover {
+      background-color: #0056b3;
+    }
+
+    .delete-button {
+      background-color: red;
+      color: white;
+    }
+
+    .delete-button:hover {
+      background-color: darkred;
+    }
+
+    .update-button {
+      background-color: orange;
+      color: white;
+      margin-left: 10px;
+    }
+
+    .update-button:hover {
+      background-color: darkorange;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Activities List</h1>
+
+  <div id="activityContainer">
+    <!-- Activities will be loaded here -->
+  </div>
+
+  <button class="toggle-button" onclick="toggleCreateForm()">Create New Activity</button>
+
+  <div id="createFormContainer" class="create-form">
+    <h2>Create New Activity</h2>
+    <input type="date" id="activityDate" placeholder="Date">
+    <input type="time" id="activityTime" placeholder="Time">
+    <input type="text" id="activityLocation" placeholder="Location (URL)">
+    <input type="number" id="activityPrice" placeholder="Price">
+    <input type="text" id="activityCategory" placeholder="Category (ID)">
+    <input type="text" id="activityTags" placeholder="Tags (comma separated)">
+    <input type="text" id="activityDiscounts" placeholder="Special Discounts">
+    <select id="bookingOpen">
+      <option value="true">Booking Open</option>
+      <option value="false">Booking Closed</option>
+    </select>
+    <button onclick="createActivity()">Create Activity</button>
+  </div>
+
+  <div id="updateFormContainer" class="update-form">
+    <h2>Update Activity</h2>
+    <input type="hidden" id="updateActivityId" placeholder="Activity ID">
+    <input type="date" id="updateActivityDate" placeholder="Date">
+    <input type="time" id="updateActivityTime" placeholder="Time">
+    <input type="text" id="updateActivityLocation" placeholder="Location (URL)">
+    <input type="number" id="updateActivityPrice" placeholder="Price">
+    <input type="text" id="updateActivityCategory" placeholder="Category (ID)">
+    <input type="text" id="updateActivityTags" placeholder="Tags (comma separated)">
+    <input type="text" id="updateActivityDiscounts" placeholder="Special Discounts">
+    <select id="updateBookingOpen">
+      <option value="true">Booking Open</option>
+      <option value="false">Booking Closed</option>
+    </select>
+    <button onclick="updateActivity()">Update Activity</button>
+  </div>
+
+  <script>
+    let currentActivityId = null; // To hold the current activity ID for updates
+
+    // Function to fetch Activities
+    async function fetchActivities() {
+      try {
+        const response = await fetch('http://localhost:8000/getActivity'); // Fetch data from the API
+        const data = await response.json(); // Parse the response to JSON
+
+        const container = document.getElementById('activityContainer');
+        container.innerHTML = ''; // Clear any existing data
+
+        if (response.ok && data.length > 0) {
+          data.forEach(activity => {
+            const activityElement = document.createElement('div');
+            activityElement.className = 'activity';
+
+            // Creating elements dynamically for each activity
+            activityElement.innerHTML = `
+              <h2>${activity.date} ${activity.time}</h2>
+              <p>Location: ${activity.location}</p>
+              <p>Price: ${activity.price}</p>
+              <p>Category ID: ${activity.category}</p>
+              <p>Tags: ${activity.tags.join(', ')}</p>
+              <p>Special Discounts: ${activity.specialDiscounts}</p>
+              <p><strong>Booking Open: ${activity.bookingOpen ? 'Yes' : 'No'}</strong></p>
+              <button class="delete-button" onclick="deleteActivity('${activity.id}')">Delete Activity</button>
+              <button class="update-button" onclick="showUpdateForm('${activity.id}', '${activity.date}', '${activity.time}', '${activity.location}', ${activity.price}, '${activity.category}', '${activity.tags.join(',')}', '${activity.specialDiscounts}', ${activity.bookingOpen})">Update Activity</button>
+            `;
+
+            container.appendChild(activityElement);
+          });
+        } else {
+          container.innerHTML = '<p>No activities available at the moment.</p>';
+        }
+      } catch (error) {
+        console.error('Error fetching activities:', error);
+        document.getElementById('activityContainer').innerHTML = '<p>Failed to load activities.</p>';
+      }
+    }
+
+    // Function to toggle the create form visibility
+    function toggleCreateForm() {
+      const formContainer = document.getElementById('createFormContainer');
+      formContainer.style.display = formContainer.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // Function to create a new activity
+    async function createActivity() {
+      const date = document.getElementById('activityDate').value;
+      const time = document.getElementById('activityTime').value;
+      const location = document.getElementById('activityLocation').value;
+      const price = document.getElementById('activityPrice').value;
+      const category = document.getElementById('activityCategory').value;
+      const tags = document.getElementById('activityTags').value.split(',').map(tag => tag.trim());
+      const specialDiscounts = document.getElementById('activityDiscounts').value;
+      const bookingOpen = document.getElementById('bookingOpen').value === 'true';
+
+      try {
+        const response = await fetch('http://localhost:8000/createActivity', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            date,
+            time,
+            location,
+            price,
+            category,
+            tags,
+            specialDiscounts,
+            bookingOpen
+          }),
+        });
+
+        if (response.ok) {
+          alert('Activity created successfully!');
+          fetchActivities(); // Refresh the activities after creation
+          document.getElementById('createFormContainer').style.display = 'none'; // Hide form after creation
+        } else {
+          const errorData = await response.json();
+          alert(`Error: ${errorData.error}`);
+        }
+      } catch (error) {
+        console.error('Error creating activity:', error);
+        alert('Failed to create activity.');
+      }
+    }
+
+    // Function to show update form with pre-filled values
+    function showUpdateForm(id, date, time, location, price, category, tags, specialDiscounts, bookingOpen) {
+      currentActivityId = id; // Set the current activity ID for updates
+      document.getElementById('updateActivityId').value = id;
+      document.getElementById('updateActivityDate').value = date;
+      document.getElementById('updateActivityTime').value = time;
+      document.getElementById('updateActivityLocation').value = location;
+      document.getElementById('updateActivityPrice').value = price;
+      document.getElementById('updateActivityCategory').value = category;
+      document.getElementById('updateActivityTags').value = tags;
+      document.getElementById('updateActivityDiscounts').value = specialDiscounts;
+      document.getElementById('updateBookingOpen').value = bookingOpen;
+
+      document.getElementById('updateFormContainer').style.display = 'block'; // Show update form
+    }
+
+    // Function to update an existing activity
+    async function updateActivity() {
+      const id = currentActivityId;
+      const date = document.getElementById('updateActivityDate').value;
+      const time = document.getElementById('updateActivityTime').value;
+      const location = document.getElementById('updateActivityLocation').value;
+      const price = document.getElementById('updateActivityPrice').value;
+      const category = document.getElementById('updateActivityCategory').value;
+      const tags = document.getElementById('updateActivityTags').value.split(',').map(tag => tag.trim());
+      const specialDiscounts = document.getElementById('updateActivityDiscounts').value;
+      const bookingOpen = document.getElementById('updateBookingOpen').value === 'true';
+
+      try {
+        const response = await fetch(`http://localhost:8000/updateActivity/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            date,
+            time,
+            location,
+            price,
+            category,
+            tags,
+            specialDiscounts,
+            bookingOpen
+          }),
+        });
+
+        if (response.ok) {
+          alert('Activity updated successfully!');
+          fetchActivities(); // Refresh the activities after update
+          document.getElementById('updateFormContainer').style.display = 'none'; // Hide form after update
+        } else {
+          const errorData = await response.json();
+          alert(`Error: ${errorData.error}`);
+        }
+      } catch (error) {
+        console.error('Error updating activity:', error);
+        alert('Failed to update activity.');
+      }
+    }
+
+    // Function to delete an activity
+    async function deleteActivity(id) {
+      if (confirm('Are you sure you want to delete this activity?')) {
+        try {
+          const response = await fetch(`http://localhost:8000/deleteActivity/${id}`, {
+            method: 'DELETE',
+          });
+
+          if (response.ok) {
+            alert('Activity deleted successfully!');
+            fetchActivities(); // Refresh the activities after deletion
+          } else {
+            const errorData = await response.json();
+            alert(`Error: ${errorData.error}`);
+          }
+        } catch (error) {
+          console.error('Error deleting activity:', error);
+          alert('Failed to delete activity.');
+        }
+      }
+    }
+
+    // Load Activities when the page is loaded
+    window.onload = fetchActivities;
+    window.onfocus = fetchActivities;
+  </script>
+
+</body>
+</html>

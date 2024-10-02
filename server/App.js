@@ -10,7 +10,7 @@ require("dotenv").config();
 
 //calling for controllers
 const {createTourGuide,getTourGuide, updateTourGuide, deleteTourGuide} = require("./Controllers/tourGuideController");
-const {createAdvertiser,getAdvertiser,
+const {createAdvertiser,getAdvertiser,getAdvertiserByUsername,
   updateAdvertiser,createActivity, getActivity, updateActivity, deleteActivity} = require("./Controllers/advertiserController");
 
 const MongoURI =
@@ -61,6 +61,8 @@ app.delete("/deletetgprofile", deleteTourGuide);
 app.use(express.json())
 app.post("/createAdvertiserProfile",createAdvertiser);
 app.get("/getAdvertiser", getAdvertiser);
+app.get("/getAdvertiserByUsername", getAdvertiserByUsername);
+app.post("/getAdvertiserByUsername", getAdvertiserByUsername);
 app.put("/updateAdvertiser", updateAdvertiser);
 //routes for activity
 app.use(express.json())
