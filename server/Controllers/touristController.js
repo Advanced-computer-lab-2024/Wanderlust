@@ -1,4 +1,7 @@
 const touristModel = require("../Models/Tourist");
+const locationsModel = require("../Models/Locations");
+const activityModel = require("../Models/Activity");
+const itineraryModel = require("../Models/Itinerary");
 const { default: mongoose } = require("mongoose");
 
 const getTourist = async (req, res) => {
@@ -32,6 +35,8 @@ const createTourist = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+
 
 const updateTourist = async (req, res) => {
   try {
