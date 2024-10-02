@@ -20,10 +20,6 @@ const {
   getAdvertiser,
   getAdvertiserByUsername,
   updateAdvertiser,
-  createActivity,
-  getActivity,
-  updateActivity,
-  deleteActivity,
 } = require("./Controllers/advertiserController");
 
 const MongoURI =

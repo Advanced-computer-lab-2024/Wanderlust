@@ -64,6 +64,13 @@ const updateAdvertiser = async (req, res) => {
   }
 };
 
+module.exports = {
+  createAdvertiser,
+  getAdvertiser,
+  getAdvertiserByUsername,
+  updateAdvertiser,
+};
+
 // const deleteAdvertiser = async (req, res) => {
 //   const { username } = req.params;
 

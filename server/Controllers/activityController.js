@@ -107,10 +107,6 @@ const deleteActivity = async (req, res) => {
 };
 
 module.exports = {
-  createAdvertiser,
-  getAdvertiser,
-  getAdvertiserByUsername,
-  updateAdvertiser,
   createActivity,
   getActivity,
   updateActivity,
