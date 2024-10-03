@@ -21,6 +21,13 @@ const {
   getAdvertiserByUsername,
   updateAdvertiser,
 } = require("./Controllers/advertiserController");
+//new 
+const {
+  createCategory,
+  getCategories,
+  updateCategory,
+  deleteCategory,
+} = require("./Controllers/ActivityCatController");
 
 const MongoURI =
   "mongodb+srv://alimousa2003:33Dt6AmBI1uV9DG7@mernapp.l0tdo.mongodb.net/?retryWrites=true&w=majority&appName=MernApp";
@@ -49,13 +56,14 @@ const preferenceTagRoutes = require("./Routes/PreferenceTagRoutes");
 const productRoutes = require("./Routes/productRoutes");
 const adminRoutes = require("./Routes/adminRoutes");
 const touristRoutes = require("./Routes/touristRoutes");
-const ActivityCategoryRoutes = require("./Routes/ActivityCategoryRoutes");
+//const ActivityCategoryRoutes = require("./Routes/ActivityCategoryRoutes");
 const activityRoutes = require("./Routes/ActivityRoutes");
+
 //Routes
 app.use("/api/tourist", touristRoutes);
 app.use("/api", productRoutes);
 app.use("/api", adminRoutes);
-app.use("/api", ActivityCategoryRoutes);
+//app.use("/api", ActivityCategoryRoutes);
 app.use(bodyParser.json());
 app.use("/api", preferenceTagRoutes);
 app.use("/api/activityRoutes", activityRoutes);
@@ -74,3 +82,10 @@ app.get("/getAdvertiserByUsername", getAdvertiserByUsername);
 app.post("/getAdvertiserByUsername", getAdvertiserByUsername);
 app.put("/updateAdvertiser", updateAdvertiser);
 //routes for activity
+
+//routes for activity category
+app.use(express.json());
+app.post("/createCategory", createCategory);
+app.get("/getCategories", getCategories);
+app.put("/updateCategory", updateCategory);
+app.delete("/deleteCategory", deleteCategory);
