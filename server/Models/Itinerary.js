@@ -17,6 +17,11 @@ const itinerarySchema = new mongoose.Schema(
       start: { type: Date, required: true }, // Start date and time of the itinerary
       end: { type: Date, required: true }, // End date and time of the itinerary
     },
+    tag: [{
+      type: Schema.Types.ObjectId,
+      ref: 'PreferenceTag', 
+      required: true
+    }],// Tags associated with the itinerary (array 34an akeed fe kaza tag)
     language: { type: String, required: true }, // Language of the tour
     price: { type: Number, required: true }, // Price of the tour
     availableDates: [{ type: Date, required: true }], // Available dates for the tour

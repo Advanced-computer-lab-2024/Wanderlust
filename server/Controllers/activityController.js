@@ -105,10 +105,31 @@ const deleteActivity = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+//requirement 45
+//get method (app.get)
+// http://localhost:8000/api/activityRoutes/filterActivities
+const filterActivities = async (req, res) => {
+  try {
+      const { budget, date, category , ratings } = req.body;
+
+      const query = {
+          ...(budget && { price: { $gte: budget.min, $lte: budget.max } }),
+          ...(date && { date: { $gte: new Date(date.start), $lte: new Date(date.end) } }),
+          ...(category && { category }),
+          ...(ratings && { rating: { $gte: ratings.min } })
+      };
+
+      const activities = await Activity.find(query);
+      res.status(200).json(activities);
+  } catch (error) {
+      res.status(500).json({ message: error.message });
+  }
+}
 
 module.exports = {
   createActivity,
   getActivity,
   updateActivity,
   deleteActivity,
+  filterActivities,
 };
