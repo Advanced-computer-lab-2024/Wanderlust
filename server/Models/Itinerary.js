@@ -18,7 +18,7 @@ const itinerarySchema = new mongoose.Schema(
       end: { type: Date, required: true }, // End date and time of the itinerary
     },
     tag: [{
-      type: Schema.Types.ObjectId,
+      type: mongoose.Types.ObjectId,
       ref: 'PreferenceTag', 
       required: true
     }],// Tags associated with the itinerary (array 34an akeed fe kaza tag)
