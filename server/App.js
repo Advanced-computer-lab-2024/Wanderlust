@@ -61,7 +61,7 @@ const activityRoutes = require("./Routes/ActivityRoutes");
 
 //Routes
 app.use("/api/tourist", touristRoutes);
-app.use("/api", productRoutes);
+app.use("/api/product", productRoutes);
 app.use("/api", adminRoutes);
 //app.use("/api", ActivityCategoryRoutes);
 app.use(bodyParser.json());
