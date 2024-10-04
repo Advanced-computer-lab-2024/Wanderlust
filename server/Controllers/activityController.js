@@ -1,5 +1,6 @@
 const Activity = require("../Models/Activity.js");
 const { default: mongoose, get } = require("mongoose");
+const { findById } = require("../Models/tourGuide.js");
 
 const createActivity = async (req, res) => {
   const {
@@ -12,16 +13,7 @@ const createActivity = async (req, res) => {
     specialDiscounts,
     bookingOpen,
   } = req.body;
-
-  try {
-    // Ensure the category exists (if provided)
-    if (category) {
-      const activityCategory = await ActivityCategory.findById(category);
-      if (!activityCategory) {
-        return res.status(404).json({ error: "Activity category not found" });
-      }
-    }
-
+try{
     const activity = await Activity.create({
       date,
       time,
@@ -32,15 +24,15 @@ const createActivity = async (req, res) => {
       specialDiscounts,
       bookingOpen,
     });
-    res.status(200).json(activity);
+    const populatedActivity=await Activity.findById(activity._id).populate('category').populate('tags');  
+    res.status(200).json(populatedActivity);
   } catch (error) {
     res.status(400).json({ error: error.message });
-  }
-};
+  }};
 
 const getActivity = async (req, res) => {
   try {
-    const activities = await Activity.find().populate("category"); // Populating the category field
+    const activities = await Activity.find().populate('category').populate('tags');
     res.status(200).json(activities);
   } catch (error) {
     res.status(400).json({ error: error.message });

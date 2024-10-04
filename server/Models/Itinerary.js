@@ -1,38 +1,42 @@
-const mongoose = require("mongoose");
+const { date } = require('joi');
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-// Define the schema for Activities
-const activitySchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  location: { type: String, required: true }, // Activity location
-  duration: { type: Number, required: true },
-});
-
-// Define the schema for Itinerary
-const itinerarySchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true }, // Title of the itinerary
-    activities: [activitySchema], // Array of activity sub-documents
-    locations: [{ type: String, required: true }], // Locations to be visited
-    timeline: {
-      start: { type: Date, required: true }, // Start date and time of the itinerary
-      end: { type: Date, required: true }, // End date and time of the itinerary
-    },
-    tag: [{
-      type: mongoose.Types.ObjectId,
-      ref: 'PreferenceTag', 
+const itinerarySchema = new mongoose.Schema({
+    title: { 
+          type: String,
+          required: true
+       },
+    activities: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Activity',
       required: true
-    }],// Tags associated with the itinerary (array 34an akeed fe kaza tag)
-    language: { type: String, required: true }, // Language of the tour
-    price: { type: Number, required: true }, // Price of the tour
-    availableDates: [{ type: Date, required: true }], // Available dates for the tour
-    accessibility: { type: Boolean, default: false }, // Whether the tour is accessible
-    pickupLocation: { type: String, required: true }, // Pick up location
-    dropoffLocation: { type: String, required: true }, // Drop off location
-  },
-  { timestamps: true }
-); // Adds createdAt and updatedAt timestamps
+    }, 
+    locations: [{ type: String, required: true }], 
+    timeline: {
+        start: { type: Date, required: true }, // Start date and time of the itinerary
+        end: { type: Date, required: true }, // End date and time of the itinerary
+    },
+    languageOfTour: { 
+      type: String, 
+      required: true 
+    }, 
+    price: { 
+      type: Number,
+       required: true
+       }, 
+    availableDates: [{ 
+      type: Date, 
+      required: true }], 
+    accessibility: {
+       type: Boolean, 
+      default: false }, 
+    pickupLocation: { 
+      type: String,
+       required: true }, 
+    dropoffLocation: { type: String, required: true }, 
+}, 
+{ timestamps: true }); 
 
-// Create the Itinerary model
-const Itinerary = mongoose.model("Itinerary", itinerarySchema);
-
+const Itinerary = mongoose.model('Itinerary', itinerarySchema);
 module.exports = Itinerary;
