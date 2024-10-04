@@ -36,8 +36,6 @@ const createTourist = async (req, res) => {
   }
 };
 
-
-
 const updateTourist = async (req, res) => {
   try {
     const touristId = req.params.touristId;
@@ -69,4 +67,57 @@ const updateTourist = async (req, res) => {
   }
 };
 
-module.exports = { getTourist, createTourist, updateTourist };
+const viewAll = async (req, res) => {
+  const locations = await locationsModel.find();
+  const activity = await activityModel.find().populate("category");
+  const itinerary = await itineraryModel.find();
+  res.status(200).json({ locations, activity, itinerary });
+};
+
+const searchAll = async (req, res) => {
+  const { query } = req.body;
+  try {
+    const locations = await locationsModel.find({
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { tags: { $elemMatch: { $regex: query, $options: "i" } } },
+      ],
+    });
+
+    const activities = await activityModel.find({
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        {
+          category: mongoose.Types.ObjectId.isValid(query)
+            ? mongoose.Types.ObjectId(query)
+            : null,
+        },
+        { tags: { $elemMatch: { $regex: query, $options: "i" } } },
+      ].filter(Boolean),
+    });
+
+    const itineraries = await itineraryModel.find({
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        {
+          category: mongoose.Types.ObjectId.isValid(query)
+            ? mongoose.Types.ObjectId(query)
+            : null,
+        },
+        { tags: { $elemMatch: { $regex: query, $options: "i" } } },
+      ].filter(Boolean),
+    });
+
+    res.status(200).json({ locations, activities, itineraries });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  getTourist,
+  createTourist,
+  updateTourist,
+  viewAll,
+  searchAll,
+};

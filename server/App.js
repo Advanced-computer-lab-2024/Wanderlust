@@ -21,7 +21,7 @@ const {
   getAdvertiserByUsername,
   updateAdvertiser,
 } = require("./Controllers/advertiserController");
-//new 
+//new
 const {
   createCategory,
   getCategories,
@@ -66,7 +66,7 @@ app.use("/api", adminRoutes);
 //app.use("/api", ActivityCategoryRoutes);
 app.use(bodyParser.json());
 app.use("/api", preferenceTagRoutes);
-app.use("/api/activityRoutes", activityRoutes);
+app.use("/api/activity", activityRoutes);
 
 //routes for tour guide
 app.use(express.json());
