@@ -126,10 +126,21 @@ const filterActivities = async (req, res) => {
   }
 }
 
+const sortActivities = async (req, res) => {
+  try {
+      const { sortBy, orderBy } = req.body;
+      const activities = await Activity.find().sort({ [sortBy]: orderBy });
+      res.status(200).json(activities);
+  } catch (error) {
+      res.status(500).json({ message: error.message });
+  }
+}
+
 module.exports = {
   createActivity,
   getActivity,
   updateActivity,
   deleteActivity,
   filterActivities,
+  sortActivities,
 };

@@ -6,11 +6,12 @@ const {
   updateActivity,
   deleteActivity,
   filterActivities,
+  sortActivities,
 } = require("../Controllers/activityController");
 router.post("/createActivity", createActivity);
 router.get("/getActivity", getActivity);
 router.put("/updateActivity/:id", updateActivity);
 router.delete("/deleteActivity/:id", deleteActivity);
 router.get("/filterActivities", filterActivities);
-
+router.get("/sortActivities", sortActivities);
 module.exports = router;
