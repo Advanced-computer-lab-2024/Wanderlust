@@ -107,6 +107,7 @@
   </div>
 
   <button class="toggle-button" onclick="toggleCreateForm()">Create New Activity</button>
+  <button onclick="fetchActivities()">Load Activities</button>
 
   <div id="createFormContainer" class="create-form">
     <h2>Create New Activity</h2>
@@ -146,9 +147,12 @@
 
     // Function to fetch Activities
     async function fetchActivities() {
+      console.log("fetchActivities function called");
       try {
-        const response = await fetch('http://localhost:8000/getActivity'); // Fetch data from the API
-        const data = await response.json(); // Parse the response to JSON
+        const response = await fetch('http://localhost:8000/api/activity/getActivity'); // Fetch data from the API
+        console.log('Response status:', response.status); 
+        const data = await response.json();
+        console.log('Data:', data); // Parse the response to JSON
 
         const container = document.getElementById('activityContainer');
         container.innerHTML = ''; // Clear any existing data
@@ -181,7 +185,7 @@
         document.getElementById('activityContainer').innerHTML = '<p>Failed to load activities.</p>';
       }
     }
-
+  
     // Function to toggle the create form visibility
     function toggleCreateForm() {
       const formContainer = document.getElementById('createFormContainer');

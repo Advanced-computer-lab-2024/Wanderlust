@@ -10,7 +10,7 @@ const {
 } = require("../Controllers/activityController");
 router.post("/createActivity", createActivity);
 router.get("/getActivity", getActivity);
-router.put("/updateActivity/:id", updateActivity);
+router.put("/updateActivity", updateActivity);
 router.delete("/deleteActivity", deleteActivity);
 router.get("/filterActivities", filterActivities);
 router.get("/sortActivities", sortActivities);

@@ -59,14 +59,7 @@ const updateActivity = async (req, res) => {
       return res.status(404).json({ error: "Activity not found" });
     }
 
-    // Ensure the category exists (if provided)
-    if (category) {
-      const activityCategory = await ActivityCategory.findById(category);
-      if (!activityCategory) {
-        return res.status(404).json({ error: "Activity category not found" });
-      }
-    }
-
+    
     const updatedActivity = await Activity.findByIdAndUpdate(
       id,
       {
@@ -81,8 +74,9 @@ const updateActivity = async (req, res) => {
       },
       { new: true, runValidators: true }
     );
+    const populatedActivity=await Activity.findById(activity._id).populate('category').populate('tags');  
+    res.status(200).json(populatedActivity);
 
-    res.status(200).json(updatedActivity);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
