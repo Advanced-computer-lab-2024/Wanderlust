@@ -5,7 +5,7 @@ const itineraryModel = require("../Models/Itinerary");
 const { default: mongoose } = require("mongoose");
 
 const getTourist = async (req, res) => {
-  const username = req.body.username;
+  const username = req.query.username;
   const tourist = await touristModel.findOne({ username: username });
   res.status(200).json(tourist);
 };
