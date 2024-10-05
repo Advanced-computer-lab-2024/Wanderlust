@@ -4,9 +4,9 @@ const Itinerary = require('../Models/Itinerary');
 const Activity = require('../Models/Activity');
 
 const createItinerary = async (req, res) => {
-    const { title, activities, locations, timeline, languageOfTour, price, availableDates, accessibility, pickupLocation, dropoffLocation } = req.body;
+    const { title, activities, locations, timeline, languageOfTour, price,rating, availableDates, accessibility, pickupLocation, dropoffLocation } = req.body;
     try {
-        const itinerary = await Itinerary.create({ title, activities, locations, timeline, languageOfTour, price, availableDates, accessibility, pickupLocation, dropoffLocation });
+        const itinerary = await Itinerary.create({ title, activities, locations, timeline, languageOfTour, price,rating, availableDates, accessibility, pickupLocation, dropoffLocation });
         const populatedItenary = await Itinerary.findById(itinerary._id).populate('activities');
         res.status(200).json(populatedItenary);
     } catch (error) {
@@ -27,13 +27,13 @@ const getItinerary = async (req, res) => {
 };
 
 const updateItinerary = async (req, res) => {
-    const { id, title, activities, locations, timeline, languageOfTour, price, availableDates, accessibility, pickupLocation, dropoffLocation } = req.body;
+    const { id, title, activities, locations, timeline, languageOfTour, price,rating, availableDates, accessibility, pickupLocation, dropoffLocation } = req.body;
     try {
         const itenary = await Itinerary.findById(id);
         if (!itenary) {
             return res.status(404).json({ error: "Itenary not found" });
         }
-        const updatedItenary = await Itinerary.findOneAndUpdate({ _id: id }, { title, activities, locations, timeline, languageOfTour, price, availableDates, accessibility, pickupLocation, dropoffLocation }, { new: true });
+        const updatedItenary = await Itinerary.findOneAndUpdate({ _id: id }, { title, activities, locations, timeline, languageOfTour, price,rating, availableDates, accessibility, pickupLocation, dropoffLocation }, { new: true });
         res.status(200).json(updatedItenary);
     } catch (error) {
         res.status(400).json({ error: error.message });

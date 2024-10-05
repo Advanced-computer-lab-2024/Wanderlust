@@ -4,10 +4,13 @@ const { findById } = require("../Models/tourGuide.js");
 
 const createActivity = async (req, res) => {
   const {
+    name,
     date,
     time,
     location,
     price,
+    duration,
+    rating,
     category,
     tags,
     specialDiscounts,
@@ -15,10 +18,13 @@ const createActivity = async (req, res) => {
   } = req.body;
 try{
     const activity = await Activity.create({
+      name,
       date,
       time,
       location,
       price,
+      duration,
+      rating,
       category,
       tags,
       specialDiscounts,
@@ -46,6 +52,8 @@ const updateActivity = async (req, res) => {
     time,
     location,
     price,
+    duration,
+    rating,
     category,
     tags,
     specialDiscounts,
@@ -67,6 +75,8 @@ const updateActivity = async (req, res) => {
         time,
         location,
         price,
+        duration,
+        rating,
         category,
         tags,
         specialDiscounts,
