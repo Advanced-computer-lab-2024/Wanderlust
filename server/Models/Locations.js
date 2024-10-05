@@ -8,6 +8,11 @@ const locationsSchema = new Schema({
   location: { type: String, required: true },
   openingHours: { type: String, required: true },
   ticketPrices: { type: Number, required: true },
+  tags: {
+    type: mongoose.Types.ObjectId,
+    ref: "PreferenceTag",
+    required: false,
+  },
 });
 
 const Locations = mongoose.model("Locations", locationsSchema);

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #77aaff 3px solid;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        header ul {
+            padding: 0;
+            list-style: none;
+        }
+        header li {
+            float: left;
+            display: inline;
+            padding: 0 20px 0 20px;
+        }
+        .admin-details {
+            background: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .admin-details h2 {
+            margin-top: 0;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        .buttons button {
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-right: 10px;
+            text-transform: uppercase;
+        }
+        .buttons button:hover {
+            background: #77aaff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Admin Dashboard</h1>
+        </div>
+    </header>
+    <div class="container">
+        <div class="admin-details">
+            <h2>Admin Profile</h2>
+            <p><strong>Name:</strong> John Doe</p>
+            <p><strong>Email:</strong> john.doe@example.com</p>
+            <p><strong>Username:</strong> admin123</p>
+        </div>
+        <div class="buttons">
+            <button onclick="window.location.href='addAdmin.html'">Add Another Admin</button>
+            <button onclick="window.location.href='addTourismGovernor.html'">Add Tourism Governor</button>
+            <button onclick="window.location.href='allusers.html'">Get All Users</button>
+            <button onclick="window.location.href='activityCategory.html'">Activity Categories</button>
+            <button onclick="window.location.href='preferenceTags.html'">Preference Tags</button>
+            <button onclick="window.location.href='products.html'">Available Products</button>
+        </div>
+    </div>
+</body>
+</html>

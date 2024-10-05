@@ -14,13 +14,23 @@ const createTourGuide = async(req,res) => {
     }
  }
 
-const getTourGuide = async (req, res) => {
+ const getTourGuide = async (req, res) => {
    try {
+      // Fetch the username from query parameters (e.g., ?username=ah1)
+    
 
-      const tourGuide = await tourGuideModel.find(); 
-      res.status(200).json(tourGuide); 
+      // Find the tour guide by username
+      const tourGuide = await tourGuideModel.findOne({ userName: "AmrHesham1" });
+
+      // If no tour guide is found, return 404
+      if (!tourGuide) {
+         return res.status(404).json({ error: 'Tour guide not found' });
+      }
+
+      // Send the tour guide details in response
+      res.status(200).json(tourGuide);
    } catch (error) {
-      res.status(400).json({ error: error.message }); 
+      res.status(400).json({ error: error.message });
    }
 };
 

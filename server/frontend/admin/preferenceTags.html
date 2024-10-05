@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Preference Tags</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #77aaff 3px solid;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        header ul {
+            padding: 0;
+            list-style: none;
+        }
+        header li {
+            float: left;
+            display: inline;
+            padding: 0 20px 0 20px;
+        }
+        .form-container, .tags-container {
+            background: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h2, .tags-container h2 {
+            margin-top: 0;
+        }
+        .form-container label, .form-container input, .form-container button {
+            display: block;
+            margin: 10px 0;
+        }
+        .form-container button {
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .form-container button:hover {
+            background: #77aaff;
+        }
+        .tag-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .tag-item:last-child {
+            border-bottom: none;
+        }
+        .tag-item button {
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .tag-item button:hover {
+            background: #77aaff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Preference Tags</h1>
+        </div>
+    </header>
+    <div class="container">
+        <div class="form-container">
+            <h2>Create Preference Tag</h2>
+            <form id="createTagForm">
+                <label for="createName">Name:</label>
+                <input type="text" id="createName" name="name" required>
+                <button type="submit">Create Tag</button>
+            </form>
+            <div id="createMessage"></div>
+        </div>
+        <div class="form-container">
+            <h2>Update Preference Tag</h2>
+            <form id="updateTagForm">
+                <label for="updateId">ID:</label>
+                <input type="text" id="updateId" name="id" required>
+                <label for="updateName">New Name:</label>
+                <input type="text" id="updateName" name="name" required>
+                <button type="submit">Update Tag</button>
+            </form>
+            <div id="updateMessage"></div>
+        </div>
+        <div class="tags-container">
+            <h2>Existing Tags</h2>
+            <div id="tags"></div>
+        </div>
+    </div>
+    <script>
+        async function fetchTags() {
+            try {
+                const response = await fetch('http://localhost:8000/admin/getPreferenceTags');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const tags = await response.json();
+                console.log('Fetched tags:', tags); // Debugging information
+                const tagsDiv = document.getElementById('tags');
+                tagsDiv.innerHTML = '';
+
+                tags.forEach(tag => {
+                    const tagItem = document.createElement('div');
+                    tagItem.className = 'tag-item';
+                    tagItem.innerHTML = `
+                        <span>${tag.name}</span>
+                        <button onclick="deleteTag('${tag._id}')">Delete</button>
+                    `;
+                    tagsDiv.appendChild(tagItem);
+                });
+            } catch (error) {
+                console.error('Error fetching tags:', error);
+            }
+        }
+
+        async function createTag(event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+
+            const name = document.getElementById('createName').value;
+
+            try {
+                const response = await fetch('http://localhost:8000/admin/createPreferenceTag', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name })
+                });
+
+                const result = await response.json();
+                const messageDiv = document.getElementById('createMessage');
+
+                if (response.ok) {
+                    messageDiv.textContent = result.message;
+                    messageDiv.style.color = 'green';
+                    fetchTags(); // Refresh the tags list
+                    document.getElementById('createTagForm').reset(); // Reset the form
+                } else {
+                    messageDiv.textContent = `Error: ${result.message}`;
+                    messageDiv.style.color = 'red';
+                }
+            } catch (error) {
+                const messageDiv = document.getElementById('createMessage');
+                messageDiv.textContent = `Error: ${error.message}`;
+                messageDiv.style.color = 'red';
+            }
+        }
+
+        async function updateTag(event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+
+            const id = document.getElementById('updateId').value;
+            const name = document.getElementById('updateName').value;
+
+            try {
+                const response = await fetch('http://localhost:8000/admin/updatePreferenceTag', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id, name })
+                });
+
+                const result = await response.json();
+                const messageDiv = document.getElementById('updateMessage');
+
+                if (response.ok) {
+                    messageDiv.textContent = result.message;
+                    messageDiv.style.color = 'green';
+                    fetchTags(); // Refresh the tags list
+                    document.getElementById('updateTagForm').reset(); // Reset the form
+                } else {
+                    messageDiv.textContent = `Error: ${result.message}`;
+                    messageDiv.style.color = 'red';
+                }
+            } catch (error) {
+                const messageDiv = document.getElementById('updateMessage');
+                messageDiv.textContent = `Error: ${error.message}`;
+                messageDiv.style.color = 'red';
+            }
+        }
+
+        async function deleteTag(id) {
+            try {
+                const response = await fetch('http://localhost:8000/admin/deletePreferenceTag', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message);
+                    fetchTags(); // Refresh the tags list
+                } else {
+                    alert(`Error: ${result.message}`);
+                }
+            } catch (error) {
+                console.error('Error deleting tag:', error);
+            }
+        }
+
+        // Fetch tags when the page loads
+        window.onload = fetchTags;
+        document.getElementById('createTagForm').addEventListener('submit', createTag);
+        document.getElementById('updateTagForm').addEventListener('submit', updateTag);
+    </script>
+</body>
+</html>

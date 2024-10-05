@@ -1,29 +1,24 @@
 // External variables
 const express = require("express");
 const mongoose = require("mongoose");
-const cors = require('cors');
+const cors = require("cors");
 const bodyParser = require("body-parser");
-
 require("dotenv").config();
 //Make sure to add your MongoDB URI in the .env file as MONGO_URI="your mongodb uri"
 //Check db connection links in README file
 
-//calling for controllers
-const {createTourGuide,getTourGuide, updateTourGuide, deleteTourGuide} = require("./Controllers/tourGuideController");
-const {createAdvertiser,getAdvertiser,
-  updateAdvertiser,createActivity, getActivity, updateActivity, deleteActivity} = require("./Controllers/advertiserController");
-
-const MongoURI =
-  "mongodb+srv://alimousa2003:33Dt6AmBI1uV9DG7@mernapp.l0tdo.mongodb.net/?retryWrites=true&w=majority&appName=MernApp";
+//new
 
 //App variables
 const app = express();
-const port = process.env.PORT || "8000";
-
 app.use(express.json());
+app.use(bodyParser.json());
 app.use(cors());
 // configurations
 // Mongo DB
+const port = process.env.PORT || "8000";
+const MongoURI =
+  "mongodb+srv://alimousa2003:33Dt6AmBI1uV9DG7@mernapp.l0tdo.mongodb.net/?retryWrites=true&w=majority&appName=MernApp";
 mongoose
   .connect(MongoURI)
   .then(() => {
@@ -35,39 +30,24 @@ mongoose
   })
   .catch((err) => console.log(err));
 
-
 //routes initialisation
 const preferenceTagRoutes = require("./Routes/PreferenceTagRoutes");
-const productRoutes = require('./Routes/productRoutes');
-const adminRoutes = require('./Routes/adminRoutes');
-const tourist = require("./Routes/touristRoutes");
-const ActivityCategoryRoutes = require("./Routes/ActivityCategoryRoutes");
+const productRoutes = require("./Routes/productRoutes");
+const adminRoutes = require("./Routes/adminRoutes");
+const touristRoutes = require("./Routes/touristRoutes");
+const activityRoutes = require("./Routes/ActivityRoutes");
+const locationRoutes = require("./Routes/locationsRoutes");
+const tourGuideRoutes = require("./Routes/tourGuideRoutes");
+const advertiserRoutes = require("./Routes/advertiserRoutes");
+const categoryRoutes = require("./Routes/categoryRoutes");
+
 //Routes
-app.use("/api/tourist", tourist);
-app.use('/api', productRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api', ActivityCategoryRoutes);
-app.use(bodyParser.json());
-app.use("/api", preferenceTagRoutes);
-
-
-//routes for tour guide
-app.use(express.json())
-app.post("/createtgprofile",createTourGuide);
-app.get("/gettgprofile", getTourGuide);
-app.put("/updatetgprofile", updateTourGuide);
-app.delete("/deletetgprofile", deleteTourGuide);
-//routes for advertiser
-app.use(express.json())
-app.post("/createAdvertiserProfile",createAdvertiser);
-app.get("/getAdvertiser", getAdvertiser);
-app.put("/updateAdvertiser", updateAdvertiser);
-//routes for activity
-app.use(express.json())
-app.post('/createActivity', createActivity);
-app.get('/getActivity', getActivity);
-app.put('/updateActivity/:id', updateActivity);
-app.delete('/deleteActivity/:id', deleteActivity);
-
-
-
+app.use("/api/tourist", touristRoutes);
+app.use("/api/product", productRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/preferenceTag", preferenceTagRoutes);
+app.use("/api/activity", activityRoutes);
+app.use("/api/location", locationRoutes);
+app.use("/api/tourGuide", tourGuideRoutes);
+app.use("/api/advertiser", advertiserRoutes);
+app.use("/api/category", categoryRoutes);
