@@ -9,7 +9,8 @@ const locationsSchema = new Schema({
   openingHours: { type: String, required: true },
   ticketPrices: { type: Number, required: true },
   tags: {
-    type: [String],
+    type: mongoose.Types.ObjectId,
+    ref: "PreferenceTag",
     required: false,
   },
 });
