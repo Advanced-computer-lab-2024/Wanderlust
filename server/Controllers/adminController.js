@@ -32,12 +32,12 @@ const adminLogin = async (req, res) => {
 };
 const createAdmin = async (req, res) => {
     try {
-        const { name, email, password, role, username } = req.body;
+        const { name, email, password, username } = req.body;
         const existingAdmin = await adminModel.findOne({ username });
         if (existingAdmin) {
             return res.status(400).json({ message: 'Username already exists' });
         }
-        const newAdmin = new adminModel({ name, email, password, role, username });
+        const newAdmin = new adminModel({ name, email, password, username });
         await newAdmin.save();
         res.status(201).json({ message: 'Admin created successfully' });
     } catch (error) {
