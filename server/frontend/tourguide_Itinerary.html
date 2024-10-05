@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tour Guide Itinerary</title>
   <style>
-    /* Add some styling for the itinerary page */
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
@@ -16,7 +15,6 @@
       text-align: center;
     }
 
-    /* Nav bar styling as before */
     nav {
       background-color: #333;
       padding: 10px;
@@ -36,11 +34,68 @@
       border-radius: 4px;
     }
 
+    .itinerary {
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .activity {
+      margin: 10px 0;
+    }
+
+    .activity h3 {
+      margin: 0;
+    }
+
+    .delete-button {
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .delete-button:hover {
+      background-color: #ff1a1a;
+    }
+
+    .update-form {
+      display: none;
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .update-form input, .update-form select {
+      width: 100%;
+      margin: 5px 0;
+      padding: 8px;
+    }
+
+    .update-button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .update-button:hover {
+      background-color: #45a049;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Navigation Bar -->
+  
+
   <nav>
     <a>Tour Guide</a>
     <a href="tourguide_profile.html">Profile</a>
@@ -50,10 +105,408 @@
 
   <h1>Tour Guide Itinerary</h1>
 
-  <div>
-    <!-- Itinerary content will go here -->
-    <p>This page will display itineraries associated with the tour guides.</p>
+  <button id="toggleCreateFormButton" >Create New Itinerary</button>
+
+  <div id="createFormContainer" class="create-form" style="display:none;">
+    
+    <h2>Create New Itinerary</h2>
+    <form id="createItineraryForm">
+      <label for="title">Title:</label>
+      <input type="text" id="createTitle" name="title" required>
+      
+      <!-- Dropdown for selecting activities -->
+      <label for="activities">Select Activities:</label>
+      <select id="createActivities" name="activities" multiple size="5" required>
+        <!-- Your options here -->
+        <option value="1">Activity 1</option>
+        <option value="2">Activity 2</option>
+        <option value="3">Activity 3</option>
+        <option value="4">Activity 4</option>
+        <option value="5">Activity 5</option>
+      </select>
+    
+      <script>
+     document.addEventListener('DOMContentLoaded', function () {
+  const selectElement = document.getElementById('createActivities');
+
+  // Handle mousedown instead of click to prevent default behavior
+  selectElement.addEventListener('mousedown', function(event) {
+    event.preventDefault(); // Prevent the default behavior
+    const option = event.target;
+
+    // Toggle selection state manually
+    if (option.tagName === 'OPTION') {
+      option.selected = !option.selected;
+    }
+  });
+});
+        </script>
+    
+      
+      
+      <label for="locations">Locations (comma separated):</label>
+      <input type="text" id="createLocations" name="locations" required>
+      
+      <label for="timelineStart">Timeline Start:</label>
+      <input type="datetime-local" id="createTimelineStart" name="timeline.start" required>
+      
+      <label for="timelineEnd">Timeline End:</label>
+      <input type="datetime-local" id="createTimelineEnd" name="timeline.end" required>
+      
+      <label for="languageOfTour">Language of Tour:</label>
+      <input type="text" id="createLanguageOfTour" name="languageOfTour" required>
+      
+      <label for="price">Price:</label>
+      <input type="number" id="createPrice" name="price" required>
+      
+      <label for="availableDates">Available Dates (comma separated):</label>
+      <input type="text" id="createAvailableDates" name="availableDates" required>
+      
+      <label for="accessibility">Accessibility:</label>
+      <input type="text" id="createAccessibility" name="accessibility" required>
+      
+      <label for="pickupLocation">Pickup Location:</label>
+      <input type="text" id="createPickupLocation" name="pickupLocation" required>
+      
+      <label for="dropoffLocation">Dropoff Location:</label>
+      <input type="text" id="createDropoffLocation" name="dropoffLocation" required>
+      
+      <button type="submit" class="create-button">Create Itinerary</button>
+    </form>
   </div>
+
+  <div id="itineraryContainer">
+    <!-- Itinerary content will be loaded here -->
+  </div>
+
+  <button class="update-button" onclick="openUpdateForm('${itinerary._id}')">Update Itinerary</button>
+    <h2>Update Itinerary</h2>
+    <form id="updateItineraryForm">
+      <input type="hidden" id="itineraryId" name="id">
+      <label for="title">Title:</label>
+      <input type="text" id="title" name="title" required>
+      <label for="locations">Locations (comma separated):</label>
+      <input type="text" id="locations" name="locations" required>
+      <label for="timelineStart">Timeline Start:</label>
+      <input type="datetime-local" id="timelineStart" name="timeline.start" required>
+      <label for="timelineEnd">Timeline End:</label>
+      <input type="datetime-local" id="timelineEnd" name="timeline.end" required>
+      <label for="languageOfTour">Language of Tour:</label>
+      <input type="text" id="languageOfTour" name="languageOfTour" required>
+      <label for="price">Price:</label>
+      <input type="number" id="price" name="price" required>
+      <label for="availableDates">Available Dates (comma separated):</label>
+      <input type="text" id="availableDates" name="availableDates" required>
+      <label for="accessibility">Accessibility:</label>
+      <input type="text" id="accessibility" name="accessibility" required>
+      <label for="pickupLocation">Pickup Location:</label>
+      <input type="text" id="pickupLocation" name="pickupLocation" required>
+      <label for="dropoffLocation">Dropoff Location:</label>
+      <input type="text" id="dropoffLocation" name="dropoffLocation" required>
+      <button type="submit" class="update-button">Update Itinerary</button>
+      <button type="button" onclick="toggleUpdateForm()">Cancel</button>
+    </form>
+  </div>
+
+  <script>
+    
+    // Function to toggle the create itinerary form visibility
+function toggleCreateForm() {
+  const formContainer = document.getElementById('createFormContainer');
+  const toggleButton = document.getElementById('toggleCreateFormButton');
+  
+  if (formContainer.style.display === 'none') {
+    formContainer.style.display = 'block';
+    toggleButton.textContent = 'Hide Create Itinerary Form';
+  } else {
+    formContainer.style.display = 'none';
+    toggleButton.textContent = 'Create New Itinerary';
+  }
+}
+
+
+
+// Add an event listener to the button to trigger the toggle function
+document.getElementById('toggleCreateFormButton').addEventListener('click', toggleCreateForm);
+    // Function to fetch itinerary data from the API
+    async function fetchItineraries() {
+      try {
+        const response = await fetch('http://localhost:8000/getItinerary'); // Adjust the API endpoint as needed
+        const data = await response.json();
+        console.error(data);
+
+        const container = document.getElementById('itineraryContainer');
+        container.innerHTML = '';
+
+        if (response.ok && data.length > 0) {
+          data.forEach(itinerary => {
+            const itineraryElement = document.createElement('div');
+            itineraryElement.className = 'itinerary';
+            itineraryElement.innerHTML = `
+              <h2>${itinerary.title}</h2>
+              <p><strong>Timeline:</strong> ${new Date(itinerary.timeline.start).toLocaleString()} to ${new Date(itinerary.timeline.end).toLocaleString()}</p>
+              <p><strong>Price:</strong> $${itinerary.price}</p>
+              <p><strong>Language of Tour:</strong> ${itinerary.languageOfTour}</p>
+              <p><strong>Locations:</strong> ${itinerary.locations.join(', ')}</p>
+              <h3>Activities:</h3>
+              ${itinerary.activities.map(activity => `
+                <div class="activity">
+                  <h4>${activity.date} at ${activity.time}</h4>
+                  <p>Location: <a href="${activity.location}" target="_blank">${activity.location}</a></p>
+                  <p>Price: ${activity.price}</p>
+                  <p>Special Discounts: ${activity.specialDiscounts}</p>
+                  <p><strong>Booking Open: ${activity.bookingOpen ? 'Yes' : 'No'}</strong></p>
+                </div>
+              `).join('')}
+              <button class="delete-button" onclick="deleteItinerary('${itinerary._id}')">Delete Itinerary</button>
+              <button class="update-button" onclick="openUpdateForm('${itinerary._id}')">Update Itinerary</button>
+            `;
+            container.appendChild(itineraryElement);
+          });
+        } else {
+          container.innerHTML = '<p>No itineraries available at the moment.</p>';
+        }
+      } catch (error) {
+        console.error('Error fetching itineraries:', error);
+        document.getElementById('itineraryContainer').innerHTML = '<p>Failed to load itineraries.</p>';
+      }
+    }
+
+    // Function to delete an itinerary
+    async function deleteItinerary(id) {
+      try {
+        const response = await fetch(`http://localhost:8000/deleteItinerary/${id}`, {
+          method: 'DELETE'
+        });
+        
+        if (response.ok) {
+          fetchItineraries(); // Refresh the itinerary list after deletion
+        } else {
+          const errorData = await response.json();
+          console.error('Error deleting itinerary:', errorData.error);
+          alert('Failed to delete itinerary: ' + errorData.error);
+        }
+      } catch (error) {
+        console.error('Error deleting itinerary:', error);
+        alert('Failed to delete itinerary.');
+      }
+    }
+
+    // Function to open the update form and populate it with existing data
+    function openUpdateForm(id) {
+      const itinerary = getItineraryById(id);
+      if (itinerary) {
+        document.getElementById('itineraryId').value = itinerary._id;
+        document.getElementById('title').value = itinerary.title;
+        document.getElementById('locations').value = itinerary.locations.join(', ');
+        document.getElementById('timelineStart').value = new Date(itinerary.timeline.start).toISOString().slice(0, 16);
+        document.getElementById('timelineEnd').value = new Date(itinerary.timeline.end).toISOString().slice(0, 16);
+        document.getElementById('languageOfTour').value = itinerary.languageOfTour;
+        document.getElementById('price').value = itinerary.price;
+        document.getElementById('availableDates').value = itinerary.availableDates.join(', ');
+        document.getElementById('accessibility').value = itinerary.accessibility;
+        document.getElementById('pickupLocation').value = itinerary.pickupLocation;
+        document.getElementById('dropoffLocation').value = itinerary.dropoffLocation;
+
+        toggleUpdateForm();
+      }
+    }
+
+    // Function to toggle the update form visibility
+    function toggleUpdateForm() {
+  const formContainer = document.getElementById('updateFormContainer');
+  if (formContainer.style.display === 'none' || formContainer.style.display === '') {
+    formContainer.style.display = 'block';
+  } else {
+    formContainer.style.display = 'none';
+  }
+}
+function getItineraryById(id) {
+  const itineraries = JSON.parse(localStorage.getItem('itineraries')) || [];
+  return itineraries.find(itinerary => itinerary._id === id);
+}
+
+    // Function to handle form submission for updating an itinerary
+    document.getElementById('updateItineraryForm').addEventListener('submit', async (event) => {
+      event.preventDefault(); // Prevent default form submission
+
+      const id = document.getElementById('itineraryId').value;
+      const title = document.getElementById('title').value;
+      const locations = document.getElementById('locations').value.split(',').map(loc => loc.trim());
+      const timeline = {
+        start: new Date(document.getElementById('timelineStart').value).toISOString(),
+        end: new Date(document.getElementById('timelineEnd').value).toISOString()
+      };
+      const languageOfTour = document.getElementById('languageOfTour').value;
+      const price = parseFloat(document.getElementById('price').value);
+      const availableDates = document.getElementById('availableDates').value.split(',').map(date => date.trim());
+      const accessibility = document.getElementById('accessibility').value;
+      const pickupLocation = document.getElementById('pickupLocation').value;
+      const dropoffLocation = document.getElementById('dropoffLocation').value;
+
+      const response = await fetch(`http://localhost:8000/updateItinerary`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id, title, activities, locations, timeline, languageOfTour, price, availableDates, accessibility, pickupLocation, dropoffLocation }),
+      });
+
+      if (response.ok) {
+        alert('Itinerary updated successfully!');
+        fetchItineraries(); // Refresh the itinerary list after updating
+        toggleUpdateForm(); // Hide the update form
+      } else {
+        const errorData = await response.json();
+        console.error('Error updating itinerary:', errorData.error);
+        alert('Failed to update itinerary: ' + errorData.error);
+      }
+    });
+
+    // Call the function to fetch itineraries when the page loads
+    document.addEventListener('DOMContentLoaded', fetchItineraries);
+
+    document.getElementById('createItineraryForm').addEventListener('submit', async function(event) {
+  event.preventDefault(); // Prevent the form from submitting the traditional way
+
+  // Get values from the form fields
+  const title = document.getElementById('createTitle').value;
+  const activities = Array.from(document.getElementById('createActivities').selectedOptions).map(option => option.value);
+  const locations = document.getElementById('createLocations').value.split(',').map(location => location.trim());
+  const timeline = {
+    start: new Date(document.getElementById('createTimelineStart').value).toISOString(),
+    end: new Date(document.getElementById('createTimelineEnd').value).toISOString()
+  };
+  const languageOfTour = document.getElementById('createLanguageOfTour').value;
+  const price = parseFloat(document.getElementById('createPrice').value);
+  const availableDates = document.getElementById('createAvailableDates').value.split(',').map(date => date.trim());
+  const accessibility = document.getElementById('createAccessibility').value;
+  const pickupLocation = document.getElementById('createPickupLocation').value;
+  const dropoffLocation = document.getElementById('createDropoffLocation').value;
+
+  // Create the data object to send
+  const data = {
+    title,
+    activities,  
+    locations,
+    timeline,
+    languageOfTour,
+    price,
+    availableDates,
+    accessibility,
+    pickupLocation,
+    dropoffLocation
+  };
+
+  try {
+    // Send the data to the server using fetch
+    const response = await fetch('http://localhost:8000/createItinerary', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      alert('Itinerary created successfully!');
+      fetchItineraries(); // Optionally refresh the itineraries list
+    } else {
+      console.error('Error:', result.error);
+      alert('Failed to create itinerary: ' + result.error);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('An error occurred while creating the itinerary.');
+  }
+});
+  // Function to fetch activities and populate the dropdown using the existing /getActivity API
+  async function fetchActivities() {
+    try {
+      const response = await fetch('http://localhost:8000/api/activity/getActivity'); // Use the existing API endpoint
+      const activities = await response.json();
+
+      const activitiesDropdown = document.getElementById('createActivities');
+      activitiesDropdown.innerHTML = ''; // Clear existing options
+
+      if (response.ok && activities.length > 0) {
+        activities.forEach(activity => {
+          const option = document.createElement('option');
+          option.value = activity._id;  // Use the activity ID as the value
+          option.text = activity.name;  // Use the activity name as the text
+          activitiesDropdown.appendChild(option);
+        });
+      } else {
+        activitiesDropdown.innerHTML = '<option>No activities available</option>';
+      }
+    } catch (error) {
+      console.error('Error fetching activities:', error);
+    }
+  }
+
+  // Call fetchActivities when the page loads
+  document.addEventListener('DOMContentLoaded', fetchActivities);
+
+  // Function to handle form submission for creating an itinerary
+  // document.getElementById('createItineraryForm').addEventListener('submit', async function(event) {
+  //   event.preventDefault(); // Prevent the form from submitting the traditional way
+
+  //   // Get values from the form fields
+  //   const title = document.getElementById('createTitle').value;
+  //   const activities = Array.from(document.getElementById('createActivities').selectedOptions).map(option => option.value); // Get selected activity IDs
+  //   const locations = document.getElementById('createLocations').value.split(',').map(location => location.trim());
+  //   const timeline = {
+  //     start: new Date(document.getElementById('createTimelineStart').value).toISOString(),
+  //     end: new Date(document.getElementById('createTimelineEnd').value).toISOString()
+  //   };
+  //   const languageOfTour = document.getElementById('createLanguageOfTour').value;
+  //   const price = parseFloat(document.getElementById('createPrice').value);
+  //   const availableDates = document.getElementById('createAvailableDates').value.split(',').map(date => date.trim());
+  //   const accessibility = document.getElementById('createAccessibility').value;
+  //   const pickupLocation = document.getElementById('createPickupLocation').value;
+  //   const dropoffLocation = document.getElementById('createDropoffLocation').value;
+
+  //   // Create the data object to send
+  //   const data = {
+  //     title,
+  //     activities,  // Send the selected activity IDs
+  //     locations,
+  //     timeline,
+  //     languageOfTour,
+  //     price,
+  //     availableDates,
+  //     accessibility,
+  //     pickupLocation,
+  //     dropoffLocation
+  //   };
+
+  //   try {
+  //     // Send the data to the server using fetch
+  //     const response = await fetch('http://localhost:8000/createItinerary', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: JSON.stringify(data)
+  //     });
+
+  //     const result = await response.json();
+
+  //     if (response.ok) {
+  //       alert('Itinerary created successfully!');
+  //       // Optionally, refresh the itineraries list or do something else
+  //     } else {
+  //       console.error('Error:', result.error);
+  //       alert('Failed to create itinerary: ' + result.error);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //     alert('An error occurred while creating the itinerary.');
+  //   }
+  // });
+  // </script>
 
 </body>
 </html>
