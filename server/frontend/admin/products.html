@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Products</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #77aaff 3px solid;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        header ul {
+            padding: 0;
+            list-style: none;
+        }
+        header li {
+            float: left;
+            display: inline;
+            padding: 0 20px 0 20px;
+        }
+        .form-container {
+            background: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h2 {
+            margin-top: 0;
+        }
+        .form-container label, .form-container input {
+            display: block;
+            margin: 10px 0;
+        }
+        .form-container button {
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .form-container button:hover {
+            background: #77aaff;
+        }
+        .products-container {
+            background: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .products-container h2 {
+            margin-top: 0;
+        }
+        .product-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        .delete-button {
+            background: #810808;
+            color: #fff;
+            border: none;
+            padding: 3px 7px;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-right: 10px;
+            font-size: 12px;
+        }
+        .delete-button:hover {
+            background: #af3f3f;
+        }
+        nav {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        nav a {
+            color: #fff; 
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 10px;
+            padding: 10px 15px;
+        }
+        nav a:hover {
+            color: #93badd; 
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="adminDashboard.html">Dashboard</a>
+                <a href="addAdmin.html">Add Admin</a>
+                <a href="addTourismGovernor.html">Add Tourism Governor</a>
+                <a href="allusers.html">get all users</a>
+                <a href="activityCategory.html">Activity Categories</a>
+                <a href="preferenceTags.html">Preference Tags</a>
+            </nav>
+            <h1>Manage Products</h1>
+        </div>
+    </header>
+    <div class="container">
+        <div class="form-container">
+            <h2>Add Product</h2>
+            <form id="addProductForm">
+                <label for="addName">Name:</label>
+                <input type="text" id="addName" name="name" required>
+
+                <label for="addPrice">Price:</label>
+                <input type="number" id="addPrice" name="price" required>
+
+                <label for="addDescription">Description:</label>
+                <input type="text" id="addDescription" name="description" required>
+
+                <label for="addQuantity">Quantity:</label>
+                <input type="number" id="addQuantity" name="quantity" required>
+
+                <label for="addRating">Rating:</label>
+                <input type="number" id="addRating" name="rating" required>
+
+                <label for="addReviews">Reviews:</label>
+                <input type="text" id="addReviews" name="reviews">
+
+                <label for="addSeller">Seller:</label>
+                <input type="text" id="addSeller" name="seller">
+
+                <label for="addPicture">Picture URL:</label>
+                <input type="text" id="addPicture" name="picture">
+
+                <button type="submit">Add Product</button>
+            </form>
+            <div id="addMessage"></div>
+        </div>
+        <div class="form-container">
+            <h2>Update Product</h2>
+            <form id="updateProductForm">
+                <label for="updateName">Name:</label>
+                <input type="text" id="updateName" name="name" required>
+
+                <label for="updatePrice">New Price:</label>
+                <input type="number" id="updatePrice" name="price" required>
+
+                <label for="updateDescription">New Description:</label>
+                <input type="text" id="updateDescription" name="description" required>
+
+                <button type="submit">Update Product</button>
+            </form>
+            <div id="updateMessage"></div>
+        </div>
+        <div class="products-container">
+            <h2>Available Products</h2>
+            <label for="sortOrder">Sort by Rating:</label>
+            <select id="sortOrder" onchange="fetchProducts()">
+                <option value="desc">Highest to Lowest</option>
+                <option value="asc">Lowest to Highest</option>
+            </select>
+            <div class="form-group">
+                <label for="searchName">Product Name:</label>
+                <input type="text" class="form-control" id="searchName">
+                <button class="btn btn-primary mt-2" onclick="searchProducts()">Search</button>
+            </div>
+            <label for="minPrice">Min Price:</label>
+            <input type="number" id="minPrice" name="minPrice">
+            <label for="maxPrice">Max Price:</label>
+            <input type="number" id="maxPrice" name="maxPrice">
+            <button onclick="filterProducts()">Filter</button>
+            <div id="productsList"></div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.getElementById('addProductForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+
+            const name = document.getElementById('addName').value;
+            const price = document.getElementById('addPrice').value;
+            const description = document.getElementById('addDescription').value;
+            const quantity = document.getElementById('addQuantity').value;
+            const rating = document.getElementById('addRating').value;
+            const reviews = document.getElementById('addReviews').value;
+            const seller = document.getElementById('addSeller').value;
+            const picture = document.getElementById('addPicture').value;
+            //lazem tedkhl seller id get it from user details
+
+            const data = {
+                name,
+                price,
+                description,
+                quantity,
+                rating,
+                reviews,
+                seller,
+                picture
+            };
+
+            try {
+                const response = await axios.post('http://localhost:8000/api/product/addProduct', data);
+                if (response.status === 201) {
+                    alert('Product added successfully');
+                    document.getElementById('addProductForm').reset(); 
+                    fetchProducts(); 
+                } else {
+                    alert('Failed to add product: ' + response.data.message);
+                }
+            } catch (error) {
+                if (error.response && error.response.data) {
+                    alert('An error occurred: ' + error.response.data.message);
+                } else {
+                    alert('An error occurred: ' + error.message);
+                }
+            }
+        });
+
+        document.getElementById('updateProductForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); 
+
+            const name = document.getElementById('updateName').value;
+            const price = document.getElementById('updatePrice').value;
+            const description = document.getElementById('updateDescription').value;
+
+            const data = {
+                name: name,
+                price: price,
+                description: description
+            };
+
+            try {
+                const response = await axios.put('http://localhost:8000/api/product/updateProductByName', data);
+                if (response.status === 200) {
+                    alert('Product updated successfully');
+                    document.getElementById('updateProductForm').reset(); 
+                    fetchProducts();
+                } else {
+                    alert('Failed to update product: ' + response.data.message);
+                }
+            } catch (error) {
+                if (error.response && error.response.data) {
+                    alert('An error occurred: ' + error.response.data.message);
+                } else {
+                    alert('An error occurred: ' + error.message);
+                }
+            }
+        });
+        
+        async function fetchProducts() {
+            const sortOrder = document.getElementById('sortOrder').value;
+            try {
+                const response = await fetch(`http://localhost:8000/api/product/sortedByRating?sort=${sortOrder}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const products = await response.json();
+                console.log('Fetched products:', products); 
+                const productsList = document.getElementById('productsList');
+                productsList.innerHTML = '';
+
+                products.forEach(product => {
+                    const productItem = document.createElement('div');
+                    productItem.className = 'product-item';
+                    productItem.innerHTML = `
+                        <span>Name: ${product.name}</span><br>
+                        <span>Price: $${product.price}</span><br>
+                        <span>Description: ${product.description}</span><br>
+                        <span>Quantity: ${product.quantity}</span><br>
+                        <span>Rating: ${product.rating}</span><br>
+                        <span>Reviews: ${product.reviews}</span><br>
+                        <span>Seller: ${product.seller}</span><br>
+                        <button class="delete-button" onclick="deleteProduct('${product.name}')">Delete Product</button>
+                    `;
+                    productsList.appendChild(productItem);
+                });
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        }
+       
+        async function deleteProduct(name) {
+            try {
+                const response = await axios.delete('http://localhost:8000/api/product/deleteproduct', {
+                    data: { name: name }
+                });
+                if (response.status === 200) {
+                    alert('Product deleted successfully');
+                    fetchProducts(); 
+                } else {
+                    alert('Failed to delete product: ' + response.data.message);
+                }
+            } catch (error) {
+                if (error.response && error.response.data) {
+                    alert('An error occurred: ' + error.response.data.message);
+                } else {
+                    alert('An error occurred: ' + error.message);
+                }
+            }
+        } 
+
+        async function searchProducts() {
+    const name = document.getElementById('searchName').value;
+    if (!name) {
+        alert('Please enter a product name to search');
+        return;
+    }
+
+    try {
+        const response = await axios.get('http://localhost:8000/api/product/searchProductByName', {
+            params: { name }
+        });
+        if (response.status === 200) {
+            const products = response.data.products;
+            const productsList = document.getElementById('productsList');
+            productsList.innerHTML = '';
+
+            products.forEach(product => {
+                const productItem = document.createElement('div');
+                productItem.className = 'product-item';
+                productItem.innerHTML = `
+                    <span>Name: ${product.name}</span><br>
+                    <span>Price: $${product.price}</span><br>
+                    <span>Description: ${product.description}</span><br>
+                    <span>Quantity: ${product.quantity}</span><br>
+                    <span>Rating: ${product.rating}</span><br>
+                    <span>Reviews: ${product.reviews}</span><br>
+                    <span>Seller: ${product.seller.name}</span><br>
+                    <button class="delete-button" onclick="deleteProduct('${product.name}')">Delete Product</button>
+                `;
+                productsList.appendChild(productItem);
+            });
+        } else {
+            alert('No products found');
+        }
+    } catch (error) {
+        console.error('Error searching products:', error);
+    }
+}
+
+async function filterProducts() {
+    const minPrice = document.getElementById('minPrice').value;
+    const maxPrice = document.getElementById('maxPrice').value;
+
+    try {
+        const response = await axios.get('http://localhost:8000/api/product/filterProductsByPrice', {
+            params: { minPrice, maxPrice }
+        });
+        if (response.status === 200) {
+            const products = response.data.products;
+            const productsList = document.getElementById('productsList');
+            productsList.innerHTML = '';
+
+            products.forEach(product => {
+                const productItem = document.createElement('div');
+                productItem.className = 'product-item';
+                productItem.innerHTML = `
+                    <span>Name: ${product.name}</span><br>
+                    <span>Price: $${product.price}</span><br>
+                    <span>Description: ${product.description}</span><br>
+                    <span>Quantity: ${product.quantity}</span><br>
+                    <span>Rating: ${product.rating}</span><br>
+                    <span>Reviews: ${product.reviews}</span><br>
+                    <span>Seller: ${product.seller.name}</span><br>
+                    <button class="delete-button" onclick="deleteProduct('${product.name}')">Delete Product</button>
+                `;
+                productsList.appendChild(productItem);
+            });
+        } else {
+            alert('No products found');
+        }
+    } catch (error) {
+        console.error('Error filtering products:', error);
+    }
+}
+        window.onload = fetchProducts;
+       
+    </script>
+</body>
+</html>

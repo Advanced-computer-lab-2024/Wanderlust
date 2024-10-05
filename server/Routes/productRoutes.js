@@ -9,5 +9,6 @@ router.get("/searchProductByName", productController.searchProductByName);
 router.get("/filterProductsByPrice", productController.filterProductsByPrice);
 router.get("/sortedByRating", productController.getProductsSortedByRating);
 router.get("/viewProducts", productController.viewProducts);
+router.delete("/deleteproduct", productController.deleteProductByName);
 
 module.exports = router;

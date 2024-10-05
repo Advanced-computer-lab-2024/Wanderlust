@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Admin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #77aaff 3px solid;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        header ul {
+            padding: 0;
+            list-style: none;
+        }
+        header li {
+            float: left;
+            display: inline;
+            padding: 0 20px 0 20px;
+        }
+        .form-container {
+            background: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h2 {
+            margin-top: 0;
+        }
+        .form-container label, .form-container input {
+            display: block;
+            margin: 10px 0;
+        }
+        .form-container button {
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .form-container button:hover {
+            background: #77aaff;
+        }
+        nav {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        nav a {
+            color: #fff; 
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 10px;
+            padding: 10px 15px;
+        }
+        nav a:hover {
+            color: #93badd; 
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="adminDashboard.html">Dashboard</a>
+                <a href="addTourismGovernor.html">Add Tourism Governor</a>
+                <a href="allusers.html">get all users</a>
+                <a href="activityCategory.html">Activity Categories</a>
+                <a href="preferenceTags.html">Preference Tags</a>
+                <a href="products.html">Products</a>
+            </nav>
+            <h1>Add Admin</h1>
+        </div>
+    </header>
+    <div class="container">
+        <div class="form-container">
+            <h2>Admin Details</h2>
+            <form id="addAdminForm">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+
+                <button type="submit">Create Admin</button>
+            </form>
+            <div id="message"></div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.getElementById('addAdminForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const data = {
+                name: name,
+                email: email,
+                username: username,
+                password: password
+            };
+            try {
+                const response = await axios.post('http://localhost:8000/api/admin/create', data);
+                if (response.status === 201) {
+                    alert('Admin created successfully');
+                    window.location.href = 'adminDashboard.html';
+                } else {
+                    alert('Failed to create admin: ' + response.data.message);
+                }
+            } catch (error) {
+                if (error.response && error.response.data) {
+                    alert('An error occurred: ' + error.response.data.message);
+                } else {
+                    alert('An error occurred: ' + error.message);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

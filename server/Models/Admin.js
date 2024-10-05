@@ -22,10 +22,6 @@ const AdminSchema = new Schema({
             message: props => `${props.value} is not a valid password! Password must be at least 6 characters long and contain both letters and numbers.`
         }
     },
-    role: {
-        type: String,
-        required: true
-    },
     username: {
         type: String,
         required: true,

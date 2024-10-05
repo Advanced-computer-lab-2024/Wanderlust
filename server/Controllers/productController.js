@@ -76,7 +76,7 @@ const updateProductByName = async (req, res) => {
 };
 const searchProductByName = async (req, res) => {
   try {
-    const { name } = req.body; // Change from req.query to req.body
+    const { name } = req.query;
     if (!name) {
       return res.status(400).json({ message: "Product name is required" });
     }
@@ -95,7 +95,7 @@ const searchProductByName = async (req, res) => {
 // Filter products by price
 const filterProductsByPrice = async (req, res) => {
   try {
-    const { minPrice, maxPrice } = req.body;
+    const { minPrice, maxPrice } = req.query;
     if (!minPrice && !maxPrice) {
       return res
         .status(400)
@@ -117,10 +117,11 @@ const filterProductsByPrice = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-//sort product by rating
+
 const getProductsSortedByRating = async (req, res) => {
   try {
-    const products = await Product.find().sort({ rating: -1 });
+    const sortOrder = req.query.sort === 'asc' ? 1 : -1;
+    const products = await Product.find().sort({ rating: sortOrder });
     res.status(200).json(products);
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -138,6 +139,21 @@ const viewProducts = async (req, res) => {
   }
 };
 
+const deleteProductByName = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const deletedProduct = await Product.findOneAndDelete({ name });
+    if (!deletedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
 module.exports = {
   addProduct,
   updateProductByName,
@@ -145,4 +161,5 @@ module.exports = {
   filterProductsByPrice,
   getProductsSortedByRating,
   viewProducts,
+  deleteProductByName
 };
