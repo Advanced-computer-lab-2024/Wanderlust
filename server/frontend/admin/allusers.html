@@ -84,7 +84,7 @@
     <script>
         async function fetchUsers() {
             try {
-                const response = await fetch('http://localhost:8000/api/usernames');
+                const response = await fetch('http://localhost:8000/api/admin/usernames');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -109,7 +109,7 @@
 
         async function deleteUser(username) {
             try {
-                const response = await fetch('http://localhost:8000/api/delete', {
+                const response = await fetch('http://localhost:8000/api/admin/delete', {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json'
