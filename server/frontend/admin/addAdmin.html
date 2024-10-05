@@ -85,14 +85,12 @@
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required>
 
-                <label for="role">Role:</label>
-                <input type="text" id="role" name="role" required>
-
                 <button type="submit">Create Admin</button>
             </form>
             <div id="message"></div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         document.getElementById('addAdminForm').addEventListener('submit', async function(event) {
             event.preventDefault(); // Prevent the form from submitting the traditional way
@@ -101,31 +99,28 @@
             const email = document.getElementById('email').value;
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            const role = document.getElementById('role').value;
-
+            
+            const data = {
+                name: name,
+                email: email,
+                username: username,
+                password: password
+            };
             try {
-                const response = await fetch('/admin/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name, email, username, password, role })
-                });
-
-                const result = await response.json();
-                const messageDiv = document.getElementById('message');
-
-                if (response.ok) {
-                    messageDiv.textContent = result.message;
-                    messageDiv.style.color = 'green';
+                const response = await axios.post('http://localhost:8000/api/admin/create', data);
+                if (response.status === 201) {
+                    alert('Admin created successfully');
+                    // Optionally, redirect to another page
+                    window.location.href = '/server/frontend/admin/adminDashboard.html';
                 } else {
-                    messageDiv.textContent = `Error: ${result.message}`;
-                    messageDiv.style.color = 'red';
+                    alert('Failed to create admin: ' + response.data.message);
                 }
             } catch (error) {
-                const messageDiv = document.getElementById('message');
-                messageDiv.textContent = `Error: ${error.message}`;
-                messageDiv.style.color = 'red';
+                if (error.response && error.response.data) {
+                    alert('An error occurred: ' + error.response.data.message);
+                } else {
+                    alert('An error occurred: ' + error.message);
+                }
             }
         });
     </script>

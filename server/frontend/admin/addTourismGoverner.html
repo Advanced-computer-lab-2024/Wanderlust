@@ -84,36 +84,35 @@
             <div id="message"></div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         document.getElementById('addTourismGovernorForm').addEventListener('submit', async function(event) {
             event.preventDefault(); // Prevent the form from submitting the traditional way
 
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-
+            
             try {
-                const response = await fetch('http://localhost:8000/admin/addTourismGovernor', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password })
+                const response = await axios.post('http://localhost:8000/api/admin/addTourismGovernor', {
+                    username,
+                    password
                 });
 
-                const result = await response.json();
                 const messageDiv = document.getElementById('message');
-
-                if (response.ok) {
-                    messageDiv.textContent = result.message;
-                    messageDiv.style.color = 'green';
+                if (response.status === 201) {
+                    // messageDiv.innerHTML = '<div class="alert alert-success">Tourism Governor created successfully</div>';
+                    alert('Tourism Governor created successfully');
+                    window.location.href = '/server/frontend/admin/adminDashboard.html';
                 } else {
-                    messageDiv.textContent = `Error: ${result.message}`;
-                    messageDiv.style.color = 'red';
+                    messageDiv.innerHTML = '<div class="alert alert-danger">Failed to create Tourism Governor: ' + response.data.message + '</div>';
                 }
             } catch (error) {
                 const messageDiv = document.getElementById('message');
-                messageDiv.textContent = `Error: ${error.message}`;
-                messageDiv.style.color = 'red';
+                if (error.response && error.response.data) {
+                    messageDiv.innerHTML = '<div class="alert alert-danger">An error occurred: ' + error.response.data.message + '</div>';
+                } else {
+                    messageDiv.innerHTML = '<div class="alert alert-danger">An error occurred: ' + error.message + '</div>';
+                }
             }
         });
     </script>
