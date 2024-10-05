@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Activity Categories</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #77aaff 3px solid;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        header ul {
+            padding: 0;
+            list-style: none;
+        }
+        header li {
+            float: left;
+            display: inline;
+            padding: 0 20px 0 20px;
+        }
+        .form-container {
+            background: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h2 {
+            margin-top: 0;
+        }
+        .form-container label, .form-container input {
+            display: block;
+            margin: 10px 0;
+        }
+        .form-container button {
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .form-container button:hover {
+            background: #77aaff;
+        }
+        .categories-container {
+            background: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .categories-container h2 {
+            margin-top: 0;
+        }
+        .category-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        .category-item:last-child {
+            border-bottom: none;
+        }
+        .delete-button {
+            background: #810808;
+            color: #fff;
+            border: none;
+            padding: 3px 7px;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-right: 10px;
+            font-size: 12px;
+        }
+        .delete-button:hover {
+            background: #af3f3f;
+        }
+        nav {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        nav a {
+            color: #fff; 
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 10px;
+            padding: 10px 15px;
+        }
+        nav a:hover {
+            color: #93badd; 
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="adminDashboard.html">Dashboard</a>
+                <a href="addAdmin.html">Add Admin</a>
+                <a href="addTourismGovernor.html">Add Tourism Governor</a>
+                <a href="allusers.html">get  all users</a>
+                <a href="preferenceTags.html">Preference Tags</a>
+                <a href="products.html">Products</a>
+            </nav>
+            <h1>Manage Activity Categories</h1>
+        </div>
+    </header>
+    <div class="container">
+        <div class="form-container">
+            <h2>Create Category</h2>
+            <form id="createCategoryForm">
+                <label for="createName">Name:</label>
+                <input type="text" id="createName" name="name" required>
+                <label for="createDescription">Description:</label>
+                <input type="text" id="createDescription" name="description" required>
+                <button type="submit">Create Category</button>
+            </form>
+            <div id="createMessage"></div>
+        </div>
+        <div class="form-container">
+            <h2>Update Category</h2>
+            <form id="updateCategoryForm">
+                <label for="updateId">ID:</label>
+                <input type="text" id="updateId" name="id" required>
+                <label for="updateName">New Name:</label>
+                <input type="text" id="updateName" name="name" required>
+                <label for="updateDescription">New Description:</label>
+                <input type="text" id="updateDescription" name="description" required>
+                <button type="submit">Update Category</button>
+            </form>
+            <div id="updateMessage"></div>
+        </div>
+        <div class="categories-container">
+            <h2>Available Categories</h2>
+            <div id="categoriesList"></div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.getElementById('createCategoryForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+
+            const name = document.getElementById('createName').value;
+            const description = document.getElementById('createDescription').value;
+
+            const data = { name, description };
+
+            try {
+                const response = await axios.post('http://localhost:8000/api/category/createCategory', data);
+                if (response.status === 201) {
+                    alert('Category created successfully');
+                    document.getElementById('createCategoryForm').reset(); 
+                    fetchCategories(); 
+                } else {
+                    alert('Failed to create category: ' + response.data.message);
+                }
+            } catch (error) {
+                if (error.response && error.response.data) {
+                    alert('An error occurred: ' + error.response.data.message);
+                } else {
+                    alert('An error occurred: ' + error.message);
+                }
+            }
+        });
+
+        document.getElementById('updateCategoryForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+
+            const id = document.getElementById('updateId').value;
+            const name = document.getElementById('updateName').value;
+            const description = document.getElementById('updateDescription').value;
+
+            const data = { id, name, description };
+
+            try {
+                const response = await axios.put('http://localhost:8000/api/category/updateCategory', data);
+                if (response.status === 200) {
+                    alert('Category updated successfully');
+                    document.getElementById('updateCategoryForm').reset(); // Reset the form
+                    fetchCategories(); // Refresh the category list
+                } else {
+                    alert('Failed to update category: ' + response.data.message);
+                }
+            } catch (error) {
+                if (error.response && error.response.data) {
+                    alert('An error occurred: ' + error.response.data.message);
+                } else {
+                    alert('An error occurred: ' + error.message);
+                }
+            }
+        });
+
+        async function fetchCategories() {
+            try {
+                const response = await axios.get('http://localhost:8000/api/category/getCategories');
+                if (response.status === 200) {
+                    const categories = response.data;
+                    const categoriesList = document.getElementById('categoriesList');
+                    categoriesList.innerHTML = '';
+
+                    categories.forEach(category => {
+                        const categoryItem = document.createElement('div');
+                        categoryItem.className = 'category-item';
+                        categoryItem.innerHTML = `
+                            <span>ID: ${category._id}</span><br>
+                            <span>Name: ${category.name}</span><br>
+                            <span>Description: ${category.description}</span><br>
+                            <button class="delete-button" onclick="deleteCategory('${category._id}')">Delete</button>
+                        `;
+                        categoriesList.appendChild(categoryItem);
+                    });
+                } else {
+                    alert('Failed to fetch categories: ' + response.data.message);
+                }
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        }
+        async function deleteCategory(id) {
+            try {
+                const response = await axios.delete('http://localhost:8000/api/category/deleteCategory', { data: { id } });
+                if (response.status === 200) {
+                    alert('Category deleted successfully');
+                    fetchCategories(); // Refresh the category list
+                } else {
+                    alert('Failed to delete category: ' + response.data.message);
+                }
+            } catch (error) {
+                if (error.response && error.response.data) {
+                    alert('An error occurred: ' + error.response.data.message);
+                } else {
+                    alert('An error occurred: ' + error.message);
+                }
+            }
+        }
+
+        window.onload = fetchCategories;
+    </script>
+</body>
+</html>

@@ -11,7 +11,7 @@
             background-color: #f4f4f4;
         }
         .container {
-            width: 80%;
+            width: 50%;
             margin: auto;
             overflow: hidden;
         }
@@ -37,59 +37,104 @@
             display: inline;
             padding: 0 20px 0 20px;
         }
-        .user-list {
+        .form-container {
             background: #fff;
             padding: 20px;
             margin-top: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .user-list h2 {
+        .form-container h2 {
+            margin-top: 0;
+        }
+        .form-container label, .form-container input {
+            display: block;
+            margin: 10px 0;
+        }
+        .form-container button {
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .form-container button:hover {
+            background: #77aaff;
+        }
+        .users-container {
+            background: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .users-container h2 {
             margin-top: 0;
         }
         .user-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
             border-bottom: 1px solid #ddd;
+            padding: 10px 0;
         }
         .user-item:last-child {
             border-bottom: none;
         }
-        .user-item button {
-            background: #333;
+        .delete-button {
+            background: #810808;
             color: #fff;
             border: none;
-            padding: 5px 10px;
+            padding: 3px 7px;
             cursor: pointer;
             text-transform: uppercase;
+            margin-right: 10px;
+            font-size: 12px;
         }
-        .user-item button:hover {
-            background: #77aaff;
+        .delete-button:hover {
+            background: #af3f3f;
+        }
+        nav {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        nav a {
+            color: #fff; 
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 10px;
+            padding: 10px 15px;
+        }
+        nav a:hover {
+            color: #93badd; 
         }
     </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <h1>All Users</h1>
+            <nav>
+                <a href="adminDashboard.html">Dashboard</a>
+                <a href="addAdmin.html">Add Admin</a>
+                <a href="addTourismGovernor.html">Add Tourism Governor</a>
+                <a href="activityCategory.html">Activity Categories</a>
+                <a href="preferenceTags.html">Preference Tags</a>
+                <a href="products.html">Products</a>
+            </nav>
+            <h1>All users on the sytem</h1>
         </div>
     </header>
     <div class="container">
         <div class="user-list">
-            <h2>User Accounts</h2>
+            <h2>details of users</h2>
             <div id="users"></div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         async function fetchUsers() {
-            try {
-                const response = await fetch('http://localhost:8000/api/admin/usernames');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const users = await response.json();
-                console.log('Fetched users:', users); 
+        try {
+            const response = await axios.get('http://localhost:8000/api/admin/usernames');
+            if (response.status === 200) {
+                const users = response.data;
                 const usersDiv = document.getElementById('users');
                 usersDiv.innerHTML = '';
 
@@ -97,39 +142,40 @@
                     const userItem = document.createElement('div');
                     userItem.className = 'user-item';
                     userItem.innerHTML = `
-                        <span>${user.username} (${user.accountType})</span>
-                        <button onclick="deleteUser('${user.username}')">Delete Account</button>
+                        <span>ID: ${user.id}</span><br>
+                        <span>Username: ${user.username}</span><br>
+                        <span>Email: ${user.email}</span><br>
+                        <span>Password: ${user.password}</span><br>
+                        <span>Account Type: ${user.accountType}</span><br>
+                        <button class="delete-button" onclick="deleteUser('${user.id}')">Delete Account</button>
                     `;
                     usersDiv.appendChild(userItem);
                 });
-            } catch (error) {
-                console.error('Error fetching users:', error);
+            } else {
+                alert('Failed to fetch users: ' + response.data.message);
+            }
+        } catch (error) {
+            console.error('Error fetching users:', error);
+        }
+    }
+
+        async function deleteUser(id) {
+        try {
+            const response = await axios.delete('http://localhost:8000/api/admin/delete', { data: { id } });
+            if (response.status === 200) {
+                alert('User deleted successfully');
+                fetchUsers(); 
+            } else {
+                alert('Failed to delete user: ' + response.data.message);
+            }
+        } catch (error) {
+            if (error.response && error.response.data) {
+                alert('An error occurred: ' + error.response.data.message);
+            } else {
+                alert('An error occurred: ' + error.message);
             }
         }
-
-        async function deleteUser(username) {
-            try {
-                const response = await fetch('http://localhost:8000/api/admin/delete', {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username })
-                });
-
-                const result = await response.json();
-                if (response.ok) {
-                    alert(result.message);
-                    fetchUsers(); // Refresh the user list
-                } else {
-                    alert(`Error: ${result.message}`);
-                }
-            } catch (error) {
-                console.error('Error deleting user:', error);
-            }
-        }
-
-        // Fetch users when the page loads
+    }
         window.onload = fetchUsers;
     </script>
 </body>

@@ -61,11 +61,35 @@
         .form-container button:hover {
             background: #77aaff;
         }
+        nav {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        nav a {
+            color: #fff; 
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 10px;
+            padding: 10px 15px;
+        }
+        nav a:hover {
+            color: #93badd; 
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="container">
+            <nav>
+                <a href="adminDashboard.html">Dashboard</a>
+                <a href="addTourismGovernor.html">Add Tourism Governor</a>
+                <a href="allusers.html">get all users</a>
+                <a href="activityCategory.html">Activity Categories</a>
+                <a href="preferenceTags.html">Preference Tags</a>
+                <a href="products.html">Products</a>
+            </nav>
             <h1>Add Admin</h1>
         </div>
     </header>
@@ -110,8 +134,7 @@
                 const response = await axios.post('http://localhost:8000/api/admin/create', data);
                 if (response.status === 201) {
                     alert('Admin created successfully');
-                    // Optionally, redirect to another page
-                    window.location.href = '/server/frontend/admin/adminDashboard.html';
+                    window.location.href = 'adminDashboard.html';
                 } else {
                     alert('Failed to create admin: ' + response.data.message);
                 }

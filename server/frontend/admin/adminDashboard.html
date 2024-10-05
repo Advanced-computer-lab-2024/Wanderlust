@@ -72,9 +72,10 @@
     <div class="container">
         <div class="admin-details">
             <h2>Admin Profile</h2>
-            <p><strong>Name:</strong> John Doe</p>
-            <p><strong>Email:</strong> john.doe@example.com</p>
-            <p><strong>Username:</strong> admin123</p>
+            <p><strong>ID:</strong> <span id="admin-id">Loading...</span></p>
+            <p><strong>Name:</strong> <span id="admin-name">Loading...</span></p>
+            <p><strong>Email:</strong> <span id="admin-email">Loading...</span></p>
+            <p><strong>Username:</strong> <span id="admin-username">Loading...</span></p>
         </div>
         <div class="buttons">
             <button onclick="window.location.href='addAdmin.html'">Add Another Admin</button>
@@ -85,5 +86,33 @@
             <button onclick="window.location.href='products.html'">Available Products</button>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+       async function fetchAdminDetails() {
+            try {
+                const username = localStorage.getItem('adminUsername');
+                if (!username) {
+                    alert('No admin logged in');
+                    window.location.href = 'adminLogin.html';
+                    return;
+                }
+
+                const response = await axios.get(`http://localhost:8000/api/admin/profile?username=${username}`);
+                if (response.status === 200) {
+                    const admin = response.data;
+                    document.getElementById('admin-id').textContent = admin.id;
+                    document.getElementById('admin-name').textContent = admin.name;
+                    document.getElementById('admin-email').textContent = admin.email;
+                    document.getElementById('admin-username').textContent = admin.username;
+                } else {
+                    console.error('Failed to fetch admin details:', response.data.message);
+                    alert('Failed to fetch admin details: ' + response.data.message);
+                }
+            } catch (error) {
+                console.error('Error fetching admin details:', error);
+            }
+        }
+        window.onload = fetchAdminDetails;
+    </script>
 </body>
 </html>
