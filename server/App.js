@@ -20,6 +20,7 @@ const {
   getItinerary,
   updateItinerary,
   deleteItinerary,
+  sortItineraries,
 } = require("./Controllers/ItineraryController");
 const {
   createAdvertiser,
@@ -67,7 +68,7 @@ app.use("/api/product", productRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/preferenceTag", preferenceTagRoutes);
 app.use("/api/activity", activityRoutes);
-
+app.use("/api/location", locationRoutes);
 //routes for tour guide
 app.use(express.json());
 app.post("/createtgprofile", createTourGuide);
@@ -96,4 +97,4 @@ app.put("/updateAdvertiser", updateAdvertiser);
   app.get("/getItinerary", getItinerary);
   app.put("/updateItinerary", updateItinerary);
   app.delete("/deleteItinerary", deleteItinerary);
-
+  app.get("/sortItineraries", sortItineraries);

@@ -55,10 +55,21 @@ const deleteItinerary = async (req, res) => {
     }   
 }
 
-module.exports = { createItinerary ,
+const sortItineraries = async (req, res) => {
+    try {
+        const { sortBy, orderBy } = req.body;
+        const itineraries = await Itinerary.find().sort({ [sortBy]: orderBy });
+        res.status(200).json(itineraries);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+  }
+
+module.exports = { 
+    createItinerary ,
     getItinerary ,
     updateItinerary ,
-    deleteItinerary
-
+    deleteItinerary,
+    sortItineraries,
 
 };

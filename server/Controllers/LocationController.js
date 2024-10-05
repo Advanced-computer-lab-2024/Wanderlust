@@ -97,10 +97,20 @@ const deleteLocation = async (req, res) => {
     res.status(500).json({ message: "Error deleting location", error });
   }
 };
+const filterLocations = async (req, res) => {
+  const { tags } = req.body;
+  try {
+    const locations = await Locations.find({ tags: { $in: tags } });
+    res.status(200).json(locations);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
 
 module.exports = {
   createLocation,
   getLocations,
   updateLocation,
   deleteLocation,
+  filterLocations,
 };

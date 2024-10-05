@@ -9,6 +9,10 @@ const urlValidator = (v) => {
 
 // Activity Schema
 const ActivitySchema = new Schema({
+  name: {
+    type: String,
+    required: true
+  },
   date: {
     type: Date,
     required: true
@@ -28,6 +32,14 @@ const ActivitySchema = new Schema({
   price: {
     type: String,
     required: true
+  },
+  duration: {
+    type: String,
+    required: true
+  },
+  rating: {
+    type: Number,
+    required: false
   },
   category: {
     type: mongoose.Types.ObjectId,

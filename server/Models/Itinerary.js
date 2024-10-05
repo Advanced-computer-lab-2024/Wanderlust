@@ -25,6 +25,10 @@ const itinerarySchema = new mongoose.Schema({
       type: Number,
        required: true
        }, 
+    rating: { 
+      type: Number, 
+      required: false 
+    },
     availableDates: [{ 
       type: Date, 
       required: true }], 
