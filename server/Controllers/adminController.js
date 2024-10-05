@@ -5,8 +5,31 @@ const tourguideModel = require('../Models/tourGuide');
 const touristModel = require('../Models/Tourist.js');
 const advertiserModel = require('../Models/Advertiser'); 
 
+
 //each one add a method that is needed based on the requirements
 //Create or add a new admin
+const adminLogin = async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        console.log('Login attempt:', { username, password }); // Log the login attempt
+
+        const admin = await adminModel.findOne({ username });
+        if (!admin) {
+            console.log('Admin not found');
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+
+        if (password !== admin.password) {
+            console.log('Invalid credentials');
+            return res.status(400).json({ message: 'Invalid credentials' });
+        }
+
+        res.status(200).json({ message: 'Login successful', admin });
+    } catch (error) {
+        console.error('Server error:', error); // Log the error
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
 const createAdmin = async (req, res) => {
     try {
         const { name, email, password, role, username } = req.body;
@@ -106,4 +129,4 @@ const addTourismGovernor = async (req, res) => {
 
 
 //add a , then the name of ur mehtod below.
-module.exports = { createAdmin, addTourismGovernor, deleteAccount, getAllUsernames };
+module.exports = { createAdmin, addTourismGovernor, deleteAccount, getAllUsernames, adminLogin };

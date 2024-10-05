@@ -6,6 +6,7 @@ router.use(express.json())
 router.post("/addTourismGovernor",adminController.addTourismGovernor);
 router.delete("/delete", adminController.deleteAccount);
 router.get("/usernames", adminController.getAllUsernames);
-router.put("/create", adminController.createAdmin);
+router.post("/create", adminController.createAdmin);
+router.post("/login", adminController.adminLogin);
 
 module.exports = router;

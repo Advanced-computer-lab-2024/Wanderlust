@@ -45,7 +45,7 @@ const ActivityCategoryRoutes = require("./Routes/ActivityCategoryRoutes");
 //Routes
 app.use("/api/tourist", tourist);
 app.use('/api', productRoutes);
-app.use('/api', adminRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api', ActivityCategoryRoutes);
 app.use(bodyParser.json());
 app.use("/api", preferenceTagRoutes);
