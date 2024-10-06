@@ -22,6 +22,7 @@ const {
   deleteItinerary,
   sortItineraries,
   searchItinerary,
+  filterItinerairies,
 } = require("./Controllers/ItineraryController");
 const {
   createAdvertiser,
@@ -101,3 +102,4 @@ app.put("/updateItinerary", updateItinerary);
 app.delete("/deleteItinerary", deleteItinerary);
 app.get("/sortItineraries", sortItineraries);
 app.get("/searchItinerary", searchItinerary);
+app.get("/filterItineraries", filterItinerairies);

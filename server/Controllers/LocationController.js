@@ -1,4 +1,5 @@
 const locationModel = require("../Models/Locations.js");
+const preferenceTagModel = require("../Models/PreferenceTag.js");
 const { default: mongoose } = require("mongoose");
 
 // Create a new location
@@ -94,9 +95,10 @@ const deleteLocation = async (req, res) => {
   }
 };
 const filterLocations = async (req, res) => {
-  const { tags } = req.body;
+  const { name } = req.query;
   try {
-    const locations = await Locations.find({ tags: { $in: tags } });
+    const tag = await preferenceTagModel.findOne({ name });
+    const locations = await locationModel.find({ tags: tag._id });
     res.status(200).json(locations);
   } catch (error) {
     res.status(400).json({ error: error.message });

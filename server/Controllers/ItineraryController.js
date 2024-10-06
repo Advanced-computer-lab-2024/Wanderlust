@@ -2,6 +2,7 @@ const { default: mongoose } = require("mongoose");
 
 const Itinerary = require("../Models/Itinerary");
 const Activity = require("../Models/Activity");
+const PreferenceTagModel = require("../Models/PreferenceTag");
 
 const createItinerary = async (req, res) => {
   const {
@@ -140,6 +141,43 @@ const searchItinerary = async (req, res) => {
   }
 };
 
+const filterItinerairies = async (req, res) => {
+  try {
+      const { minBudget, maxBudget, date, preference, language } = req.query;
+
+      const query = {};
+      if (minBudget !== undefined && maxBudget !== undefined) {
+          query.price = { $gte: minBudget, $lte: maxBudget };
+      }
+      if (date !== undefined) {
+          query.availableDates = date;
+      }
+      if (preference !== undefined) {
+          const tag = await PreferenceTagModel.findOne({ name: preference });
+          query.tags = tag._id;
+      }
+      if (language !== undefined) {
+          query.languageOfTour = language;
+      }
+
+      // const itineraries = await Itinerary.find(query);
+      const itineraries = await Itinerary.find(query)
+      .populate({
+          path: 'activities',
+          populate: {
+              path: 'category',
+              model: 'ActivityCat'
+          }
+      });
+
+      
+      res.status(200).json(itineraries);
+  } catch (error) {
+      res.status(500).json({ message: error.message });
+  }
+}
+
+
 module.exports = {
   createItinerary,
   getItinerary,
@@ -147,4 +185,5 @@ module.exports = {
   deleteItinerary,
   sortItineraries,
   searchItinerary,
+  filterItinerairies,
 };

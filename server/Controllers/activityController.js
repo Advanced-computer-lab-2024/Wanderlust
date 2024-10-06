@@ -1,6 +1,7 @@
 const Activity = require("../Models/Activity.js");
 const { default: mongoose, get } = require("mongoose");
 const { findById } = require("../Models/tourGuide.js");
+const ActivityCatModel = require("../Models/ActivityCat.js");
 
 const createActivity = async (req, res) => {
   const {
@@ -108,21 +109,27 @@ const deleteActivity = async (req, res) => {
 };
 //requirement 45
 //get method (app.get)
-// http://localhost:8000/api/activityRoutes/filterActivities
+// http://localhost:8000/api/activity/filterActivities
 const filterActivities = async (req, res) => {
   try {
-    const { budget, date, category, ratings } = req.body;
+    const { minBudget, maxBudget, date, category, ratings } = req.query;
 
-    const query = {
-      ...(budget && { price: { $gte: budget.min, $lte: budget.max } }),
-      ...(date && {
-        date: { $gte: new Date(date.start), $lte: new Date(date.end) },
-      }),
-      ...(category && { category }),
-      ...(ratings && { rating: { $gte: ratings.min } }),
-    };
+    const query = {};
+    if (minBudget !== undefined && maxBudget !== undefined) {
+      query.price = { $gte: minBudget, $lte: maxBudget };
+    }
+    if (date !== undefined) {
+      query.date = date;
+    }
+    if (category !== undefined) {
+      const cat = await ActivityCatModel.findOne({ name: category });
+      query.category = cat._id;
+    }
+    if (ratings !== undefined) {
+      query.rating = ratings;
+    }
 
-    const activities = await Activity.find(query);
+    const activities = await Activity.find(query).populate("category").populate("tags");
     res.status(200).json(activities);
   } catch (error) {
     res.status(500).json({ message: error.message });
