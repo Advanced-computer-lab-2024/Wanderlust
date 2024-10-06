@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tour Guide Itinerary</title>
+    <title>Tourist Locations</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -86,6 +86,39 @@
       .update-button:hover {
         background-color: #45a049;
       }
+
+      .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            background-color: #3e8e41;
+        }
     </style>
   </head>
   <body>
@@ -101,19 +134,42 @@
     <h1>Tourist Locations</h1>
     <input type="text" id="searchInput" placeholder="Search for locations..." />
     <button onclick="searchLocations()">Search</button>
+    <div class="dropdown">
+      <button class="dropbtn">Tags</button>
+      <div class="dropdown-content">
+          <a onclick="handleSelection('All')">All</a>
+          <a onclick="handleSelection('Monuments')">Monuments</a>
+          <a onclick="handleSelection('Museums')">Museums</a>
+          <a onclick="handleSelection('Religious Sites')">Religious Sites</a>
+          <a onclick="handleSelection('Castles')">Castles</a>
+      </div>
+  </div>
     <div id="locationContainer">
       <!-- activity content will be loaded here -->
     </div>
     <script>
-      // Function to fetch activity data from the API
-      async function fetchLocations() {
-        try {
-          const response = await fetch(
+      async function handleSelection(tag) {
+        let response = null;
+        let data = null;
+        if(tag === 'All') {
+          response = await fetch(
             "http://localhost:8000/api/location/getLocations"
-          ); // Adjust the API endpoint as needed
-          const data = await response.json();
+          ); 
+          data = await response.json();
           console.error(data);
+        } else {
+          response = await fetch(
+            "http://localhost:8000/api/location/filterLocations?name="+tag
+          );
+          data = await response.json();
+          console.error(data);
+        }
+        fetchLocations(response,data);
+      }
 
+      // Function to fetch activity data from the API
+      async function fetchLocations(response,data) {
+        try {
           const container = document.getElementById("locationContainer");
           container.innerHTML = "";
 
@@ -125,7 +181,9 @@
               <h2>${location.name}</h2>
               <p><strong>Description:</strong> ${location.description}</p>
               <p><strong>Opening Hours:</strong> ${location.openingHours}</p>
-              <p><strong>Price:</strong> $${location.ticketPrices}</p>              
+              <p><strong>Price:</strong> $${location.ticketPrices}</p> 
+              <p><strong>Tag:</strong> ${location.tags.name}</p>    
+              <p><strong>Location:</strong> ${location.location}</p>                         
               
             `;
               container.appendChild(locationElement);
@@ -181,7 +239,7 @@
         }
       }
 
-      window.onload = fetchLocations;
+      window.onload = handleSelection('All');
     </script>
   </body>
 </html>
