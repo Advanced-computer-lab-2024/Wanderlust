@@ -361,9 +361,8 @@ async function filterProducts() {
     const maxPrice = document.getElementById('maxPrice').value;
 
     try {
-        const response = await axios.get('http://localhost:8000/api/product/filterProductsByPrice', {
-            params: { minPrice, maxPrice }
-        });
+        const response = await axios.get(`http://localhost:8000/api/product/filterProductsByPrice?minPrice=${minPrice}&maxPrice=${maxPrice}`);
+        console.log(response.data);
         if (response.status === 200) {
             const products = response.data.products;
             const productsList = document.getElementById('productsList');
