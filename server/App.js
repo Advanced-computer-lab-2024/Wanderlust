@@ -15,12 +15,13 @@ const {
   deleteTourGuide,
 } = require("./Controllers/tourGuideController");
 
-const { 
+const {
   createItinerary,
   getItinerary,
   updateItinerary,
   deleteItinerary,
   sortItineraries,
+  searchItinerary,
 } = require("./Controllers/ItineraryController");
 const {
   createAdvertiser,
@@ -93,9 +94,10 @@ app.put("/updateAdvertiser", updateAdvertiser);
 // app.delete("/deleteCategory", deleteCategory);
 
 //routes for Itinerary
- app.use(express.json());
-  app.post("/createItinerary", createItinerary);
-  app.get("/getItinerary", getItinerary);
-  app.put("/updateItinerary", updateItinerary);
-  app.delete("/deleteItinerary", deleteItinerary);
-  app.get("/sortItineraries", sortItineraries);
+app.use(express.json());
+app.post("/createItinerary", createItinerary);
+app.get("/getItinerary", getItinerary);
+app.put("/updateItinerary", updateItinerary);
+app.delete("/deleteItinerary", deleteItinerary);
+app.get("/sortItineraries", sortItineraries);
+app.get("/searchItinerary", searchItinerary);

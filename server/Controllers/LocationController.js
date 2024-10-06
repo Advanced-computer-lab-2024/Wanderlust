@@ -26,12 +26,10 @@ const createLocation = async (req, res) => {
 
     await newLocation.save(); // Save the new location in the database
 
-    res
-      .status(201)
-      .json({
-        message: "Location created successfully",
-        location: newLocation,
-      });
+    res.status(201).json({
+      message: "Location created successfully",
+      location: newLocation,
+    });
   } catch (error) {
     res.status(500).json({ message: "Error creating location", error });
   }
@@ -70,12 +68,10 @@ const updateLocation = async (req, res) => {
       return res.status(404).json({ message: "Location not found" });
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Location updated successfully",
-        location: updatedLocation,
-      });
+    res.status(200).json({
+      message: "Location updated successfully",
+      location: updatedLocation,
+    });
   } catch (error) {
     res.status(500).json({ message: "Error updating location", error });
   }
@@ -105,7 +101,26 @@ const filterLocations = async (req, res) => {
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
-}
+};
+// Search for locations by name or tags
+const searchLocations = async (req, res) => {
+  const { query } = req.body;
+  try {
+    const locations = await locationModel.find().populate("tags");
+    const filteredLocations = locations.filter((location) => {
+      const nameMatches = location.name
+        .toLowerCase()
+        .includes(query.toLowerCase());
+      const tagMatches =
+        location.tags &&
+        location.tags.name.toLowerCase().includes(query.toLowerCase());
+      return nameMatches || tagMatches;
+    });
+    res.status(200).json(filteredLocations);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 
 module.exports = {
   createLocation,
@@ -113,4 +128,5 @@ module.exports = {
   updateLocation,
   deleteLocation,
   filterLocations,
+  searchLocations,
 };

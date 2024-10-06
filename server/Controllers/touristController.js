@@ -77,44 +77,6 @@ const viewAll = async (req, res) => {
   res.status(200).json({ locations, activity, itinerary });
 };
 
-const searchAll = async (req, res) => {
-  const { query } = req.body;
-  try {
-    const locations = await locationsModel
-      .find({
-        $or: [
-          { name: { $regex: query, $options: "i" } },
-          { tags: { $elemMatch: { $regex: query, $options: "i" } } },
-        ],
-      })
-      .populate("tags");
-
-    const activities = await activityModel
-      .find({
-        $or: [
-          {
-            category: mongoose.Types.ObjectId.isValid(query)
-              ? mongoose.Types.ObjectId(query)
-              : null,
-          },
-          { tags: { $elemMatch: { $regex: query, $options: "i" } } },
-        ].filter(Boolean),
-      })
-      .populate("category")
-      .populate("tags");
-
-    const itineraries = await itineraryModel
-      .find({
-        $or: [{ title: { $regex: query, $options: "i" } }, ,].filter(Boolean),
-      })
-      .populate("activities");
-
-    res.status(200).json({ locations, activities, itineraries });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
 module.exports = {
   getTourist,
   createTourist,
