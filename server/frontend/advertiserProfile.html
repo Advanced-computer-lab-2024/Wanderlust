@@ -3,128 +3,105 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Advertiser Profile</title>
+  <title>Tour Guide Itinerary</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: Arial, sans-serif;
       background-color: #f4f4f4;
-      margin: 0;
-      padding: 0;
-    }
-
-    .profile-container {
-      max-width: 900px;
-      margin: 50px auto;
-      background-color: #fff;
-      border-radius: 10px;
       padding: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .profile-header {
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 20px;
+    h1 {
+      text-align: center;
     }
 
-    .profile-header .info h1 {
-      margin: 0;
-      font-size: 28px;
-      color: #333;
-    }
-
-    .profile-header .info p {
-      margin: 5px 0;
-      font-size: 16px;
-      color: #777;
-    }
-
-    .profile-header .info .contact-info {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #555;
-    }
-
-    .profile-content {
-      padding: 20px 0;
-    }
-
-    .profile-section {
+    nav {
+      background-color: #333;
+      padding: 10px;
       margin-bottom: 20px;
     }
 
-    .profile-section h2 {
-      margin-bottom: 10px;
-      font-size: 22px;
-      color: #007BFF;
-    }
-
-    .profile-section p {
-      font-size: 16px;
-      color: #555;
-    }
-
-    .profile-section a {
-      color: #007BFF;
+    nav a {
+      color: white;
       text-decoration: none;
+      padding: 10px;
+      margin-right: 10px;
+      display: inline-block;
     }
 
-    .profile-section a:hover {
-      text-decoration: underline;
+    nav a:hover {
+      background-color: #575757;
+      border-radius: 4px;
     }
 
-    .profile-footer {
-      text-align: center;
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid #ddd;
-    }
-
-    .profile-footer button {
-      background-color: #007BFF;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
+    .itinerary {
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
       border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
-    .profile-footer button:hover {
-      background-color: #0056b3;
+    .activity {
+      margin: 10px 0;
+    }
+
+    .activity h3 {
+      margin: 0;
+    }
+
+    .delete-button {
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .delete-button:hover {
+      background-color: #ff1a1a;
     }
 
     .update-form {
       display: none;
-      background-color: #f9f9f9;
+      background: white;
       padding: 15px;
-      margin-top: 10px;
-      border: 1px solid #ccc;
+      margin: 10px 0;
       border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
-    .update-form input[type="text"] {
-      margin-bottom: 10px;
+    .update-form input, .update-form select {
+      width: 100%;
+      margin: 5px 0;
       padding: 8px;
-      width: calc(100% - 20px);
-      border: 1px solid #ddd;
+    }
+
+    .update-button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
       border-radius: 4px;
     }
 
-    .update-form button {
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .update-form button:hover {
-      background-color: #0056b3;
+    .update-button:hover {
+      background-color: #45a049;
     }
   </style>
 </head>
 <body>
+
+
+  <nav>
+    <a>Advertiser</a>
+    <a href="advertiserProfile.html">Profile</a>
+    <a href="activities.html">Activities</a>
+    <a href="Main.html">Back to Main Page</a>
+  </nav>
+
 
   <div class="profile-container">
     <!-- Profile Header Section -->

@@ -107,44 +107,188 @@
 ></script></head>
 <body>
 
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tour Guide Itinerary</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    nav {
+      background-color: #333;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+      margin-right: 10px;
+      display: inline-block;
+    }
+
+    nav a:hover {
+      background-color: #575757;
+      border-radius: 4px;
+    }
+
+    .itinerary {
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .activity {
+      margin: 10px 0;
+    }
+
+    .activity h3 {
+      margin: 0;
+    }
+
+    .delete-button {
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .delete-button:hover {
+      background-color: #ff1a1a;
+    }
+
+    .update-form {
+      display: none;
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .update-form input, .update-form select {
+      width: 100%;
+      margin: 5px 0;
+      padding: 8px;
+    }
+
+    .update-button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .update-button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+
+
+  
+
+  <nav>
+    <a>Advertiser</a>
+    <a href="advertiserProfile.html">Profile</a>
+    <a href="activities.html">Activities</a>
+    <a href="Main.html">Back to Main Page</a>
+  </nav>
+
   <h1>Activities List</h1>
 
   <div id="activityContainer">
     <!-- Activities will be loaded here -->
   </div>
 
+
   <button class="toggle-button" onclick="toggleCreateForm()">Create New Activity</button>
   <button onclick="fetchActivities()">Load Activities</button>
 
   <div id="createFormContainer" class="create-form">
     <h2>Create New Activity</h2>
+    <input type="date" id="activityName" placeholder="Name">
     <input type="date" id="activityDate" placeholder="Date">
     <input type="time" id="activityTime" placeholder="Time">
     <input type="text" id="activityLocation" placeholder="Location (URL)">
     <button onclick="getCoordinates()">Get Coordinates</button> <!-- Button to get coordinates -->
     <div id="map"></div> <!-- Map div -->
     <input type="text" id="activityPrice" placeholder="Price"> <!-- Changed to text -->
-    <input type="text" id="activityCategory" placeholder="Category Name">
-    <input type="text" id="activityTags" placeholder="Tags (comma separated)">
+    <label for="Category">Category:</label>
+    <select id="activityCategory" name="Categories" size="1" onclick="toggleDropdown(this)">
+      <!-- Category options will be populated here by JavaScript -->
+    </select>
+    <br>
+    <br>
+    
+    <label for="Tags">Tags:</label>
+    <select id="activityTagsDropdown" name="Tags" size="1" onclick="toggleDropdown(this)">
+      <!-- Category options will be populated here by JavaScript -->
+    </select>
+    
+   
     <input type="text" id="activityDiscounts" placeholder="Special Discounts">
+    <input type="text" id="activityDuration" placeholder="Duration">
     <select id="bookingOpen">
       <option value="true">Booking Open</option>
       <option value="false">Booking Closed</option>
     </select>
+    <br>
     <button onclick="createActivity()">Create Activity</button>
   </div>
 
+  <script>
+    function toggleDropdown(selectElement) {
+      // Check if the dropdown is expanded or not
+      if (selectElement.size === 1) {
+        // Set size to show all options
+        selectElement.size = selectElement.options.length;
+      } else {
+        // Collapse back to showing only one option
+        selectElement.size = 1;
+      }
+  
+      // Close the dropdown when it loses focus
+      selectElement.addEventListener('blur', function() {
+        selectElement.size = 1;
+      });
+    }
+  </script>
+
   <div id="updateFormContainer" class="update-form">
     <h2>Update Activity</h2>
+    <input type="date" id="UpdateActivityName" placeholder="Name">
     <input type="date" id="updateActivityDate" placeholder="Date">
     <input type="time" id="updateActivityTime" placeholder="Time">
     <input type="text" id="updateActivityLocation" placeholder="Location (URL)">
     <button onclick="getCoordinates(true)">Get Coordinates</button> <!-- Button to get coordinates for update -->
     <div id="updateMap"></div> <!-- Update map div -->
     <input type="text" id="updateActivityPrice" placeholder="Price"> <!-- Changed to text -->
-    <input type="text" id="updateActivityCategory" placeholder="Category Name">
+    <select id="updateActivityCategory">
+      <option value="">Select Category</option>
+    </select>
     <input type="text" id="updateActivityTags" placeholder="Tags (comma separated)">
     <input type="text" id="updateActivityDiscounts" placeholder="Special Discounts">
+    <input type="text" id="UpdateActivityDuration" placeholder="Duration">
     <select id="updateBookingOpen">
       <option value="true">Booking Open</option>
       <option value="false">Booking Closed</option>
@@ -153,6 +297,83 @@
   </div>
 
   <script>
+    // Function to fetch categories and populate the dropdown
+async function fetchCategories() {
+  try {
+    const response = await fetch('http://localhost:8000/api/category/getCategories'); // Ensure the API URL is correct
+    if (!response.ok) {
+      throw new Error(`Failed to fetch categories: ${response.status}`);
+    }
+
+    const categories = await response.json();
+
+    const categoryDropdown = document.getElementById('activityCategory');
+    const updateCategoryDropdown = document.getElementById('updateActivityCategory');
+
+    // Clear any existing options
+    categoryDropdown.innerHTML = '<option value="">Select Category</option>';
+    updateCategoryDropdown.innerHTML = '<option value="">Select Category</option>';
+
+    // Populate the dropdowns with categories
+    categories.forEach(category => {
+      const option = document.createElement('option');
+      option.value = category._id;  // Use the category ID as the value
+      option.text = category.name;  // Use the category name as the text
+      categoryDropdown.appendChild(option);
+
+      // Also add to the update dropdown
+      const updateOption = document.createElement('option');
+      updateOption.value = category._id;
+      updateOption.text = category.name;
+      updateCategoryDropdown.appendChild(updateOption);
+    });
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+  }
+}
+document.addEventListener('DOMContentLoaded', fetchCategories);
+
+async function fetchTags() {
+  try {
+    const response = await fetch('http://localhost:8000/api/prefrenceTag/getpreferenceTags'); // Ensure the API URL is correct for fetching tags
+    if (!response.ok) {
+      throw new Error(`Failed to fetch tags: ${response.status}`);
+    }
+
+    const tags = await response.json();
+
+    const tagDropdown = document.getElementById('activityTagsDropdown'); // Make sure this ID exists in your HTML
+    const updateTagDropdown = document.getElementById('updateActivityTagsDropdown'); // Make sure this ID exists in your HTML
+
+    // Clear any existing options
+    tagDropdown.innerHTML = '<option value="">Select Tags</option>';
+    updateTagDropdown.innerHTML = '<option value="">Select Tags</option>';
+
+    // Populate the dropdowns with tags
+    tags.forEach(tag => {
+      const option = document.createElement('option');
+      option.value = tag._id;  // Use the tag ID as the value
+      option.text = tag.name;  // Use the tag name as the text
+      tagDropdown.appendChild(option);
+
+      // Also add to the update dropdown
+      const updateOption = document.createElement('option');
+      updateOption.value = tag._id;
+      updateOption.text = tag.name;
+      updateTagDropdown.appendChild(updateOption);
+    });
+  } catch (error) {
+    console.error('Error fetching tags:', error);
+  }
+}
+
+// Call fetchTags when the page loads
+document.addEventListener('DOMContentLoaded', fetchTags);
+
+
+
+// Call fetchCategories when the page loads
+
     let currentActivityId = null; // To hold the current activity ID for updates
     let map; // Map variable for creating Google Map instance
     let geocoder; // Geocoder for converting location to coordinates

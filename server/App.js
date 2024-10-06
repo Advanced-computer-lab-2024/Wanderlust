@@ -69,6 +69,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/preferenceTag", preferenceTagRoutes);
 app.use("/api/activity", activityRoutes);
 app.use("/api/location", locationRoutes);
+app.use("/api/category", categoryRoutes);
 //routes for tour guide
 app.use(express.json());
 app.post("/createtgprofile", createTourGuide);
