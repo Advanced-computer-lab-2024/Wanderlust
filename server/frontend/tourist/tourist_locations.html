@@ -102,48 +102,43 @@
     <a href="Main.html">Back to Main Page</a>
   </nav>
 
-  <h1>Tourist Activity</h1>
+  <h1>Tourist Locations</h1>
 
-  <div id="activityContainer">
+  <div id="locationContainer">
     <!-- activity content will be loaded here -->
   </div>
   <script>
     // Function to fetch activity data from the API
-    async function fetchActivities() {
+    async function fetchLocations() {
       try {
-        const response = await fetch('http://localhost:8000/api/activity/getActivity'); // Adjust the API endpoint as needed
+        const response = await fetch('http://localhost:8000/api/location/getLocations'); // Adjust the API endpoint as needed
         const data = await response.json();
         console.error(data);
 
-        const container = document.getElementById('activityContainer');
+        const container = document.getElementById('locationContainer');
         container.innerHTML = '';
 
         if (response.ok && data.length > 0) {
-          data.forEach(activity => {
-            const activityElement = document.createElement('div');
-            activityElement.className = 'activity';
-            activityElement.innerHTML = `
-              <h2>${activity.name}</h2>
-              <p><strong>Price:</strong> $${activity.price}</p>
-              <p><strong>Date:</strong> ${activity.date}</p>
-              <p><strong>Time:</strong> ${activity.time}</p>
-              <p><strong>Location:</strong> ${activity.location}</p>
-              <p><strong>Discount:</strong> ${activity.specialDiscounts}</p>    
-              <p><strong>Available:</strong> ${activity.bookingOpen}</p>
-
-              
+          data.forEach(location => {
+            const locationElement = document.createElement('div');
+            locationElement.className = 'location';
+            locationElement.innerHTML = `
+              <h2>${location.name}</h2>
+              <p><strong>Description:</strong> ${location.description}</p>
+              <p><strong>Opening Hours:</strong> ${location.openingHours}</p>
+              <p><strong>Price:</strong> $${location.ticketPrices}</p>              
               
             `;
-            container.appendChild(activityElement);
+            container.appendChild(locationElement);
           });
         } else {
-          container.innerHTML = '<p>No itineraries available at the moment.</p>';
+          container.innerHTML = '<p>No Locations available at the moment.</p>';
         }
       } catch (error) {
-        console.error('Error fetching itineraries:', error);
-        document.getElementById('itineraryContainer').innerHTML = '<p>Failed to load itineraries.</p>';
+        console.error('Error fetching Locations:', error);
+        document.getElementById('locationContainer').innerHTML = '<p>Failed to load Locations.</p>';
       }
     }
-    window.onload = fetchActivities;
+    window.onload = fetchLocations;
 
   </script>

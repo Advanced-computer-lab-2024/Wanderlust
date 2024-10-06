@@ -40,7 +40,7 @@ const createLocation = async (req, res) => {
 // Get all locations
 const getLocations = async (req, res) => {
   try {
-    const locations = await locationModel.find().populate("tag", "name"); // Retrieve all locations from the database
+    const locations = await locationModel.find().populate("tags"); // Retrieve all locations from the database
     res.status(200).json(locations); // Send the locations as a response
   } catch (error) {
     res.status(500).json({ message: "Error retrieving locations", error });
