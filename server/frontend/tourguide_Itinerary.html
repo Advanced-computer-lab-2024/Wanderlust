@@ -230,48 +230,59 @@ function toggleCreateForm() {
 document.getElementById('toggleCreateFormButton').addEventListener('click', toggleCreateForm);
     // Function to fetch itinerary data from the API
     async function fetchItineraries() {
-      try {
-        const response = await fetch('http://localhost:8000/getItinerary'); // Adjust the API endpoint as needed
-        const data = await response.json();
-        console.error(data);
+  try {
+    const response = await fetch('http://localhost:8000/getItinerary'); // Adjust the API endpoint as needed
+    const data = await response.json();
+    console.error(data);
 
-        const container = document.getElementById('itineraryContainer');
-        container.innerHTML = '';
+    const container = document.getElementById('itineraryContainer');
+    container.innerHTML = '';
 
-        if (response.ok && data.length > 0) {
-          data.forEach(itinerary => {
-            const itineraryElement = document.createElement('div');
-            itineraryElement.className = 'itinerary';
-            itineraryElement.innerHTML = `
-              <h2>${itinerary.title}</h2>
-              <p><strong>Timeline:</strong> ${new Date(itinerary.timeline.start).toLocaleString()} to ${new Date(itinerary.timeline.end).toLocaleString()}</p>
-              <p><strong>Price:</strong> $${itinerary.price}</p>
-              <p><strong>Language of Tour:</strong> ${itinerary.languageOfTour}</p>
-              <p><strong>Locations:</strong> ${itinerary.locations.join(', ')}</p>
-              <h3>Activities:</h3>
-              ${itinerary.activities.map(activity => `
-                <div class="activity">
-                  <h4>${activity.date} at ${activity.time}</h4>
-                  <p>Location: <a href="${activity.location}" target="_blank">${activity.location}</a></p>
-                  <p>Price: ${activity.price}</p>
-                  <p>Special Discounts: ${activity.specialDiscounts}</p>
-                  <p><strong>Booking Open: ${activity.bookingOpen ? 'Yes' : 'No'}</strong></p>
-                </div>
-              `).join('')}
-              <button class="delete-button" onclick="deleteItinerary('${itinerary._id}')">Delete Itinerary</button>
-              <button class="update-button" onclick="openUpdateForm('${itinerary._id}')">Update Itinerary</button>
-            `;
-            container.appendChild(itineraryElement);
-          });
-        } else {
-          container.innerHTML = '<p>No itineraries available at the moment.</p>';
-        }
-      } catch (error) {
-        console.error('Error fetching itineraries:', error);
-        document.getElementById('itineraryContainer').innerHTML = '<p>Failed to load itineraries.</p>';
-      }
+    if (response.ok && data.length > 0) {
+      data.forEach(itinerary => {
+        const itineraryElement = document.createElement('div');
+        itineraryElement.className = 'itinerary';
+
+        // Build activities list dynamically
+        const activitiesHTML = itinerary.activities.map(activity => `
+          <div class="activity">
+            <h4>${new Date(activity.date).toLocaleDateString()} at ${activity.time}</h4>
+            <p><strong>Activity Name:</strong> ${activity.name}</p>
+            <p>Location: <a href="${activity.location}" target="_blank">${activity.location}</a></p>
+            <p>Price: ${activity.price}</p>
+            <p><strong>Category:</strong> ${activity.category.name}</p>
+            <p><strong>Tags:</strong> ${Array.isArray(activity.tags) ? activity.tags.map(tag => tag.name).join(', ') : activity.tags.name}</p>
+            <p>Special Discounts: ${activity.specialDiscounts}</p>
+            <p><strong>Booking Open:</strong> ${activity.bookingOpen ? 'Yes' : 'No'}</p>
+          </div>
+        `).join('');
+
+        // Render the itinerary details
+        itineraryElement.innerHTML = `
+          <h2>${itinerary.title}</h2>
+          <p><strong>Timeline:</strong> ${new Date(itinerary.timeline.start).toLocaleString()} to ${new Date(itinerary.timeline.end).toLocaleString()}</p>
+          <p><strong>Price:</strong> $${itinerary.price}</p>
+          <p><strong>Language of Tour:</strong> ${itinerary.languageOfTour}</p>
+          <p><strong>Locations:</strong> ${itinerary.locations.join(', ')}</p>
+          <h3>Activities:</h3>
+          ${activitiesHTML} <!-- Dynamically inserted activities -->
+          <p><strong>Accessibility:</strong> ${itinerary.accessibility}</p>
+          <p><strong>Pickup Location:</strong> ${itinerary.pickupLocation}</p>
+          <p><strong>Dropoff Location:</strong> ${itinerary.dropoffLocation}</p>
+          <button class="delete-button" onclick="deleteItinerary('${itinerary._id}')">Delete Itinerary</button>
+          <button class="update-button" onclick="openUpdateForm('${itinerary._id}')">Update Itinerary</button>
+        `;
+
+        container.appendChild(itineraryElement);
+      });
+    } else {
+      container.innerHTML = '<p>No itineraries available at the moment.</p>';
     }
-
+  } catch (error) {
+    console.error('Error fetching itineraries:', error);
+    document.getElementById('itineraryContainer').innerHTML = '<p>Failed to load itineraries.</p>';
+  }
+}
     // Function to delete an itinerary
     async function deleteItinerary(id) {
       try {

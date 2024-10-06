@@ -420,7 +420,7 @@ document.addEventListener('DOMContentLoaded', fetchTags);
 
     // Function to fetch Activities
   // Function to fetch Activities
-async function fetchActivities() {
+  async function fetchActivities() {
   console.log("fetchActivities function called");
   try {
     const response = await fetch('http://localhost:8000/api/activity/getActivity'); // Fetch data from the API
@@ -444,11 +444,12 @@ async function fetchActivities() {
 
         // Creating elements dynamically for each activity
         activityElement.innerHTML = `
-          <h2>${new Date(activity.date).toLocaleDateString()} ${activity.time}</h2>
+          <h2>${activity.name}</h2>
+          <p>${new Date(activity.date).toLocaleDateString()} ${activity.time}</p>
           <p>Location: <a href="${activity.location}" target="_blank">${activity.location}</a></p>
           <p>Price: ${activity.price}</p>
-          <p>Category: ${activity.category.name}</p>
-          <p>Tags: ${tags.map(tag => tag.name).join(', ')}</p> <!-- Displaying tag names -->
+          <p>Category:${activity.category ? activity.category.name : 'N/A'}</p>
+          <p>Tags: ${tags && tags.length > 0 ? tags.map(tag => tag.name).join(', ') : 'None'}</p>
           <p>Special Discounts: ${activity.specialDiscounts}</p>
           <p><strong>Booking Open: ${activity.bookingOpen ? 'Yes' : 'No'}</strong></p>
           <button class="delete-button" onclick="deleteActivity('${activity._id}')">Delete Activity</button>
@@ -464,7 +465,6 @@ async function fetchActivities() {
     console.error('Error fetching activities:', error);
   }
 }
-
 
     // Function to create a new activity
     async function createActivity() {
