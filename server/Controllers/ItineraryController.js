@@ -97,17 +97,18 @@ const updateItinerary = async (req, res) => {
 };
 
 const deleteItinerary = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const itenary = await Itinerary.findByIdAndDelete(id);
-    if (!itenary) {
-      return res.status(404).json({ error: "Itenary not found" });
-    }
-    res.status(200).json(itenary);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
+    const { id } = req.body;
+    try {
+        const itenary = await Itinerary.findByIdAndDelete(id);
+        if (!itenary) {
+            return res.status(404).json({ error: "Itenary not found" });
+        }
+        res.status(200).json(itenary);
+    }   
+    catch (error) {
+        res.status(400).json({ error: error.message });
+    }   
+}
 
 const sortItineraries = async (req, res) => {
   try {

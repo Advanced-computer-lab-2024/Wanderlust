@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Itinerary</title>
+    <script defer src="script.js"></script>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: #333;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            margin-right: 10px;
+            display: inline-block;
+        }
+
+        nav a:hover {
+            background-color: #575757;
+            border-radius: 4px;
+        }
+
+        /* Main Content Styles */
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Itinerary Container Styles */
+        #itinerary-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        /* Itinerary Box Styles */
+        .itinerary-box {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .itinerary-box h3 {
+            margin-top: 0;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .itinerary-box p {
+            color: #555;
+        }
+
+        .itinerary-box .activities {
+            margin-top: 10px;
+        }
+
+        .itinerary-box .activity-box {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .itinerary-box .activity-box p {
+            color: #444;
+        }
+
+        /* Button Styles */
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Update Form Styles */
+        .update-form {
+            display: none;
+            margin-top: 10px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .update-form input {
+            width: calc(100% - 20px);
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        /* Message Styles */
+        #message {
+            text-align: center;
+            color: green;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <header>
+        <nav>
+            <a href="#">Tour Guide</a>
+            <a href="tourguide_profile.html">Profile</a>
+            <a href="tourguide_Itinerary.html">Itinerary</a>
+            <a href="Main.html">Back to Main Page</a>
+        </nav>
+    </header>
+
+    <!-- Page Title -->
+    <main>
+        <h1>Itinerary List</h1>
+
+        <!-- Itineraries will be injected here -->
+        <section id="itinerary-container"></section>
+
+        <!-- Message Display -->
+        <div id="message"></div>
+    </main>
+</body>
+</html>
+<script>
+// Fetch Itineraries
+async function getItinerary() {
+    try {
+        const response = await fetch('http://localhost:8000/getItinerary');
+        if (!response.ok) {
+            throw new Error('Error fetching itinerary data');
+        }
+        const itineraries = await response.json();
+        displayItinerary(itineraries);
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
+// Display Itineraries with Update Buttons
+function displayItinerary(itineraries) {
+    const container = document.getElementById('itinerary-container');
+    container.innerHTML = '';
+    
+    itineraries.forEach(itinerary => {
+        const itineraryElement = document.createElement('div');
+        itineraryElement.innerHTML = `
+            <h3>${itinerary.title}</h3>
+            <p><strong>Timeline:</strong> ${formatDate(itinerary.timeline.start)} - ${formatDate(itinerary.timeline.end)}</p>
+            <p><strong>Locations:</strong> ${itinerary.locations.join(', ')}</p>
+            <p><strong>Language of Tour:</strong> ${itinerary.languageOfTour}</p>
+            <p><strong>Price:</strong> $${itinerary.price}</p>
+            <p><strong>Available Dates:</strong> ${itinerary.availableDates.map(date => formatDate(date)).join(', ')}</p>
+            <p><strong>Accessibility:</strong> ${itinerary.accessibility}</p>
+            <p><strong>Pickup Location:</strong> ${itinerary.pickupLocation}</p>
+            <p><strong>Dropoff Location:</strong> ${itinerary.dropoffLocation}</p>
+
+            <!-- Activities Section -->
+            <h4>Activities</h4>
+            ${itinerary.activities.map(activity => `
+                <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+                    <p><strong>Activity Name:</strong> ${activity.name}</p>
+                    <p><strong>Date:</strong> ${formatDate(activity.date)}</p>
+                    <p><strong>Time:</strong> ${activity.time}</p>
+                    <p><strong>Location:</strong> <a href="${activity.location}" target="_blank">${activity.location}</a></p>
+                    <p><strong>Price:</strong> ${activity.price}</p>
+                    <p><strong>Special Discounts:</strong> ${activity.specialDiscounts}</p>
+                    <p><strong>Category:</strong> ${activity.category.name} (${activity.category.description})</p>
+                    <p><strong>Tags:</strong> ${activity.tags.name}</p>
+                    <p><strong>Booking Open:</strong> ${activity.bookingOpen ? 'Yes' : 'No'}</p>
+                </div>
+            `).join('')}
+
+            <!-- Button to load form with itinerary data -->
+            <button onclick="loadItineraryForUpdate('${itinerary._id}')">Update Itinerary</button>
+
+            <!-- Hidden form to update the itinerary -->
+            <form id="update-form-${itinerary._id}" class="update-form" style="display:none;">
+                <input type="text" id="title-${itinerary._id}" value="${itinerary.title}" placeholder="Title"><br><br>
+                <input type="text" id="locations-${itinerary._id}" value="${itinerary.locations.join(', ')}" placeholder="Locations"><br><br>
+                <input type="text" id="timeline-start-${itinerary._id}" value="${itinerary.timeline.start}" placeholder="Timeline Start"><br><br>
+                <input type="text" id="timeline-end-${itinerary._id}" value="${itinerary.timeline.end}" placeholder="Timeline End"><br><br>
+                <input type="text" id="languageOfTour-${itinerary._id}" value="${itinerary.languageOfTour}" placeholder="Language of Tour"><br><br>
+                <input type="number" id="price-${itinerary._id}" value="${itinerary.price}" placeholder="Price"><br><br>
+                <input type="text" id="availableDates-${itinerary._id}" value="${itinerary.availableDates.join(', ')}" placeholder="Available Dates"><br><br>
+                <input type="text" id="accessibility-${itinerary._id}" value="${itinerary.accessibility}" placeholder="Accessibility"><br><br>
+                <input type="text" id="pickupLocation-${itinerary._id}" value="${itinerary.pickupLocation}" placeholder="Pickup Location"><br><br>
+                <input type="text" id="dropoffLocation-${itinerary._id}" value="${itinerary.dropoffLocation}" placeholder="Dropoff Location"><br><br>
+                <button type="button" onclick="updateItinerary('${itinerary._id}')">Submit Update</button>
+            </form>
+        `;
+        container.appendChild(itineraryElement);
+    });
+}
+
+// Format date helper function
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+    });
+}
+
+// Load the itinerary data into the form for updating
+function loadItineraryForUpdate(id) {
+    const form = document.getElementById(`update-form-${id}`);
+    form.style.display = form.style.display === 'none' ? 'block' : 'none'; // Toggle form visibility
+}
+
+// Update Itinerary
+async function updateItinerary(id) {
+    const title = document.getElementById(`title-${id}`).value;
+    const locations = document.getElementById(`locations-${id}`).value.split(',');
+    const timelineStart = document.getElementById(`timeline-start-${id}`).value;
+    const timelineEnd = document.getElementById(`timeline-end-${id}`).value;
+    const languageOfTour = document.getElementById(`languageOfTour-${id}`).value;
+    const price = document.getElementById(`price-${id}`).value;
+    const availableDates = document.getElementById(`availableDates-${id}`).value.split(',');
+    const accessibility = document.getElementById(`accessibility-${id}`).value;
+    const pickupLocation = document.getElementById(`pickupLocation-${id}`).value;
+    const dropoffLocation = document.getElementById(`dropoffLocation-${id}`).value;
+
+    const itineraryData = {
+        id,
+        title,
+        locations,
+        timeline: { start: timelineStart, end: timelineEnd },
+        languageOfTour,
+        price,
+        availableDates,
+        accessibility,
+        pickupLocation,
+        dropoffLocation
+    };
+
+    try {
+        const response = await fetch('http://localhost:8000/updateItinerary', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(itineraryData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Error updating itinerary');
+        }
+
+        const updatedItinerary = await response.json();
+        document.getElementById('message').innerText = 'Itinerary updated successfully!';
+        console.log('Updated Itinerary:', updatedItinerary);
+
+        getItinerary(); // Refresh the itinerary list
+    } catch (error) {
+        console.error(error.message);
+        document.getElementById('message').innerText = 'Failed to update itinerary';
+    }
+}
+
+// Load the itineraries when the page loads
+window.onload = getItinerary;
+</script>
