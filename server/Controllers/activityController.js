@@ -131,8 +131,9 @@ const filterActivities = async (req, res) => {
 
 const sortActivities = async (req, res) => {
   try {
-    const { sortBy, orderBy } = req.body;
-    const activities = await Activity.find().sort({ [sortBy]: orderBy });
+    const { sortBy = "price", orderBy = "1" } = req.query; // Set default values
+    const sortQuery = { [sortBy]: parseInt(orderBy) }; // Ensure orderBy is an integer
+    const activities = await Activity.find().sort(sortQuery);
     res.status(200).json(activities);
   } catch (error) {
     res.status(500).json({ message: error.message });

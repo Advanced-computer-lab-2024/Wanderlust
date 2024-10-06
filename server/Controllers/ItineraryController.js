@@ -96,23 +96,23 @@ const updateItinerary = async (req, res) => {
 };
 
 const deleteItinerary = async (req, res) => {
-    const { id } = req.body;
-    try {
-        const itenary = await Itinerary.findByIdAndDelete(id);
-        if (!itenary) {
-            return res.status(404).json({ error: "Itenary not found" });
-        }
-        res.status(200).json(itenary);
-    }   
-    catch (error) {
-        res.status(400).json({ error: error.message });
-    }   
-}
+  const { id } = req.body;
+  try {
+    const itenary = await Itinerary.findByIdAndDelete(id);
+    if (!itenary) {
+      return res.status(404).json({ error: "Itenary not found" });
+    }
+    res.status(200).json(itenary);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 
 const sortItineraries = async (req, res) => {
   try {
-    const { sortBy, orderBy } = req.body;
-    const itineraries = await Itinerary.find().sort({ [sortBy]: orderBy });
+    const { sortBy = "price", orderBy = "1" } = req.query; // Set default values
+    const sortQuery = { [sortBy]: parseInt(orderBy) }; // Ensure orderBy is an integer
+    const itineraries = await Itinerary.find().sort(sortQuery);
     res.status(200).json(itineraries);
   } catch (error) {
     res.status(500).json({ message: error.message });

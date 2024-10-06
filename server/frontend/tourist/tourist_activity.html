@@ -101,6 +101,23 @@
     <h1>Tourist Activity</h1>
     <input type="text" id="searchInput" placeholder="Search for Itinerary..." />
     <button onclick="searchActivity()">Search</button>
+
+    <div class="sort-container">
+      <label for="sortBy">Sort by:</label>
+      <select id="sortBy">
+        <option value="price">Price</option>
+        <option value="rating">Rating</option>
+      </select>
+
+      <label for="orderBy">Order:</label>
+      <select id="orderBy">
+        <option value="1">Ascending</option>
+        <option value="-1">Descending</option>
+      </select>
+
+      <button onclick="sortActivities()">Sort</button>
+    </div>
+
     <div id="activityContainer">
       <!-- activity content will be loaded here -->
     </div>
@@ -186,6 +203,54 @@
           console.error("Error searching activities:", error);
           document.getElementById("activityContainer").innerHTML =
             "<p>Failed to search activities.</p>";
+        }
+      }
+
+      // Function to sort and display activities
+      async function sortActivities() {
+        const sortBy = document.getElementById("sortBy").value;
+        const orderBy = document.getElementById("orderBy").value;
+
+        try {
+          const response = await fetch(
+            `http://localhost:8000/api/activity/sortActivities?sortBy=${sortBy}&orderBy=${orderBy}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          const data = await response.json();
+
+          const container = document.getElementById("activityContainer");
+          container.innerHTML = ""; // Clear the previous content
+
+          if (response.ok && data.length > 0) {
+            data.forEach((activity) => {
+              const activityElement = document.createElement("div");
+              activityElement.className = "activity";
+              activityElement.innerHTML = `
+              <h2>${activity.name}</h2>
+              <p><strong>Price:</strong> $${activity.price}</p>
+              <p><strong>Date:</strong> ${activity.date}</p>
+              <p><strong>Time:</strong> ${activity.time}</p>
+              <p><strong>Location:</strong> ${activity.location}</p>
+              <p><strong>Discount:</strong> ${activity.specialDiscounts}</p>
+              <p><strong>Available:</strong> ${
+                activity.bookingOpen ? "Yes" : "No"
+              }</p>
+            `;
+              container.appendChild(activityElement);
+            });
+          } else {
+            container.innerHTML = "<p>No activities found.</p>";
+          }
+        } catch (error) {
+          console.error("Error fetching sorted activities:", error);
+          document.getElementById("activityContainer").innerHTML =
+            "<p>Failed to load activities.</p>";
         }
       }
 
