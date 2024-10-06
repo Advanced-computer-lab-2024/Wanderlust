@@ -113,7 +113,18 @@ const sortItineraries = async (req, res) => {
   try {
     const { sortBy = "price", orderBy = "1" } = req.query; // Set default values
     const sortQuery = { [sortBy]: parseInt(orderBy) }; // Ensure orderBy is an integer
-    const itineraries = await Itinerary.find().sort(sortQuery);
+    const itineraries = await Itinerary.find()
+      .sort(sortQuery)
+      .populate({
+        path: "activities",
+        populate: [
+          {
+            path: "category",
+            model: "ActivityCat",
+          },
+          { path: "tags", model: "PreferenceTag" },
+        ],
+      });
     res.status(200).json(itineraries);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -123,7 +134,16 @@ const sortItineraries = async (req, res) => {
 const searchItinerary = async (req, res) => {
   const { query } = req.query;
   try {
-    const itinerary = await Itinerary.find().populate("activities");
+    const itinerary = await Itinerary.find().populate({
+      path: "activities",
+      populate: [
+        {
+          path: "category",
+          model: "ActivityCat",
+        },
+        { path: "tags", model: "PreferenceTag" },
+      ],
+    });
     const filteredItinerary = itinerary.filter((itinerary) => {
       const titleMatches = itinerary.title
         .toLowerCase()
@@ -143,40 +163,37 @@ const searchItinerary = async (req, res) => {
 
 const filterItinerairies = async (req, res) => {
   try {
-      const { minBudget, maxBudget, date, preference, language } = req.query;
+    const { minBudget, maxBudget, date, preference, language } = req.query;
 
-      const query = {};
-      if (minBudget !== undefined && maxBudget !== undefined) {
-          query.price = { $gte: minBudget, $lte: maxBudget };
-      }
-      if (date !== undefined) {
-          query.availableDates = date;
-      }
-      if (preference !== undefined) {
-          const tag = await PreferenceTagModel.findOne({ name: preference });
-          query.tags = tag._id;
-      }
-      if (language !== undefined) {
-          query.languageOfTour = language;
-      }
+    const query = {};
+    if (minBudget !== undefined && maxBudget !== undefined) {
+      query.price = { $gte: minBudget, $lte: maxBudget };
+    }
+    if (date !== undefined) {
+      query.availableDates = date;
+    }
+    if (preference !== undefined) {
+      const tag = await PreferenceTagModel.findOne({ name: preference });
+      query.tags = tag._id;
+    }
+    if (language !== undefined) {
+      query.languageOfTour = language;
+    }
 
-      // const itineraries = await Itinerary.find(query);
-      const itineraries = await Itinerary.find(query)
-      .populate({
-          path: 'activities',
-          populate: {
-              path: 'category',
-              model: 'ActivityCat'
-          }
-      });
+    // const itineraries = await Itinerary.find(query);
+    const itineraries = await Itinerary.find(query).populate({
+      path: "activities",
+      populate: {
+        path: "category",
+        model: "ActivityCat",
+      },
+    });
 
-      
-      res.status(200).json(itineraries);
+    res.status(200).json(itineraries);
   } catch (error) {
-      res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
-}
-
+};
 
 module.exports = {
   createItinerary,

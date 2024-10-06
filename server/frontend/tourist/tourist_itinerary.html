@@ -290,48 +290,7 @@
             }
           );
           const data = await response.json();
-
-          const container = document.getElementById("itineraryContainer");
-          container.innerHTML = "";
-
-          if (response.ok && data.length > 0) {
-            data.forEach((itinerary) => {
-              const itineraryElement = document.createElement("div");
-              itineraryElement.className = "itinerary";
-              itineraryElement.innerHTML = `
-          <h2>${itinerary.title}</h2>
-          <p><strong>Timeline:</strong> ${new Date(
-            itinerary.timeline.start
-          ).toLocaleString()} to ${new Date(
-                itinerary.timeline.end
-              ).toLocaleString()}</p>
-          <p><strong>Price:</strong> $${itinerary.price}</p>
-          <p><strong>Language of Tour:</strong> ${itinerary.languageOfTour}</p>
-          <p><strong>Locations:</strong> ${itinerary.locations.join(", ")}</p>
-          <h3>Activities:</h3>
-          ${itinerary.activities
-            .map(
-              (activity) => `
-            <div class="activity">
-              <h4>${activity.date} at ${activity.time}</h4>
-              <p>Location: <a href="${activity.location}" target="_blank">${
-                activity.location
-              }</a></p>
-              <p>Price: ${activity.price}</p>
-              <p>Special Discounts: ${activity.specialDiscounts}</p>
-              <p><strong>Booking Open: ${
-                activity.bookingOpen ? "Yes" : "No"
-              }</strong></p>
-            </div>
-          `
-            )
-            .join("")}
-        `;
-              container.appendChild(itineraryElement);
-            });
-          } else {
-            container.innerHTML = "<p>No itineraries found.</p>";
-          }
+          displayItinerary(response, data);
         } catch (error) {
           console.error("Error searching itineraries:", error);
           document.getElementById("itineraryContainer").innerHTML =
@@ -355,51 +314,7 @@
           );
 
           const data = await response.json();
-          const container = document.getElementById("itineraryContainer");
-          container.innerHTML = ""; // Clear previous content
-
-          if (response.ok && data.length > 0) {
-            data.forEach((itinerary) => {
-              const itineraryElement = document.createElement("div");
-              itineraryElement.className = "itinerary";
-              itineraryElement.innerHTML = `
-                <h2>${itinerary.title}</h2>
-                <p><strong>Timeline:</strong> ${new Date(
-                  itinerary.timeline.start
-                ).toLocaleString()} to ${new Date(
-                itinerary.timeline.end
-              ).toLocaleString()}</p>
-                <p><strong>Price:</strong> $${itinerary.price}</p>
-                <p><strong>Language of Tour:</strong> ${
-                  itinerary.languageOfTour
-                }</p>
-                <p><strong>Locations:</strong> ${itinerary.locations.join(
-                  ", "
-                )}</p>
-                <h3>Activities:</h3>
-                ${itinerary.activities
-                  .map(
-                    (activity) => `
-                      <div class="activity">
-                        <h4>${activity.date} at ${activity.time}</h4>
-                        <p>Location: <a href="${
-                          activity.location
-                        }" target="_blank">${activity.location}</a></p>
-                        <p>Price: ${activity.price}</p>
-                        <p>Special Discounts: ${activity.specialDiscounts}</p>
-                        <p><strong>Booking Open:</strong> ${
-                          activity.bookingOpen ? "Yes" : "No"
-                        }</p>
-                      </div>
-                    `
-                  )
-                  .join("")}
-              `;
-              container.appendChild(itineraryElement);
-            });
-          } else {
-            container.innerHTML = "<p>No itineraries found.</p>";
-          }
+          displayItinerary(response, data);
         } catch (error) {
           console.error("Error fetching sorted itineraries:", error);
           document.getElementById("itineraryContainer").innerHTML =

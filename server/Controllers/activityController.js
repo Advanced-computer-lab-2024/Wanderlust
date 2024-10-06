@@ -129,7 +129,9 @@ const filterActivities = async (req, res) => {
       query.rating = ratings;
     }
 
-    const activities = await Activity.find(query).populate("category").populate("tags");
+    const activities = await Activity.find(query)
+      .populate("category")
+      .populate("tags");
     res.status(200).json(activities);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -140,7 +142,10 @@ const sortActivities = async (req, res) => {
   try {
     const { sortBy = "price", orderBy = "1" } = req.query; // Set default values
     const sortQuery = { [sortBy]: parseInt(orderBy) }; // Ensure orderBy is an integer
-    const activities = await Activity.find().sort(sortQuery);
+    const activities = await Activity.find()
+      .sort(sortQuery)
+      .populate("category")
+      .populate("tags");
     res.status(200).json(activities);
   } catch (error) {
     res.status(500).json({ message: error.message });
