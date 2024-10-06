@@ -104,7 +104,7 @@ const filterLocations = async (req, res) => {
 };
 // Search for locations by name or tags
 const searchLocations = async (req, res) => {
-  const { query } = req.body;
+  const { query } = req.query;
   try {
     const locations = await locationModel.find().populate("tags");
     const filteredLocations = locations.filter((location) => {

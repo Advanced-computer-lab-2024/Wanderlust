@@ -1,157 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tourist Itinerary</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      padding: 20px;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tourist Itinerary</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 20px;
+      }
 
-    h1 {
-      text-align: center;
-    }
+      h1 {
+        text-align: center;
+      }
 
-    nav {
-      background-color: #333;
-      padding: 10px;
-      margin-bottom: 20px;
-    }
+      nav {
+        background-color: #333;
+        padding: 10px;
+        margin-bottom: 20px;
+      }
 
-    nav a {
-      color: white;
-      text-decoration: none;
-      padding: 10px;
-      margin-right: 10px;
-      display: inline-block;
-    }
+      nav a {
+        color: white;
+        text-decoration: none;
+        padding: 10px;
+        margin-right: 10px;
+        display: inline-block;
+      }
 
-    nav a:hover {
-      background-color: #575757;
-      border-radius: 4px;
-    }
+      nav a:hover {
+        background-color: #575757;
+        border-radius: 4px;
+      }
 
-    .itinerary {
-      background: white;
-      padding: 15px;
-      margin: 10px 0;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
+      .itinerary {
+        background: white;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
 
-    .activity {
-      margin: 10px 0;
-    }
+      .activity {
+        margin: 10px 0;
+      }
 
-    .activity h3 {
-      margin: 0;
-    }
+      .activity h3 {
+        margin: 0;
+      }
 
-    .delete-button {
-      background-color: #ff4d4d;
-      color: white;
-      border: none;
-      padding: 8px;
-      cursor: pointer;
-      border-radius: 4px;
-    }
+      .delete-button {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
 
-    .delete-button:hover {
-      background-color: #ff1a1a;
-    }
+      .delete-button:hover {
+        background-color: #ff1a1a;
+      }
 
-    .update-form {
-      display: none;
-      background: white;
-      padding: 15px;
-      margin: 10px 0;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
+      .update-form {
+        display: none;
+        background: white;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
 
-    .update-form input, .update-form select {
-      width: 100%;
-      margin: 5px 0;
-      padding: 8px;
-    }
+      .update-form input,
+      .update-form select {
+        width: 100%;
+        margin: 5px 0;
+        padding: 8px;
+      }
 
-    .update-button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 10px;
-      cursor: pointer;
-      border-radius: 4px;
-    }
+      .update-button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
 
-    .update-button:hover {
-      background-color: #45a049;
-    }
-  </style>
-</head>
-<body>
+      .update-button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a>Tourist</a>
+      <a href="tourist_profile.html">Profile</a>
+      <a href="tourist_Itinerary.html">Itinerary</a>
+      <a href="tourist_activity.html">Activity</a>
+      <a href="tourist_locations.html">Locations</a>
+      <a href="/server/frontend/Main.html">Back to Main Page</a>
+    </nav>
 
-  
+    <h1>Tourist Itinerary</h1>
+    <input type="text" id="searchInput" placeholder="Search for Itinerary..." />
+    <button onclick="searchItinerary()">Search</button>
+    <div id="itineraryContainer">
+      <!-- Itinerary content will be loaded here -->
+    </div>
+    <script>
+      // Function to fetch itinerary data from the API
+      async function fetchItineraries() {
+        try {
+          const response = await fetch("http://localhost:8000/getItinerary"); // Adjust the API endpoint as needed
+          const data = await response.json();
+          console.error(data);
 
-  <nav>
-    <a>Tourist</a>
-    <a href="tourist_profile.html">Profile</a>
-    <a href="tourist_Itinerary.html">Itinerary</a>
-    <a href="tourist_activity.html">Activity</a>
-    <a href="tourist_locations.html">Locations</a>
-    <a href="/server/frontend/Main.html">Back to Main Page</a>
-  </nav>
+          const container = document.getElementById("itineraryContainer");
+          container.innerHTML = "";
 
-  <h1>Tourist Itinerary</h1>
-
-  <div id="itineraryContainer">
-    <!-- Itinerary content will be loaded here -->
-  </div>
-  <script>
-    // Function to fetch itinerary data from the API
-    async function fetchItineraries() {
-      try {
-        const response = await fetch('http://localhost:8000/getItinerary'); // Adjust the API endpoint as needed
-        const data = await response.json();
-        console.error(data);
-
-        const container = document.getElementById('itineraryContainer');
-        container.innerHTML = '';
-
-        if (response.ok && data.length > 0) {
-          data.forEach(itinerary => {
-            const itineraryElement = document.createElement('div');
-            itineraryElement.className = 'itinerary';
-            itineraryElement.innerHTML = `
+          if (response.ok && data.length > 0) {
+            data.forEach((itinerary) => {
+              const itineraryElement = document.createElement("div");
+              itineraryElement.className = "itinerary";
+              itineraryElement.innerHTML = `
               <h2>${itinerary.title}</h2>
-              <p><strong>Timeline:</strong> ${new Date(itinerary.timeline.start).toLocaleString()} to ${new Date(itinerary.timeline.end).toLocaleString()}</p>
+              <p><strong>Timeline:</strong> ${new Date(
+                itinerary.timeline.start
+              ).toLocaleString()} to ${new Date(
+                itinerary.timeline.end
+              ).toLocaleString()}</p>
               <p><strong>Price:</strong> $${itinerary.price}</p>
-              <p><strong>Language of Tour:</strong> ${itinerary.languageOfTour}</p>
-              <p><strong>Locations:</strong> ${itinerary.locations.join(', ')}</p>
+              <p><strong>Language of Tour:</strong> ${
+                itinerary.languageOfTour
+              }</p>
+              <p><strong>Locations:</strong> ${itinerary.locations.join(
+                ", "
+              )}</p>
               <h3>Activities:</h3>
-              ${itinerary.activities.map(activity => `
+              ${itinerary.activities
+                .map(
+                  (activity) => `
                 <div class="activity">
                   <h4>${activity.date} at ${activity.time}</h4>
-                  <p>Location: <a href="${activity.location}" target="_blank">${activity.location}</a></p>
+                  <p>Location: <a href="${activity.location}" target="_blank">${
+                    activity.location
+                  }</a></p>
                   <p>Price: ${activity.price}</p>
                   <p>Special Discounts: ${activity.specialDiscounts}</p>
-                  <p><strong>Booking Open: ${activity.bookingOpen ? 'Yes' : 'No'}</strong></p>
+                  <p><strong>Booking Open: ${
+                    activity.bookingOpen ? "Yes" : "No"
+                  }</strong></p>
                 </div>
-              `).join('')}
+              `
+                )
+                .join("")}
             `;
-            container.appendChild(itineraryElement);
-          });
-        } else {
-          container.innerHTML = '<p>No itineraries available at the moment.</p>';
+              container.appendChild(itineraryElement);
+            });
+          } else {
+            container.innerHTML =
+              "<p>No itineraries available at the moment.</p>";
+          }
+        } catch (error) {
+          console.error("Error fetching itineraries:", error);
+          document.getElementById("itineraryContainer").innerHTML =
+            "<p>Failed to load itineraries.</p>";
         }
-      } catch (error) {
-        console.error('Error fetching itineraries:', error);
-        document.getElementById('itineraryContainer').innerHTML = '<p>Failed to load itineraries.</p>';
       }
-    }
-    window.onload = fetchItineraries;
 
-  </script>
+      async function searchItinerary() {
+        const query = document.getElementById("searchInput").value;
+        try {
+          const response = await fetch(
+            `http://localhost:8000/searchItinerary?query=${query}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          const data = await response.json();
+
+          const container = document.getElementById("itineraryContainer");
+          container.innerHTML = "";
+
+          if (response.ok && data.length > 0) {
+            data.forEach((itinerary) => {
+              const itineraryElement = document.createElement("div");
+              itineraryElement.className = "itinerary";
+              itineraryElement.innerHTML = `
+          <h2>${itinerary.title}</h2>
+          <p><strong>Timeline:</strong> ${new Date(
+            itinerary.timeline.start
+          ).toLocaleString()} to ${new Date(
+                itinerary.timeline.end
+              ).toLocaleString()}</p>
+          <p><strong>Price:</strong> $${itinerary.price}</p>
+          <p><strong>Language of Tour:</strong> ${itinerary.languageOfTour}</p>
+          <p><strong>Locations:</strong> ${itinerary.locations.join(", ")}</p>
+          <h3>Activities:</h3>
+          ${itinerary.activities
+            .map(
+              (activity) => `
+            <div class="activity">
+              <h4>${activity.date} at ${activity.time}</h4>
+              <p>Location: <a href="${activity.location}" target="_blank">${
+                activity.location
+              }</a></p>
+              <p>Price: ${activity.price}</p>
+              <p>Special Discounts: ${activity.specialDiscounts}</p>
+              <p><strong>Booking Open: ${
+                activity.bookingOpen ? "Yes" : "No"
+              }</strong></p>
+            </div>
+          `
+            )
+            .join("")}
+        `;
+              container.appendChild(itineraryElement);
+            });
+          } else {
+            container.innerHTML = "<p>No itineraries found.</p>";
+          }
+        } catch (error) {
+          console.error("Error searching itineraries:", error);
+          document.getElementById("itineraryContainer").innerHTML =
+            "<p>Failed to search itineraries.</p>";
+        }
+      }
+
+      window.onload = fetchItineraries;
+    </script>
+  </body>
+</html>

@@ -82,5 +82,4 @@ module.exports = {
   createTourist,
   updateTourist,
   viewAll,
-  searchAll,
 };

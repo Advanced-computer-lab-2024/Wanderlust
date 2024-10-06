@@ -1,144 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tour Guide Itinerary</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      padding: 20px;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tour Guide Itinerary</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 20px;
+      }
 
-    h1 {
-      text-align: center;
-    }
+      h1 {
+        text-align: center;
+      }
 
-    nav {
-      background-color: #333;
-      padding: 10px;
-      margin-bottom: 20px;
-    }
+      nav {
+        background-color: #333;
+        padding: 10px;
+        margin-bottom: 20px;
+      }
 
-    nav a {
-      color: white;
-      text-decoration: none;
-      padding: 10px;
-      margin-right: 10px;
-      display: inline-block;
-    }
+      nav a {
+        color: white;
+        text-decoration: none;
+        padding: 10px;
+        margin-right: 10px;
+        display: inline-block;
+      }
 
-    nav a:hover {
-      background-color: #575757;
-      border-radius: 4px;
-    }
-    .activity {
-      background: white;
-      padding: 15px;
-      margin: 10px 0;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
+      nav a:hover {
+        background-color: #575757;
+        border-radius: 4px;
+      }
+      .activity {
+        background: white;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
 
+      .activity h3 {
+        margin: 0;
+      }
 
+      .delete-button {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
 
-    .activity h3 {
-      margin: 0;
-    }
+      .delete-button:hover {
+        background-color: #ff1a1a;
+      }
 
-    .delete-button {
-      background-color: #ff4d4d;
-      color: white;
-      border: none;
-      padding: 8px;
-      cursor: pointer;
-      border-radius: 4px;
-    }
+      .update-form {
+        display: none;
+        background: white;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
 
-    .delete-button:hover {
-      background-color: #ff1a1a;
-    }
+      .update-form input,
+      .update-form select {
+        width: 100%;
+        margin: 5px 0;
+        padding: 8px;
+      }
 
-    .update-form {
-      display: none;
-      background: white;
-      padding: 15px;
-      margin: 10px 0;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
+      .update-button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
 
-    .update-form input, .update-form select {
-      width: 100%;
-      margin: 5px 0;
-      padding: 8px;
-    }
+      .update-button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a>Tourist</a>
+      <a href="tourist_profile.html">Profile</a>
+      <a href="tourist_Itinerary.html">Itinerary</a>
+      <a href="tourist_activity.html">Activity</a>
+      <a href="tourist_locations.html">Locations</a>
+      <a href="/server/frontend/Main.html">Back to Main Page</a>
+    </nav>
 
-    .update-button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 10px;
-      cursor: pointer;
-      border-radius: 4px;
-    }
+    <h1>Tourist Locations</h1>
+    <input type="text" id="searchInput" placeholder="Search for locations..." />
+    <button onclick="searchLocations()">Search</button>
+    <div id="locationContainer">
+      <!-- activity content will be loaded here -->
+    </div>
+    <script>
+      // Function to fetch activity data from the API
+      async function fetchLocations() {
+        try {
+          const response = await fetch(
+            "http://localhost:8000/api/location/getLocations"
+          ); // Adjust the API endpoint as needed
+          const data = await response.json();
+          console.error(data);
 
-    .update-button:hover {
-      background-color: #45a049;
-    }
-  </style>
-</head>
-<body>
+          const container = document.getElementById("locationContainer");
+          container.innerHTML = "";
 
-  
-
-  <nav>
-    <a>Tourist</a>
-    <a href="tourist_profile.html">Profile</a>
-    <a href="tourist_Itinerary.html">Itinerary</a>
-    <a href="tourist_activity.html">Activity</a>
-    <a href="tourist_locations.html">Locations</a>
-    <a href="/server/frontend/Main.html">Back to Main Page</a>
-  </nav>
-
-  <h1>Tourist Locations</h1>
-
-  <div id="locationContainer">
-    <!-- activity content will be loaded here -->
-  </div>
-  <script>
-    // Function to fetch activity data from the API
-    async function fetchLocations() {
-      try {
-        const response = await fetch('http://localhost:8000/api/location/getLocations'); // Adjust the API endpoint as needed
-        const data = await response.json();
-        console.error(data);
-
-        const container = document.getElementById('locationContainer');
-        container.innerHTML = '';
-
-        if (response.ok && data.length > 0) {
-          data.forEach(location => {
-            const locationElement = document.createElement('div');
-            locationElement.className = 'location';
-            locationElement.innerHTML = `
+          if (response.ok && data.length > 0) {
+            data.forEach((location) => {
+              const locationElement = document.createElement("div");
+              locationElement.className = "location";
+              locationElement.innerHTML = `
               <h2>${location.name}</h2>
               <p><strong>Description:</strong> ${location.description}</p>
               <p><strong>Opening Hours:</strong> ${location.openingHours}</p>
               <p><strong>Price:</strong> $${location.ticketPrices}</p>              
               
             `;
-            container.appendChild(locationElement);
-          });
-        } else {
-          container.innerHTML = '<p>No Locations available at the moment.</p>';
+              container.appendChild(locationElement);
+            });
+          } else {
+            container.innerHTML =
+              "<p>No Locations available at the moment.</p>";
+          }
+        } catch (error) {
+          console.error("Error fetching Locations:", error);
+          document.getElementById("locationContainer").innerHTML =
+            "<p>Failed to load Locations.</p>";
         }
-      } catch (error) {
-        console.error('Error fetching Locations:', error);
-        document.getElementById('locationContainer').innerHTML = '<p>Failed to load Locations.</p>';
       }
-    }
-    window.onload = fetchLocations;
+      async function searchLocations() {
+        const query = document.getElementById("searchInput").value;
+        try {
+          const response = await fetch(
+            `http://localhost:8000/api/location/searchLocations?query=${encodeURIComponent(
+              query
+            )}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          const data = await response.json();
 
-  </script>
+          const container = document.getElementById("locationContainer");
+          container.innerHTML = "";
+
+          if (response.ok && data.length > 0) {
+            data.forEach((location) => {
+              const locationElement = document.createElement("div");
+              locationElement.className = "location";
+              locationElement.innerHTML = `
+          <h2>${location.name}</h2>
+          <p><strong>Description:</strong> ${location.description}</p>
+          <p><strong>Opening Hours:</strong> ${location.openingHours}</p>
+          <p><strong>Price:</strong> $${location.ticketPrices}</p>
+        `;
+              container.appendChild(locationElement);
+            });
+          } else {
+            container.innerHTML = "<p>No Locations found.</p>";
+          }
+        } catch (error) {
+          console.error("Error searching Locations:", error);
+          document.getElementById("locationContainer").innerHTML =
+            "<p>Failed to search Locations.</p>";
+        }
+      }
+
+      window.onload = fetchLocations;
+    </script>
+  </body>
+</html>

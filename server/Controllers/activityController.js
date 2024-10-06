@@ -141,7 +141,7 @@ const sortActivities = async (req, res) => {
 
 // Search for Activity by name or tags
 const searchActivity = async (req, res) => {
-  const { query } = req.body;
+  const { query } = req.query;
   try {
     const activity = await Activity.find()
       .populate("tags")

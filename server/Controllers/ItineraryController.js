@@ -119,7 +119,7 @@ const sortItineraries = async (req, res) => {
 };
 // Search for Itinerary by name or tags
 const searchItinerary = async (req, res) => {
-  const { query } = req.body;
+  const { query } = req.query;
   try {
     const itinerary = await Itinerary.find().populate("activities");
     const filteredItinerary = itinerary.filter((itinerary) => {

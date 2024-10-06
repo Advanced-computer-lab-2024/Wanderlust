@@ -1,128 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tour Guide Itinerary</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      padding: 20px;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tour Guide Itinerary</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 20px;
+      }
 
-    h1 {
-      text-align: center;
-    }
+      h1 {
+        text-align: center;
+      }
 
-    nav {
-      background-color: #333;
-      padding: 10px;
-      margin-bottom: 20px;
-    }
+      nav {
+        background-color: #333;
+        padding: 10px;
+        margin-bottom: 20px;
+      }
 
-    nav a {
-      color: white;
-      text-decoration: none;
-      padding: 10px;
-      margin-right: 10px;
-      display: inline-block;
-    }
+      nav a {
+        color: white;
+        text-decoration: none;
+        padding: 10px;
+        margin-right: 10px;
+        display: inline-block;
+      }
 
-    nav a:hover {
-      background-color: #575757;
-      border-radius: 4px;
-    }
-    .activity {
-      background: white;
-      padding: 15px;
-      margin: 10px 0;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
+      nav a:hover {
+        background-color: #575757;
+        border-radius: 4px;
+      }
+      .activity {
+        background: white;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
 
+      .activity h3 {
+        margin: 0;
+      }
 
+      .delete-button {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
 
-    .activity h3 {
-      margin: 0;
-    }
+      .delete-button:hover {
+        background-color: #ff1a1a;
+      }
 
-    .delete-button {
-      background-color: #ff4d4d;
-      color: white;
-      border: none;
-      padding: 8px;
-      cursor: pointer;
-      border-radius: 4px;
-    }
+      .update-form {
+        display: none;
+        background: white;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
 
-    .delete-button:hover {
-      background-color: #ff1a1a;
-    }
+      .update-form input,
+      .update-form select {
+        width: 100%;
+        margin: 5px 0;
+        padding: 8px;
+      }
 
-    .update-form {
-      display: none;
-      background: white;
-      padding: 15px;
-      margin: 10px 0;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
+      .update-button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
 
-    .update-form input, .update-form select {
-      width: 100%;
-      margin: 5px 0;
-      padding: 8px;
-    }
+      .update-button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a>Tourist</a>
+      <a href="tourist_profile.html">Profile</a>
+      <a href="tourist_Itinerary.html">Itinerary</a>
+      <a href="tourist_activity.html">Activity</a>
+      <a href="tourist_locations.html">Locations</a>
+      <a href="/server/frontend/Main.html">Back to Main Page</a>
+    </nav>
 
-    .update-button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 10px;
-      cursor: pointer;
-      border-radius: 4px;
-    }
+    <h1>Tourist Activity</h1>
+    <input type="text" id="searchInput" placeholder="Search for Itinerary..." />
+    <button onclick="searchActivity()">Search</button>
+    <div id="activityContainer">
+      <!-- activity content will be loaded here -->
+    </div>
+    <script>
+      // Function to fetch activity data from the API
+      async function fetchActivities() {
+        try {
+          const response = await fetch(
+            "http://localhost:8000/api/activity/getActivity"
+          ); // Adjust the API endpoint as needed
+          const data = await response.json();
+          console.error(data);
 
-    .update-button:hover {
-      background-color: #45a049;
-    }
-  </style>
-</head>
-<body>
+          const container = document.getElementById("activityContainer");
+          container.innerHTML = "";
 
-  
-
-  <nav>
-    <a>Tourist</a>
-    <a href="tourist_profile.html">Profile</a>
-    <a href="tourist_Itinerary.html">Itinerary</a>
-    <a href="tourist_activity.html">Activity</a>
-    <a href="tourist_locations.html">Locations</a>
-    <a href="/server/frontend/Main.html">Back to Main Page</a>
-  </nav>
-
-  <h1>Tourist Activity</h1>
-
-  <div id="activityContainer">
-    <!-- activity content will be loaded here -->
-  </div>
-  <script>
-    // Function to fetch activity data from the API
-    async function fetchActivities() {
-      try {
-        const response = await fetch('http://localhost:8000/api/activity/getActivity'); // Adjust the API endpoint as needed
-        const data = await response.json();
-        console.error(data);
-
-        const container = document.getElementById('activityContainer');
-        container.innerHTML = '';
-
-        if (response.ok && data.length > 0) {
-          data.forEach(activity => {
-            const activityElement = document.createElement('div');
-            activityElement.className = 'activity';
-            activityElement.innerHTML = `
+          if (response.ok && data.length > 0) {
+            data.forEach((activity) => {
+              const activityElement = document.createElement("div");
+              activityElement.className = "activity";
+              activityElement.innerHTML = `
               <h2>${activity.name}</h2>
               <p><strong>Price:</strong> $${activity.price}</p>
               <p><strong>Date:</strong> ${activity.date}</p>
@@ -134,16 +133,63 @@
               
               
             `;
-            container.appendChild(activityElement);
-          });
-        } else {
-          container.innerHTML = '<p>No itineraries available at the moment.</p>';
+              container.appendChild(activityElement);
+            });
+          } else {
+            container.innerHTML =
+              "<p>No itineraries available at the moment.</p>";
+          }
+        } catch (error) {
+          console.error("Error fetching itineraries:", error);
+          document.getElementById("itineraryContainer").innerHTML =
+            "<p>Failed to load itineraries.</p>";
         }
-      } catch (error) {
-        console.error('Error fetching itineraries:', error);
-        document.getElementById('itineraryContainer').innerHTML = '<p>Failed to load itineraries.</p>';
       }
-    }
-    window.onload = fetchActivities;
+      async function searchActivity() {
+        const query = document.getElementById("searchInput").value;
+        try {
+          const response = await fetch(
+            `http://localhost:8000/api/activity/searchActivity?query=${query}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          const data = await response.json();
 
-  </script>
+          const container = document.getElementById("activityContainer");
+          container.innerHTML = "";
+
+          if (response.ok && data.length > 0) {
+            data.forEach((activity) => {
+              const activityElement = document.createElement("div");
+              activityElement.className = "activity";
+              activityElement.innerHTML = `
+          <h2>${activity.name}</h2>
+          <p><strong>Price:</strong> $${activity.price}</p>
+          <p><strong>Date:</strong> ${activity.date}</p>
+          <p><strong>Time:</strong> ${activity.time}</p>
+          <p><strong>Location:</strong> ${activity.location}</p>
+          <p><strong>Discount:</strong> ${activity.specialDiscounts}</p>
+          <p><strong>Available:</strong> ${
+            activity.bookingOpen ? "Yes" : "No"
+          }</p>
+        `;
+              container.appendChild(activityElement);
+            });
+          } else {
+            container.innerHTML = "<p>No activities found.</p>";
+          }
+        } catch (error) {
+          console.error("Error searching activities:", error);
+          document.getElementById("activityContainer").innerHTML =
+            "<p>Failed to search activities.</p>";
+        }
+      }
+
+      window.onload = fetchActivities;
+    </script>
+  </body>
+</html>
