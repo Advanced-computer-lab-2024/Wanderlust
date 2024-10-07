@@ -289,6 +289,7 @@
                         <span>Rating: ${product.rating}</span><br>
                         <span>Reviews: ${product.reviews}</span><br>
                         <span>Seller: ${product.seller.name}</span><br>
+                    <img src="${product.picture}" alt="${product.name}" style="max-width: 100px; max-height: 100px;"><br>
                         <button class="delete-button" onclick="deleteProduct('${product.name}')">Delete Product</button>
                     `;
                     productsList.appendChild(productItem);
@@ -345,6 +346,7 @@
                     <span>Rating: ${product.rating}</span><br>
                     <span>Reviews: ${product.reviews}</span><br>
                     <span>Seller: ${product.seller.name}</span><br>
+                    <img src="${product.picture}" alt="${product.name}" style="max-width: 100px; max-height: 100px;"><br>
                     <button class="delete-button" onclick="deleteProduct('${product.name}')">Delete Product</button>
                 `;
                 productsList.appendChild(productItem);
@@ -380,6 +382,7 @@ async function filterProducts() {
                     <span>Rating: ${product.rating}</span><br>
                     <span>Reviews: ${product.reviews}</span><br>
                     <span>Seller: ${product.seller.name}</span><br>
+                    <img src="${product.picture}" alt="${product.name}" style="max-width: 100px; max-height: 100px;"><br>
                     <button class="delete-button" onclick="deleteProduct('${product.name}')">Delete Product</button>
                 `;
                 productsList.appendChild(productItem);
