@@ -24,7 +24,7 @@ const createActivity = async (req, res) => {
       date,
       time,
       lat,
-      lng, 
+      lng,
       price,
       duration,
       rating,
@@ -169,7 +169,9 @@ const searchActivity = async (req, res) => {
         .includes(query.toLowerCase());
       const tagMatches =
         activity.tags &&
-        activity.tags.name.toLowerCase().includes(query.toLowerCase());
+        activity.tags.some((tags) =>
+          tags.name.toLowerCase().includes(query.toLowerCase())
+        );
       const categoryMatches =
         activity.category &&
         activity.category.name.toLowerCase().includes(query.toLowerCase());
