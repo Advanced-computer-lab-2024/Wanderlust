@@ -62,7 +62,15 @@ const updateLocation = async (req, res) => {
 
     const updatedLocation = await locationModel.findOneAndUpdate(
       { _id: id }, // Find location by ID
-      { name, description, pictures, location, openingHours, ticketPrices, tags }, // Update the fields, including name
+      {
+        name,
+        description,
+        pictures,
+        location,
+        openingHours,
+        ticketPrices,
+        tags,
+      }, // Update the fields, including name
       { new: true } // Return the updated document
     );
 
@@ -78,7 +86,6 @@ const updateLocation = async (req, res) => {
     res.status(500).json({ message: "Error updating location", error });
   }
 };
-
 
 // Delete a location by name
 const deleteLocation = async (req, res) => {
@@ -101,16 +108,20 @@ const filterLocations = async (req, res) => {
   const { name } = req.query;
   try {
     const tag = await preferenceTagModel.findOne({ name });
-    const locations = await locationModel.find({ tags: { $in: tag._id } }).populate("tags");
+    const locations = await locationModel
+      .find({ tags: { $in: tag._id } })
+      .populate("tags");
     res.status(200).json(locations);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
-}
+};
 // Get a location by ID
 const getLocationById = async (req, res) => {
   try {
-    const location = await locationModel.findById(req.params.id).populate("tags");
+    const location = await locationModel
+      .findById(req.params.id)
+      .populate("tags");
     if (!location) {
       return res.status(404).json({ message: "Location not found" });
     }
@@ -120,6 +131,28 @@ const getLocationById = async (req, res) => {
   }
 };
 
+const searchLocations = async (req, res) => {
+  const { query } = req.query;
+  try {
+    const locations = await locationModel.find().populate("tags");
+
+    const filteredLocations = locations.filter((location) => {
+      const nameMatches = location.name
+        .toLowerCase()
+        .includes(query.toLowerCase());
+      const tagMatches =
+        location.tags &&
+        location.tags.some((tags) =>
+          tags.name.toLowerCase().includes(query.toLowerCase())
+        );
+
+      return nameMatches || tagMatches;
+    });
+    res.status(200).json(filteredLocations);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 
 module.exports = {
   createLocation,
@@ -128,4 +161,5 @@ module.exports = {
   deleteLocation,
   filterLocations,
   getLocationById,
+  searchLocations,
 };

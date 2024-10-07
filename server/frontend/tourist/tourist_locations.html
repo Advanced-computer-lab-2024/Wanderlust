@@ -88,37 +88,37 @@
       }
 
       .dropdown {
-            position: relative;
-            display: inline-block;
-        }
+        position: relative;
+        display: inline-block;
+      }
 
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-        }
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+      }
 
-        .dropdown-content a {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            cursor: pointer;
-        }
+      .dropdown-content a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        cursor: pointer;
+      }
 
-        .dropdown-content a:hover {
-            background-color: #f1f1f1;
-        }
+      .dropdown-content a:hover {
+        background-color: #f1f1f1;
+      }
 
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
+      .dropdown:hover .dropdown-content {
+        display: block;
+      }
 
-        .dropdown:hover .dropbtn {
-            background-color: #3e8e41;
-        }
+      .dropdown:hover .dropbtn {
+        background-color: #3e8e41;
+      }
     </style>
   </head>
   <body>
@@ -138,13 +138,13 @@
     <div class="dropdown">
       <button class="dropbtn">Tags</button>
       <div class="dropdown-content">
-          <a onclick="handleSelection('All')">All</a>
-          <a onclick="handleSelection('Monuments')">Monuments</a>
-          <a onclick="handleSelection('Museums')">Museums</a>
-          <a onclick="handleSelection('Religious Sites')">Religious Sites</a>
-          <a onclick="handleSelection('Castles')">Castles</a>
+        <a onclick="handleSelection('All')">All</a>
+        <a onclick="handleSelection('Monuments')">Monuments</a>
+        <a onclick="handleSelection('Museums')">Museums</a>
+        <a onclick="handleSelection('Religious Sites')">Religious Sites</a>
+        <a onclick="handleSelection('Castles')">Castles</a>
       </div>
-  </div>
+    </div>
     <div id="locationContainer">
       <!-- activity content will be loaded here -->
     </div>
@@ -152,22 +152,22 @@
       async function handleSelection(tag) {
         let response = null;
         let data = null;
-        if(tag === 'All') {
+        if (tag === "All") {
           response = await fetch(
             "http://localhost:8000/api/location/getLocations"
-          ); 
+          );
           data = await response.json();
         } else {
           response = await fetch(
-            "http://localhost:8000/api/location/filterLocations?name="+tag
+            "http://localhost:8000/api/location/filterLocations?name=" + tag
           );
           data = await response.json();
         }
-        fetchLocations(response,data);
+        fetchLocations(response, data);
       }
 
       // Function to fetch activity data from the API
-      async function fetchLocations(response,data) {
+      async function fetchLocations(response, data) {
         try {
           const container = document.getElementById("locationContainer");
           container.innerHTML = "";
@@ -181,8 +181,12 @@
               <p><strong>Description:</strong> ${location.description}</p>
               <p><strong>Opening Hours:</strong> ${location.openingHours}</p>
               <p><strong>Price:</strong> $${location.ticketPrices}</p>
-              <p><strong>Tag:</strong> ${location.tags.map(tag => tag.name).join(', ')}</p>    
-              <p><strong>Location:</strong> ${location.location}</p>                                       
+              <p><strong>Tag:</strong> ${location.tags
+                .map((tag) => tag.name)
+                .join(", ")}</p>    
+              <p><strong>Location:</strong> ${
+                location.location
+              }</p>                                       
             `;
               container.appendChild(locationElement);
             });
@@ -224,6 +228,10 @@
           <p><strong>Description:</strong> ${location.description}</p>
           <p><strong>Opening Hours:</strong> ${location.openingHours}</p>
           <p><strong>Price:</strong> $${location.ticketPrices}</p>
+          <p><strong>Tag:</strong> ${location.tags
+            .map((tag) => tag.name)
+            .join(", ")}</p>    
+              <p><strong>Location:</strong> ${location.location}</p> 
         `;
               container.appendChild(locationElement);
             });
@@ -237,7 +245,7 @@
         }
       }
 
-      window.onload = handleSelection('All');
+      window.onload = handleSelection("All");
     </script>
   </body>
 </html>
