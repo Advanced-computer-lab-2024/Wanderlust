@@ -102,8 +102,7 @@
     }
   </style>
   <script
-  async
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBjbAAKNhaUHHM7DmvEdWNVJqC2iDQtrG4&callback=initMap&libraries=places"
+  async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBjbAAKNhaUHHM7DmvEdWNVJqC2iDQtrG4&callback=initMap&libraries=places"
 ></script></head>
 <body>
 
@@ -199,11 +198,18 @@
     .update-button:hover {
       background-color: #45a049;
     }
+    #map {
+  height: 200px; /* Set height for small map */
+  width: 100%; /* Set width for map */
+  margin: 10px 0;
+}
   </style>
 </head>
 <body>
 
-
+<!-- prettier-ignore -->
+<script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
+  ({key: "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg", v: "weekly"});</script>
 
   
 
@@ -226,12 +232,13 @@
 
   <div id="createFormContainer" class="create-form">
     <h2>Create New Activity</h2>
+    <input type="text" id="activityName" placeholder="Name">
     <input type="date" id="activityName" placeholder="Name">
     <input type="date" id="activityDate" placeholder="Date">
     <input type="time" id="activityTime" placeholder="Time">
-    <input type="text" id="activityLocation" placeholder="Location (URL)">
-    <button onclick="getCoordinates()">Get Coordinates</button> <!-- Button to get coordinates -->
-    <div id="map"></div> <!-- Map div -->
+
+
+    <div id="map" style="height: 200px; width: 100%; margin: 10px 0;"></div>
     <input type="text" id="activityPrice" placeholder="Price"> <!-- Changed to text -->
     <label for="Category">Category:</label>
     <select id="activityCategory" name="Categories" size="1" onclick="toggleDropdown(this)">
@@ -244,6 +251,7 @@
     <select id="activityTagsDropdown" name="Tags" size="1" onclick="toggleDropdown(this)">
       <!-- Category options will be populated here by JavaScript -->
     </select>
+
     
    
     <input type="text" id="activityDiscounts" placeholder="Special Discounts">
@@ -255,6 +263,22 @@
     <br>
     <button onclick="createActivity()">Create Activity</button>
   </div>
+
+  <!-- <script>
+    document.addEventListener('DOMContentLoaded', function () {
+ const selectElement = document.getElementById('activityTagsDropdown');
+
+ // Handle mousedown instead of click to prevent default behavior
+ selectElement.addEventListener('mousedown', function(event) {
+   event.preventDefault(); // Prevent the default behavior
+   const option = event.target;
+
+   // Toggle selection state manually
+   if (option.tagName === 'OPTION') {
+     option.selected = !option.selected;
+   }
+ });
+});</script> -->
 
   <script>
     function toggleDropdown(selectElement) {
@@ -295,8 +319,63 @@
     </select>
     <button onclick="updateActivity()">Update Activity</button>
   </div>
+<script>
+  let lats;
+  let lngs;
+  
+  map.addListener("click", (mapsMouseEvent) => {
+    lats = mapsMouseEvent.latLng.lat();
+    lngs = mapsMouseEvent.latLng.lng();
+  
+    console.log(`Latitude: ${lat}, Longitude: ${lng}`);
+  });
+
+  console.log(lats);
+  </script>
 
   <script>
+
+    
+    // Function to create a new activity
+    async function createActivity() {
+  if (lats && lngs) {
+    console.log("createActivity function called");
+    const activityData = {
+      name: document.getElementById('activityName').value,
+      date: document.getElementById('activityDate').value,
+      time: document.getElementById('activityTime').value,
+      lat: lats,
+      lng: lngs,
+      price: document.getElementById('activityPrice').value,
+      duration: document.getElementById('activityDuration').value,
+      category: document.getElementById('activityCategory').value, // Direct ID
+      tags: document.getElementById('activityTagsDropdown').value,
+      bookingOpen: document.getElementById('bookingOpen').value === 'true',
+    };
+
+    try {
+      const response = await fetch('http://localhost:8000/api/activity/createActivity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(activityData),
+      });
+      if (response.ok) {
+        alert('Activity created successfully!');
+        fetchActivities(); // Refresh the activity list
+        toggleCreateForm(); // Hide the create form
+      } else {
+        console.log(lats)
+        console.log(activityData);
+        alert('Failed to create activity.');
+      }
+    } catch (error) {
+      console.error('Error creating activity:', error);
+    }
+  } else {
+    alert('Please click on the map to select a location.');
+  }
+}
+
     // Function to fetch categories and populate the dropdown
 async function fetchCategories() {
   try {
@@ -335,37 +414,46 @@ document.addEventListener('DOMContentLoaded', fetchCategories);
 
 async function fetchTags() {
   try {
-    const response = await fetch('http://localhost:8000/api/prefrenceTag/getpreferenceTags'); // Ensure the API URL is correct for fetching tags
+    const response = await fetch('http://localhost:8000/api/preferenceTag/getpreferenceTags');
     if (!response.ok) {
       throw new Error(`Failed to fetch tags: ${response.status}`);
     }
 
     const tags = await response.json();
+    console.log('Fetched tags:', tags); // Log fetched tags
 
-    const tagDropdown = document.getElementById('activityTagsDropdown'); // Make sure this ID exists in your HTML
-    const updateTagDropdown = document.getElementById('updateActivityTagsDropdown'); // Make sure this ID exists in your HTML
+    const tagDropdown = document.getElementById('activityTagsDropdown');
+    const updateTagDropdown = document.getElementById('updateActivityTagsDropdown');
 
-    // Clear any existing options
+    // Clear existing options
     tagDropdown.innerHTML = '<option value="">Select Tags</option>';
-    updateTagDropdown.innerHTML = '<option value="">Select Tags</option>';
+    //updateTagDropdown.innerHTML = '<option value="">Select Tags</option>';
 
     // Populate the dropdowns with tags
     tags.forEach(tag => {
+      console.log('Adding tag:', tag); // Log each tag being added
       const option = document.createElement('option');
-      option.value = tag._id;  // Use the tag ID as the value
-      option.text = tag.name;  // Use the tag name as the text
+      option.value = tag._id;  
+      option.text = tag.name;  
       tagDropdown.appendChild(option);
 
-      // Also add to the update dropdown
-      const updateOption = document.createElement('option');
-      updateOption.value = tag._id;
-      updateOption.text = tag.name;
-      updateTagDropdown.appendChild(updateOption);
+      // const updateOption = document.createElement('option');
+      // updateOption.value = tag._id;
+      // updateOption.text = tag.name;
+      // updateTagDropdown.appendChild(updateOption);
     });
+
+    // Log the final HTML of the dropdowns for verification
+    console.log('Activity Dropdown Options:', tagDropdown.innerHTML);
+    //console.log('Update Dropdown Options:', updateTagDropdown.innerHTML);
+    
   } catch (error) {
     console.error('Error fetching tags:', error);
   }
 }
+
+// Call fetchTags when the page loads
+document.addEventListener('DOMContentLoaded', fetchTags);
 
 // Call fetchTags when the page loads
 document.addEventListener('DOMContentLoaded', fetchTags);
@@ -379,48 +467,120 @@ document.addEventListener('DOMContentLoaded', fetchTags);
     let geocoder; // Geocoder for converting location to coordinates
 
     // Initialize the Google Map
-    function initMap() {
-      geocoder = new google.maps.Geocoder(); // Initialize Geocoder
-      map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 43.4142989, lng: -124.2301242 }, // Default center (can be adjusted)
-        zoom: 4,
-      });
-    }
+    // function initMap() {
+    //   geocoder = new google.maps.Geocoder(); // Initialize Geocoder
+    //   map = new google.maps.Map(document.getElementById("map"), {
+    //     center: { lat: 43.4142989, lng: -124.2301242 }, // Default center (can be adjusted)
+    //     zoom: 4,
+    //   });
+    // }
+
+    async function initMap() {
+  // Request needed libraries.
+  const { Map } = await google.maps.importLibrary("maps");
+  const myLatlng = { lat: -25.363, lng: 131.044 };
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 4,
+    center: myLatlng,
+  });
+  // Create the initial InfoWindow.
+  let infoWindow = new google.maps.InfoWindow({
+    content: "Click the map to get Lat/Lng!",
+    position: myLatlng,
+  });
+
+  infoWindow.open(map);
+
+  // Configure the click listener.
+  map.addListener("click", (mapsMouseEvent) => {
+    // Close the current InfoWindow.
+    infoWindow.close();
+    // Create a new InfoWindow.
+    infoWindow = new google.maps.InfoWindow({
+      position: mapsMouseEvent.latLng,
+    });
+    infoWindow.setContent(
+      JSON.stringify(mapsMouseEvent.latLng.toJSON(), null, 2),
+    );
+    infoWindow.open(map);
+
+    // Update the lats and lngs variables
+    lats = mapsMouseEvent.latLng.lat();
+    lngs = mapsMouseEvent.latLng.lng();
+
+    console.log(`Latitude: ${lats}, Longitude: ${lngs}`);
+  });
+}
 
     // Function to get coordinates from the location input
-    function getCoordinates(isUpdate = false) {
-      const locationInput = isUpdate ? document.getElementById('updateActivityLocation').value : document.getElementById('activityLocation').value;
-      geocoder.geocode({ 'address': locationInput }, (results, status) => {
-        if (status === 'OK') {
-          const location = results[0].geometry.location;
-          const mapElement = isUpdate ? document.getElementById('updateMap') : document.getElementById('map');
+   // Function to get coordinates from the location input
+// Function to get coordinates from the location input
+// Function to get coordinates from the location input
+// Function to get coordinates from the location input
+async function getCoordinates(isUpdate = false) {
+  const locationInput = isUpdate ? document.getElementById('updateActivityLocation').value : document.getElementById('activityLocation').value;
+  geocoder.geocode({ 'address': locationInput }, (results, status) => {
+    if (status === 'OK') {
+      const location = results[0].geometry.location;
+      const mapElement = isUpdate ? document.getElementById('updateMap') : document.getElementById('map');
 
-          // Center the map on the new location
-          const newMap = new google.maps.Map(mapElement, {
-            center: location,
-            zoom: 15,
-          });
-          new google.maps.Marker({
-            position: location,
-            map: newMap,
-          });
+      // Initialize the map
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap`;
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
 
-          // Set latitude and longitude as the location value
-          const coords = `${location.lat()}, ${location.lng()}`;
+      window.initMap1= async () => {
+        const { google } = window;
+        const myLatlng = location;
+        const map = new google.maps.Map(mapElement, {
+          zoom: 15,
+          center: myLatlng,
+        });
+
+        // Create the initial InfoWindow.
+        let infoWindow = new google.maps.InfoWindow({
+          content: "Click the map to get Lat/Lng!",
+          position: myLatlng,
+        });
+
+        infoWindow.open(map);
+
+        // Configure the click listener.
+        map.addListener("click", (mapsMouseEvent) => {
+          // Close the current InfoWindow.
+          infoWindow.close();
+          // Create a new InfoWindow.
+          infoWindow = new google.maps.InfoWindow({
+            position: mapsMouseEvent.latLng,
+          });
+          infoWindow.setContent(
+            JSON.stringify(mapsMouseEvent.latLng.toJSON(), null, 2),
+          );
+          infoWindow.open(map);
+
+          // Update the activity location
+          const lat = mapsMouseEvent.latLng.lat();
+          const lng = mapsMouseEvent.latLng.lng();
           if (!isUpdate) {
-            document.getElementById('activityLocation').value = coords; // Set latitude and longitude
+            document.getElementById('activityLocation').value = `${lat}, ${lng}`;
           } else {
-            document.getElementById('updateActivityLocation').value = coords; // Set latitude and longitude for update
+            document.getElementById('updateActivityLocation').value = `${lat}, ${lng}`;
           }
-        } else {
-          alert('Geocode was not successful for the following reason: ' + status);
-        }
-      });
+        });
+      };
+    } else {
+      alert('Geocode was not successful for the following reason: ' + status);
     }
-
+  });
+}
     // Function to fetch Activities
   // Function to fetch Activities
-  async function fetchActivities() {
+  // Function to fetch Activities
+// Function to fetch Activities
+// Function to fetch Activities
+async function fetchActivities() {
   console.log("fetchActivities function called");
   try {
     const response = await fetch('http://localhost:8000/api/activity/getActivity'); // Fetch data from the API
@@ -446,7 +606,7 @@ document.addEventListener('DOMContentLoaded', fetchTags);
         activityElement.innerHTML = `
           <h2>${activity.name}</h2>
           <p>${new Date(activity.date).toLocaleDateString()} ${activity.time}</p>
-          <p>Location: <a href="${activity.location}" target="_blank">${activity.location}</a></p>
+          <div id="map-${activity._id}" style="height: 200px; width: 100%; margin: 10px 0;"></div> <!-- Map div -->
           <p>Price: ${activity.price}</p>
           <p>Category:${activity.category ? activity.category.name : 'N/A'}</p>
           <p>Tags: ${tags && tags.length > 0 ? tags.map(tag => tag.name).join(', ') : 'None'}</p>
@@ -457,6 +617,17 @@ document.addEventListener('DOMContentLoaded', fetchTags);
         `;
 
         container.appendChild(activityElement);
+
+        // Initialize the Google Map
+        const mapElement = document.getElementById(`map-${activity._id}`);
+        const map = new google.maps.Map(mapElement, {
+          center: { lat: activity.lat, lng: activity.lng },
+          zoom: 15,
+        });
+        new google.maps.Marker({
+          position: { lat: activity.lat, lng: activity.lng },
+          map: map,
+        });
       });
     } else {
       container.innerHTML = '<p>No activities found.</p>';
@@ -465,45 +636,16 @@ document.addEventListener('DOMContentLoaded', fetchTags);
     console.error('Error fetching activities:', error);
   }
 }
-
-    // Function to create a new activity
-    async function createActivity() {
-      console.log("createActivity function called");
-      const activityData = {
-        date: document.getElementById('activityDate').value,
-        time: document.getElementById('activityTime').value,
-        location: document.getElementById('activityLocation').value,
-        price: document.getElementById('activityPrice').value,
-        category: { name: document.getElementById('activityCategory').value },
-        tags: document.getElementById('activityTags').value.split(',').map(tag => ({ name: tag.trim() })),
-        specialDiscounts: document.getElementById('activityDiscounts').value,
-        bookingOpen: document.getElementById('bookingOpen').value === 'true',
-      };
-
-      try {
-        const response = await fetch('http://localhost:8000/api/activity/createActivity', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(activityData),
-        });
-        if (response.ok) {
-          alert('Activity created successfully!');
-          fetchActivities(); // Refresh the activity list
-          toggleCreateForm(); // Hide the create form
-        } else {
-          alert('Failed to create activity.');
-        }
-      } catch (error) {
-        console.error('Error creating activity:', error);
-      }
-    }
-
     // Function to delete an activity
     async function deleteActivity(id) {
       console.log("deleteActivity function called with id:", id);
       try {
-        const response = await fetch(`http://localhost:8000/api/activity/deleteActivity/${id}`, {
+        const response = await fetch(`http://localhost:8000/api/activity/deleteActivity`, {
           method: 'DELETE',
+          headers: {
+        'Content-Type': 'application/json' // Ensure you're sending JSON data
+      },
+          body: JSON.stringify({ id })
         });
         if (response.ok) {
           alert('Activity deleted successfully!');
@@ -549,37 +691,64 @@ document.addEventListener('DOMContentLoaded', fetchTags);
       updateFormContainer.style.display = updateFormContainer.style.display === 'none' ? 'block' : 'none';
     }
 
-    // Function to update an activity
-    async function updateActivity() {
-      console.log("updateActivity function called");
-      const updatedData = {
-        date: document.getElementById('updateActivityDate').value,
-        time: document.getElementById('updateActivityTime').value,
-        location: document.getElementById('updateActivityLocation').value,
-        price: document.getElementById('updateActivityPrice').value,
-        category: { name: document.getElementById('updateActivityCategory').value },
-        tags: document.getElementById('updateActivityTags').value.split(',').map(tag => ({ name: tag.trim() })),
-        specialDiscounts: document.getElementById('updateActivityDiscounts').value,
-        bookingOpen: document.getElementById('updateBookingOpen').value === 'true',
-      };
+  // Function to update an activity
+async function updateActivity() {
+  console.log("updateActivity function called");
+  const updatedData = {
+    date: document.getElementById('updateActivityDate').value,
+    time: document.getElementById('updateActivityTime').value,
+    location: document.getElementById('updateActivityLocation').value,
+    price: document.getElementById('updateActivityPrice').value,
+    category: { name: document.getElementById('updateActivityCategory').value },
+    tags: document.getElementById('updateActivityTags').value.split(',').map(tag => ({ name: tag.trim() })),
+    specialDiscounts: document.getElementById('updateActivityDiscounts').value,
+    bookingOpen: document.getElementById('updateBookingOpen').value === 'true',
+  };
 
-      try {
-        const response = await fetch(`http://localhost:8000/api/activity/updateActivity/${currentActivityId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updatedData),
-        });
-        if (response.ok) {
-          alert('Activity updated successfully!');
-          fetchActivities(); // Refresh the activity list
-          toggleUpdateForm(); // Hide the update form
-        } else {
-          alert('Failed to update activity.');
-        }
-      } catch (error) {
-        console.error('Error updating activity:', error);
-      }
+  try {
+    const response = await fetch(`http://localhost:8000/api/activity/updateActivity`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedData),
+    });
+    if (response.ok) {
+      alert('Activity updated successfully!');
+      fetchActivities(); // Refresh the activity list
+      toggleUpdateForm(); // Hide the update form
+    } else {
+      alert('Failed to update activity.');
     }
+  } catch (error) {
+    console.error('Error updating activity:', error); 
+  }
+}
+
+// Function to show update form
+// Function to show update form
+async function showUpdateForm(id) {
+  console.log("showUpdateForm function called with id:", id);
+  currentActivityId = id; // Store the activity ID to update
+
+  const response = await fetch(`http://localhost:8000/api/activity/getActivity`);
+  const activity = await response.json();
+
+  // Check if the activity object has a date property and it's a string
+  if (activity && activity.date && typeof activity.date === 'string') {
+    // Fill the update form with the activity data
+    document.getElementById('updateActivityDate').value = activity.date.split('T')[0]; // Date format adjustment
+    document.getElementById('updateActivityTime').value = activity.time;
+    document.getElementById('updateActivityLocation').value = activity.location; // Will get coordinates
+    document.getElementById('updateActivityPrice').value = activity.price;
+    document.getElementById('updateActivityCategory').value = activity.category.name;
+    document.getElementById('updateActivityTags').value = activity.tags.map(tag => tag.name).join(', ');
+    document.getElementById('updateActivityDiscounts').value = activity.specialDiscounts;
+    document.getElementById('updateBookingOpen').value = activity.bookingOpen ? 'true' : 'false';
+  } else {
+    console.error('Error: activity object does not have a date property or it\'s not a string');
+  }
+
+  toggleUpdateForm(); // Show update form
+}
   </script>
 </body>
 </html>

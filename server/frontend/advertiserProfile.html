@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tour Guide Itinerary</title>
+  <title>Advertiser Profile</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -34,7 +34,7 @@
       border-radius: 4px;
     }
 
-    .itinerary {
+    .profile-container {
       background: white;
       padding: 15px;
       margin: 10px 0;
@@ -42,58 +42,49 @@
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
-    .activity {
-      margin: 10px 0;
+    .profile-section h2 {
+      margin-top: 0;
     }
 
-    .activity h3 {
-      margin: 0;
-    }
-
-    .delete-button {
-      background-color: #ff4d4d;
-      color: white;
-      border: none;
-      padding: 8px;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-
-    .delete-button:hover {
-      background-color: #ff1a1a;
-    }
-
-    .update-form {
+    .create-form, .update-form {
       display: none;
-      background: white;
+      background-color: #f9f9f9;
       padding: 15px;
-      margin: 10px 0;
+      margin-top: 10px;
+      border: 1px solid #ccc;
       border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
-    .update-form input, .update-form select {
-      width: 100%;
-      margin: 5px 0;
+    .create-form input[type="text"], .update-form input[type="text"] {
+      margin-bottom: 10px;
       padding: 8px;
-    }
-
-    .update-button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 10px;
-      cursor: pointer;
+      width: calc(100% - 20px);
+      border: 1px solid #ddd;
       border-radius: 4px;
     }
 
-    .update-button:hover {
-      background-color: #45a049;
+    .create-form button, .update-form button, .profile-content button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 10px;
     }
+
+    .create-form button:hover, .update-form button:hover, .profile-content button:hover {
+      background-color: #0056b3;
+    }
+
+    .error-message {
+      color: red;
+      margin-top: 10px;
+    }
+
   </style>
 </head>
 <body>
-
 
   <nav>
     <a>Advertiser</a>
@@ -101,7 +92,6 @@
     <a href="activities.html">Activities</a>
     <a href="Main.html">Back to Main Page</a>
   </nav>
-
 
   <div class="profile-container">
     <!-- Profile Header Section -->
@@ -140,6 +130,18 @@
       </div>
 
       <button onclick="toggleUpdateForm()">Update Profile</button>
+
+      <!-- Create New Advertiser Button and Form -->
+      <button id="createButton" onclick="toggleCreateForm()">+ Create a Profile</button>
+
+      <div id="createForm" class="create-form">
+        <h3>Create a Profile</h3>
+        <input type="text" id="createHotline" placeholder="Hotline">
+        <input type="text" id="createWebsite" placeholder="Company Website">
+        <input type="text" id="createProfile" placeholder="Company Profile">
+        <button onclick="createAdvertiser()">Create</button>
+        <p id="createErrorMessage" class="error-message"></p> <!-- Error message element -->
+      </div>
     </div>
 
     <!-- Profile Footer Section -->
@@ -153,7 +155,7 @@
     function loadAdvertiserProfile() {
       const url = new URL(window.location.href);
       const urlParams = new URLSearchParams(url.search);
-      const username = urlParams.get('username'); // Ensure 'username' is properly extracted
+      const username = 'yousef1'; // Ensure 'username' is properly extracted
 
       if (!username) {
         console.error("Username not found in URL");
@@ -239,13 +241,55 @@
       }
     }
 
-    // Function to navigate back to the list of advertisers
-    function goBack() {
-      window.history.back();
+    // Function to create a new Advertiser
+    async function createAdvertiser() {
+      const hotline = document.getElementById('createHotline').value;
+      const companyWebsite = document.getElementById('createWebsite').value;
+      const companyProfile = document.getElementById('createProfile').value;
+      const errorMessage = document.getElementById('createErrorMessage');
+
+      try {
+        const response = await fetch('http://localhost:8000/createAdvertiser', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            hotline,
+            companyWebsite,
+            companyProfile
+          }),
+        });
+
+        if (response.ok) {
+          alert('Advertiser created successfully!');
+          errorMessage.innerText = "";  // Clear error message on success
+          window.location.href = "advertisers.html"; // Redirect to advertiser list page
+        } else {
+          const errorData = await response.json();
+          errorMessage.innerText = "Advertiser profile already exists"; // Display error message
+        }
+      } catch (error) {
+        console.error('Error creating advertiser:', error);
+        errorMessage.innerText = "Advertiser profile already exists";
+      }
     }
 
-    // Load the advertiser profile when the page is loaded
-    window.onload = loadAdvertiserProfile;
+    // Toggle the Create Form visibility
+    function toggleCreateForm() {
+      const form = document.getElementById('createForm');
+      form.style.display = form.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // Go back function
+    function goBack() {
+      window.location.href = "advertisers.html"; // Redirect to advertisers list page
+    }
+
+    // Load the advertiser profile when the page loads
+    window.onload = function () {
+      loadAdvertiserProfile();
+    };
   </script>
 
 </body>

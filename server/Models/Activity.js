@@ -1,12 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// Validator for URL
-const urlValidator = (v) => {
-  const urlRegex = /^(https?:\/\/)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
-  return urlRegex.test(v);
-};
-
 // Activity Schema
 const ActivitySchema = new Schema({
   name: {
@@ -21,16 +15,16 @@ const ActivitySchema = new Schema({
     type: String,
     required: true
   },
-  location: {
-    type: String,
-    required: true,
-    validate: {
-      validator: urlValidator,
-      message: props => `${props.value} is not a valid URL!`
-    }
+  lat: {
+       type: Number,
+        required: true
+      },
+  lng: {
+        type: Number,
+        required: true     
   },
   price: {
-    type: Number,
+    type: String,
     required: true
   },
   duration: {

@@ -91,9 +91,13 @@
       background-color: #45a049;
     }
   </style>
-</head>
+<script
+async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBjbAAKNhaUHHM7DmvEdWNVJqC2iDQtrG4&callback=initMap&libraries=places"
+></script></head>
 <body>
 
+  <script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
+  ({key: "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg", v: "weekly"});</script>
   
 
   <nav>
@@ -128,6 +132,20 @@
       <script>
      document.addEventListener('DOMContentLoaded', function () {
   const selectElement = document.getElementById('createActivities');
+
+  // Handle mousedown instead of click to prevent default behavior
+  selectElement.addEventListener('mousedown', function(event) {
+    event.preventDefault(); // Prevent the default behavior
+    const option = event.target;
+
+    // Toggle selection state manually
+    if (option.tagName === 'OPTION') {
+      option.selected = !option.selected;
+    }
+  });
+});
+document.addEventListener('DOMContentLoaded', function () {
+  const selectElement = document.getElementById('updateActivities');
 
   // Handle mousedown instead of click to prevent default behavior
   selectElement.addEventListener('mousedown', function(event) {
@@ -224,6 +242,13 @@
   </div>
   <script>
 
+function initMap() {
+      geocoder = new google.maps.Geocoder(); // Initialize Geocoder
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 43.4142989, lng: -124.2301242 }, // Default center (can be adjusted)
+        zoom: 4,
+      });
+    }
 function handleUpdateClick(itinerary) {
   toggleUpdateForm(itinerary);
 }
@@ -384,6 +409,8 @@ function toggleCreateForm() {
 
 
 
+
+
 // Add an event listener to the button to trigger the toggle function
 document.getElementById('toggleCreateFormButton').addEventListener('click', toggleCreateForm);
     // Function to fetch itinerary data from the API
@@ -395,8 +422,6 @@ async function fetchItineraries() {
   try {
     const response = await fetch('http://localhost:8000/getItinerary'); // Adjust the API endpoint as needed
     const data = await response.json();
-    //console.error(data);
-
     const container = document.getElementById('itineraryContainer');
     container.innerHTML = '';
 
@@ -408,16 +433,17 @@ async function fetchItineraries() {
         itineraryElement.className = 'itinerary';
 
         // Build activities list dynamically
-        const activitiesHTML = itinerary.activities.map(activity => `
+        const activitiesHTML = itinerary.activities.map((activity, index) => `
           <div class="activity">
             <h4>${new Date(activity.date).toLocaleDateString()} at ${activity.time}</h4>
             <p><strong>Activity Name:</strong> ${activity.name}</p>
-            <p>Location: <a href="${activity.location}" target="_blank">${activity.location}</a></p>
+
             <p>Price: ${activity.price}</p>
             <p><strong>Category:</strong> ${activity.category.name}</p>
             <p><strong>Tags:</strong> ${Array.isArray(activity.tags) ? activity.tags.map(tag => tag.name).join(', ') : activity.tags.name}</p>
             <p>Special Discounts: ${activity.specialDiscounts}</p>
             <p><strong>Booking Open:</strong> ${activity.bookingOpen ? 'Yes' : 'No'}</p>
+            <div class="map" id="map-${itinerary._id}-${index}" style="height: 200px; width: 300px;"></div>
           </div>
         `).join('');
 
@@ -431,13 +457,25 @@ async function fetchItineraries() {
           <h3>Activities:</h3>
           ${activitiesHTML} <!-- Dynamically inserted activities -->
           <p><strong>Accessibility:</strong> ${itinerary.accessibility}</p>
-          <p><strong>Pickup Location:</strong> ${itinerary.pickupLocation}</p>
           <p><strong>Dropoff Location:</strong> ${itinerary.dropoffLocation}</p>
           <button class="delete-button" onclick="deleteItinerary('${itinerary._id}')">Delete Itinerary</button>
           <button class="update-button" onclick="toggleUpdateForm('${itinerary._id}')">Update Itinerary</button>
         `;
 
         container.appendChild(itineraryElement);
+
+        // Initialize Google Map for each activity
+        itinerary.activities.forEach((activity, index) => {
+          const mapElement = document.getElementById(`map-${itinerary._id}-${index}`);
+          const map = new google.maps.Map(mapElement, {
+            center: { lat: activity.lat, lng: activity.lng },
+            zoom: 15,
+          });
+          new google.maps.Marker({
+            position: { lat: activity.lat, lng: activity.lng },
+            map: map,
+          });
+        });
       });
     } else {
       container.innerHTML = '<p>No itineraries available at the moment.</p>';
@@ -446,8 +484,7 @@ async function fetchItineraries() {
     console.error('Error fetching itineraries:', error);
     document.getElementById('itineraryContainer').innerHTML = '<p>Failed to load itineraries.</p>';
   }
-}
-    // Function to delete an itinerary
+}  // Function to delete an itinerary
     async function deleteItinerary(id) {
   try {
     const response = await fetch(`http://localhost:8000/deleteItinerary`, {
