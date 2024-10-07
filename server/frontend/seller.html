@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seller</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    nav, button {
+      background-color: #333;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+
+    nav a, button {
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+      margin-right: 10px;
+      display: inline-block;
+    }
+
+    nav a, button:hover {
+      background-color: #575757;
+      border-radius: 4px;
+    }
+
+    /* Form styling */
+    .form-container {
+      display: none;
+      background: white;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .form-container input, .form-container select, .form-container button {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+    }
+
+    .form-container button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .form-container button:hover {
+      background-color: #45a049;
+    }
+
+    /* Seller info styling */
+    .seller-info {
+      background: white;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
+    }
+  </style>
+  <script>
+    let currentSellerId = null; // Store the current seller ID
+
+    function toggleForm() {
+      const formContainer = document.getElementById('form-container');
+      formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function submitForm(event) {
+  event.preventDefault(); // Prevent default form submission
+
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const role = document.getElementById('role').value;
+  const username = document.getElementById('username').value;
+  const description = document.getElementById('description').value;
+
+  const data = {
+    name,
+    email,
+    password,
+    role,
+    username,
+    description
+  };
+
+  try {
+    const response = await fetch('http://localhost:8000/api/seller/createSeller', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    
+    if (response.ok) {
+      alert('Success creating profile!');
+      currentSellerId = result.Seller._id; // Store seller ID
+      displaySellerInfo(result.Seller); // Call to display seller info
+      document.getElementById('form-container').style.display = 'none'; // Hide form after submission
+
+      // Hide the "Create Seller Profile!" button
+      document.getElementById('create-profile-btn').style.display = 'none';
+    } else {
+      alert('Error creating profile: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Error creating seller profile:', error);
+    alert('Error creating profile!');
+  }
+}
+
+
+    function displaySellerInfo(seller) {
+      const sellerInfoContainer = document.getElementById('seller-info');
+      sellerInfoContainer.innerHTML = `
+        <h3>Seller Information</h3>
+        <p><strong>Name:</strong> ${seller.name}</p>
+        <p><strong>Email:</strong> ${seller.email}</p>
+        <p><strong>Role:</strong> ${seller.role}</p>
+        <p><strong>Username:</strong> ${seller.username}</p>
+        <p><strong>Description:</strong> ${seller.description}</p>
+        <button onclick="toggleUpdateForm()">Update Profile</button>
+      `;
+      sellerInfoContainer.style.display = 'block'; // Show seller info box
+    }
+
+    function toggleUpdateForm() {
+  const updateFormContainer = document.getElementById('update-form-container');
+  updateFormContainer.style.display = updateFormContainer.style.display === 'none' ? 'block' : 'none';
+
+  // Pre-fill the update form with the current seller's information
+  if (currentSellerId) {
+    // Fetch the seller info from the sellerInfoContainer or store it globally when creating the profile
+    const sellerInfoContainer = document.getElementById('seller-info');
+
+    // Get the values from the display section or store seller info in a global variable upon creation
+    const sellerName = sellerInfoContainer.querySelector('p:nth-child(2)').innerText.split(': ')[1];
+    const sellerEmail = sellerInfoContainer.querySelector('p:nth-child(3)').innerText.split(': ')[1];
+    const sellerRole = sellerInfoContainer.querySelector('p:nth-child(4)').innerText.split(': ')[1];
+    const sellerUsername = sellerInfoContainer.querySelector('p:nth-child(5)').innerText.split(': ')[1];
+    const sellerDescription = sellerInfoContainer.querySelector('p:nth-child(6)').innerText.split(': ')[1];
+
+    // Pre-fill the form fields with existing values
+    document.getElementById('update-name').value = sellerName;
+    document.getElementById('update-email').value = sellerEmail;
+    document.getElementById('update-role').value = sellerRole;
+    document.getElementById('update-username').value = sellerUsername;
+    document.getElementById('update-description').value = sellerDescription;
+  }
+}
+
+
+    async function submitUpdateForm(event) {
+      event.preventDefault(); // Prevent default form submission
+
+      const name = document.getElementById('update-name').value;
+      const email = document.getElementById('update-email').value;
+      const role = document.getElementById('update-role').value;
+      const username = document.getElementById('update-username').value;
+      const description = document.getElementById('update-description').value;
+
+      const data = {
+        name,
+        email,
+        role,
+        username,
+        description
+      };
+
+      try {
+        const response = await fetch(`http://localhost:8000/api/seller/updateSeller/${currentSellerId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+          alert('Success updating profile!');
+          displaySellerInfo(result.Seller); // Call to display updated seller info
+          document.getElementById('update-form-container').style.display = 'none'; // Hide update form after submission
+        } else {
+          alert('Error updating profile: ' + result.message);
+        }
+      } catch (error) {
+        console.error('Error updating seller profile:', error);
+        alert('Error updating profile!');
+      }
+    }
+  </script>
+</head>
+<body>
+
+  <nav>
+    <a>Welcome</a>
+    <button id="create-profile-btn" onclick="toggleForm()">Create Seller Profile!</button>
+
+    <a href="Main.html">Back to Main Page</a>
+  </nav>
+
+  <!-- Form container for seller profile -->
+  <div id="form-container" class="form-container">
+    <h2>Create Seller Profile</h2>
+    <form id="sellerForm" onsubmit="submitForm(event)">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required minlength="6">
+
+      <label for="role">Role:</label>
+      <input type="text" id="role" name="role" required>
+
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required>
+
+      <label for="description">Description:</label>
+      <input type="text" id="description" name="description" required>
+
+      <button type="submit">Create Profile</button>
+    </form>
+  </div>
+
+  <!-- Update form container for seller profile -->
+  <div id="update-form-container" class="form-container" style="display: none;">
+    <h2>Update Seller Profile</h2>
+    <form id="updateSellerForm" onsubmit="submitUpdateForm(event)">
+      <label for="update-name">Name:</label>
+      <input type="text" id="update-name" name="name" required>
+
+      <label for="update-email">Email:</label>
+      <input type="email" id="update-email" name="email" required>
+
+      <label for="update-role">Role:</label>
+      <input type="text" id="update-role" name="role" required>
+
+      <label for="update-username">Username:</label>
+      <input type="text" id="update-username" name="username" required>
+
+      <label for="update-description">Description:</label>
+      <input type="text" id="update-description" name="description" required>
+
+      <button type="submit">Update Profile</button>
+    </form>
+  </div>
+
+  <!-- Seller info display -->
+  <div id="seller-info" class="seller-info" style="display: none;"></div>
+
+</body>

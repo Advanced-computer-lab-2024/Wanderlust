@@ -7,6 +7,38 @@ require("dotenv").config();
 //Make sure to add your MongoDB URI in the .env file as MONGO_URI="your mongodb uri"
 //Check db connection links in README file
 
+//calling for controllers
+const {
+  createTourGuide,
+  getTourGuide,
+  updateTourGuide,
+  deleteTourGuide,
+} = require("./Controllers/tourGuideController");
+
+const {
+  createLocation,
+  getLocations,
+  updateLocation,
+  deleteLocation,
+  filterLocations,
+  getLocationById,
+} = require("./Controllers/LocationController");
+
+const { 
+  createItinerary,
+  getItinerary,
+  updateItinerary,
+  deleteItinerary,
+  sortItineraries,
+  searchItinerary,
+  filterItinerairies,
+} = require("./Controllers/ItineraryController");
+const {
+  createAdvertiser,
+  getAdvertiser,
+  getAdvertiserByUsername,
+  updateAdvertiser,
+} = require("./Controllers/advertiserController");
 //new
 
 //App variables
@@ -40,6 +72,7 @@ const locationRoutes = require("./Routes/locationsRoutes");
 const tourGuideRoutes = require("./Routes/tourGuideRoutes");
 const advertiserRoutes = require("./Routes/advertiserRoutes");
 const categoryRoutes = require("./Routes/categoryRoutes");
+const sellerRoutes = require("./Routes/sellerRoutes");
 
 //Routes
 app.use("/api/tourist", touristRoutes);
@@ -48,6 +81,51 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/preferenceTag", preferenceTagRoutes);
 app.use("/api/activity", activityRoutes);
 app.use("/api/location", locationRoutes);
-app.use("/api/tourGuide", tourGuideRoutes);
-app.use("/api/advertiser", advertiserRoutes);
 app.use("/api/category", categoryRoutes);
+app.use("/api/seller", sellerRoutes);
+//routes for tour guide
+app.use(express.json());
+app.post("/createtgprofile", createTourGuide);
+app.get("/gettgprofile", getTourGuide);
+app.put("/updatetgprofile", updateTourGuide);
+app.delete("/deletetgprofile", deleteTourGuide);
+//routes for advertiser
+app.use(express.json());
+app.post("/createAdvertiserProfile", createAdvertiser);
+app.get("/getAdvertiser", getAdvertiser);
+app.get("/getAdvertiserByUsername", getAdvertiserByUsername);
+app.post("/getAdvertiserByUsername", getAdvertiserByUsername);
+app.put("/updateAdvertiser", updateAdvertiser);
+//routes for activity
+
+//routes for activity category
+// app.use(express.json());
+// app.post("/createCategory", createCategory);
+// app.get("/getCategories", getCategories);
+// app.put("/updateCategory", updateCategory);
+// app.delete("/deleteCategory", deleteCategory);
+
+//routes for Itinerary
+app.use(express.json());
+ app.post("/createItinerary", createItinerary);
+  app.get("/getItinerary", getItinerary);
+  app.put("/updateItinerary", updateItinerary);
+  app.delete("/deleteItinerary", deleteItinerary);
+  app.get("/sortItineraries", sortItineraries);
+  app.get("/searchItinerary", searchItinerary);
+  app.get("/filterItineraries", filterItinerairies);
+
+app.use(express.json());
+app.post("/createLocation", createLocation);
+app.get("/getLocations", getLocations);
+app.put("/updateLocation/:id", updateLocation);
+
+app.delete("/deleteLocation/:id", deleteLocation);
+app.get('/getLocation/:id', getLocationById);
+
+
+  //createLocation,
+  //getLocations,
+  //updateLocation,
+  //deleteLocation,
+  //filterLocations,

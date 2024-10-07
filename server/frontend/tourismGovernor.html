@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tourism Governor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    nav {
+      background-color: #333;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+      margin-right: 10px;
+      display: inline-block;
+    }
+
+    nav a:hover {
+      background-color: #575757;
+      border-radius: 4px;
+    }
+
+    .location {
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .location img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    /* Form styling */
+    .form-container {
+      display: none;
+      background: white;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .form-container input, .form-container select, .form-container button {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+    }
+
+    .form-container button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .form-container button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a>Tourism Govener</a>
+    <a href="Main.html">Back to Main Page</a>
+  </nav>
+
+  <h1>Available Locations</h1>
+
+  <!-- Add Location Button -->
+  <button id="addLocationButton">Add Location</button>
+  <!-- Add Tag Button -->
+  <button id="addTagButton">Add Tag</button>
+
+  <div id="tagFormContainer" class="form-container">
+    <h2>Add New Tag</h2>
+    <form id="tagForm">
+        <input type="text" id="tag" placeholder="Tag" required>
+        <button type="submit">Add Tag</button>
+    </form>
+  </div>
+  <!-- Add Location Form (Initially Hidden) -->
+  <div id="locationFormContainer" class="form-container">
+    <h2>Add New Location</h2>
+    <form id="locationForm">
+      <input type="text" id="name" placeholder="Name" required>
+      <input type="text" id="description" placeholder="Description" required>
+      <input type="text" id="pictures" placeholder="Picture URL">
+      <input type="text" id="locationUrl" placeholder="Location (Google Maps URL)" required>
+      <input type="text" id="openingHours" placeholder="Opening Hours" required>
+      <input type="number" id="ticketPrices" placeholder="Ticket Prices" required>
+      <label>Tags (Select Multiple):</label>
+      <select id="tags" multiple>
+        <!-- Tags will be dynamically added here -->
+      </select>
+
+      <button type="submit">Add Location</button>
+    </form>
+  </div>
+  
+  <!-- The location container where the locations will be displayed -->
+  <div id="LocationContainer">
+    <!-- Location content will be loaded here dynamically by JavaScript -->
+  </div>
+  <div id="updateLocationContainer" class="form-container" style="display:none;">
+    <h2>Update Location</h2>
+    <form id="updateLocationForm">
+        <input type="hidden" id="updateLocationId" name="id"> <!-- Change this ID -->
+
+        <label for="updateName">Name:</label>
+        <input type="text" id="updateName" name="name" required>
+
+        <label for="updateDescription">Description:</label>
+        <input type="text" id="updateDescription" name="description" required>
+
+        <label for="updatePictures">Picture URL:</label>
+        <input type="text" id="updatePictures" name="pictures" required>
+
+        <label for="updateLocationUrl">Location (Google Maps URL):</label>
+        <input type="text" id="updateLocationUrl" name="locationUrl" required>
+
+        <label for="updateOpeningHours">Opening Hours:</label>
+        <input type="text" id="updateOpeningHours" name="openingHours" required>
+
+        <label for="updateTicketPrices">Ticket Prices:</label>
+        <input type="number" id="updateTicketPrices" name="ticketPrices" required>
+
+        <label for="updateTags">Tags (Select Multiple):</label>
+        <select id="updateTags" multiple>
+          <!-- Tags will be dynamically added here -->
+        </select>
+
+        <button type="submit" class="update-button">Update Location</button>
+        <button type="button" onclick="toggleUpdateForm()">Cancel</button>
+    </form>
+</div>
+
+
+
+  <script>
+    // Show/Hide form for adding location
+    const addLocationButton = document.getElementById('addLocationButton');
+    const locationFormContainer = document.getElementById('locationFormContainer');
+
+    addLocationButton.addEventListener('click', () => {
+      locationFormContainer.style.display = locationFormContainer.style.display === 'none' ? 'block' : 'none';
+    });
+
+    addTagButton.addEventListener('click', () => {
+      tagFormContainer.style.display = tagFormContainer.style.display === 'none' ? 'block' : 'none';
+    });
+    // Fetch locations and display them
+    async function fetchLocations() {
+  try {
+    const response = await fetch('http://localhost:8000/getLocations');
+    const data = await response.json();
+
+    const container = document.getElementById('LocationContainer');
+    container.innerHTML = ''; // Clear the container
+
+    if (response.ok && data.length > 0) {
+      data.forEach(location => {
+        const locationElement = document.createElement('div');
+        locationElement.className = 'location';
+
+        // Handling multiple tags, assuming location.tags is an array
+        const tags = location.tags && Array.isArray(location.tags)
+          ? location.tags.map(tag => tag.name).join(', ') // Convert array of tags to a comma-separated string
+          : 'No tags available';
+
+        locationElement.innerHTML = `
+          <h2>${location.name}</h2>
+          <p><strong>Description:</strong> ${location.description}</p>
+          <p><strong>Opening Hours:</strong> ${location.openingHours}</p>
+          <p><strong>Ticket Prices:</strong> ${location.ticketPrices}</p>
+          <p><strong>Location:</strong> <a href="${location.location}" target="_blank">View on Map</a></p>
+          <p><strong>Tags:</strong> ${tags}</p> <!-- Display tags properly -->
+          <p><strong>Pictures:</strong> <img src="${location.pictures}" alt="Location Picture" /></p>
+          <button class="delete-button" onclick="deleteLocation('${location._id}')">Delete Location</button>
+          <button class="update-button" onclick="openUpdateForm('${location._id}')">Update Location</button>
+        `;
+
+        container.appendChild(locationElement);
+      });
+    } else {
+      container.innerHTML = '<p>No location available at the moment.</p>';
+    }
+  } catch (error) {
+    console.error('Error fetching locations:', error);
+    document.getElementById('LocationContainer').innerHTML = '<p>Failed to load locations.</p>';
+  }
+}
+
+
+    document.addEventListener('DOMContentLoaded', fetchLocations);
+       
+    // Fetch existing tags
+async function fetchTags() {
+  try {
+    const response = await fetch('http://localhost:8000/api/preferenceTag/getpreferenceTags');
+    const tags = await response.json();
+    
+    if (response.ok && tags.length > 0) {
+      const addTagSelect = document.getElementById('tags');
+      const updateTagSelect = document.getElementById('updateTags');
+      
+      // Clear previous options
+      addTagSelect.innerHTML = '';
+      updateTagSelect.innerHTML = '';
+      
+      // Populate both select elements with options
+      tags.forEach(tag => {
+        const option = document.createElement('option');
+        option.value = tag._id; // Assuming the tag has an _id field
+        option.text = tag.name;
+
+        addTagSelect.appendChild(option.cloneNode(true));  // For add form
+        updateTagSelect.appendChild(option);  // For update form
+      });
+    } else {
+      console.error('No tags found or failed to fetch.');
+    }
+  } catch (error) {
+    console.error('Error fetching tags:', error);
+  }
+}
+
+// Call fetchTags when the page loads
+document.addEventListener('DOMContentLoaded', fetchTags);
+
+    async function openUpdateForm(id) {
+    try {
+        const response = await fetch(`http://localhost:8000/getLocation/${id}`);
+        const location = await response.json();
+
+        if (response.ok) {
+            document.getElementById('updateLocationId').value = location._id; // Change this line
+            document.getElementById('updateName').value = location.name; // Change this line
+            document.getElementById('updateDescription').value = location.description; // Change this line
+            document.getElementById('updatePictures').value = location.pictures; // Change this line
+            document.getElementById('updateLocationUrl').value = location.location; // Change this line
+            document.getElementById('updateOpeningHours').value = location.openingHours; // Change this line
+            document.getElementById('updateTicketPrices').value = location.ticketPrices; // Change this line
+
+            if (Array.isArray(location.tags)) {
+                document.getElementById('updateTags').value = location.tags.map(tag => tag.name).join(', '); // Change this line
+            } else {
+                document.getElementById('updateTags').value = ''; // Or handle it as needed
+            }
+
+            document.getElementById('updateLocationContainer').style.display = 'block'; // Show the update form
+        } else {
+            alert('Failed to fetch location data.');
+        }
+    } catch (error) {
+        console.error('Error fetching location data:', error);
+        alert('Error fetching location data: ' + error.message);
+    }
+}
+document.getElementById('updateLocationForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  
+  const id = document.getElementById('updateLocationId').value;
+  
+  // Get selected tag values
+  const selectedTags = Array.from(document.getElementById('updateTags').selectedOptions)
+                            .map(option => option.value);
+  
+  const updatedLocation = {
+    name: document.getElementById('updateName').value,
+    description: document.getElementById('updateDescription').value,
+    pictures: document.getElementById('updatePictures').value,
+    location: document.getElementById('updateLocationUrl').value,
+    openingHours: document.getElementById('updateOpeningHours').value,
+    ticketPrices: document.getElementById('updateTicketPrices').value,
+    tags: selectedTags  // Send the array of selected tag IDs
+  };
+
+  try {
+    // Send the PUT request to update the location
+    const response = await fetch(`http://localhost:8000/updateLocation/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedLocation), // Send the updated location
+    });
+
+    // Check if the response is ok (status in the range 200-299)
+    if (response.ok) {
+      alert('Location updated successfully!');
+      fetchLocations(); // Refresh the location list after updating
+      toggleUpdateForm(); // Hide the update form
+    } else {
+      const errorData = await response.json();
+      alert('Failed to update location: ' + errorData.message); // Use 'message' field for clarity
+    }
+  } catch (error) {
+    console.error('Error updating location:', error);
+    alert('Error updating location.'); // Alert user about the error
+  }
+});
+
+
+function toggleUpdateForm() {
+  const formContainer = document.getElementById('updateLocationContainer');
+  formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+}
+
+const tagForm = document.getElementById('tagForm');
+tagForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      
+      const newtag = {name: document.getElementById('tag').value}
+      try {
+        const response = await fetch('http://localhost:8000/api/preferenceTag/createTag', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(newtag)
+        });
+
+        if (response.ok) {
+          alert('Tag added successfully!');
+          tagForm.reset(); // Clear the form
+          tagFormContainer.style.display = 'none'; // Hide the form
+          
+        } else {
+          alert('Failed to add Tag.');
+        }
+      } catch (error) {
+        console.error('Error adding Tag:', error);
+        alert('Error adding Tag.');
+      }
+    });
+
+
+    // Handle form submission to add a new location
+    const locationForm = document.getElementById('locationForm');
+    
+    locationForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+  
+  // Get selected tag values
+  const selectedTags = Array.from(document.getElementById('tags').selectedOptions)
+                            .map(option => option.value);
+  
+  const newLocation = {
+    name: document.getElementById('name').value,
+    description: document.getElementById('description').value,
+    pictures: document.getElementById('pictures').value,
+    location: document.getElementById('locationUrl').value,
+    openingHours: document.getElementById('openingHours').value,
+    ticketPrices: document.getElementById('ticketPrices').value,
+    tags: selectedTags  // Send the array of selected tag IDs
+  };
+      
+      try {
+        const response = await fetch('http://localhost:8000/createLocation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(newLocation)
+        });
+
+        if (response.ok) {
+          alert('Location added successfully!');
+          locationForm.reset(); // Clear the form
+          locationFormContainer.style.display = 'none'; // Hide the form
+          fetchLocations(); // Reload locations
+        } else {
+          alert('Failed to add location.');
+        }
+      } catch (error) {
+        console.error('Error adding location:', error);
+        alert('Error adding location.');
+      }
+    });
+
+
+    async function deleteLocation(id) {
+  try {
+    const response = await fetch(`http://localhost:8000/deleteLocation/${id}`, {
+      method: 'DELETE'
+    });
+    
+    if (response.ok) {
+      fetchLocations(); // Refresh the location list after deletion
+    } else {
+      const errorData = await response.json();
+      console.error('Error deleting location:', errorData.message);
+      alert('Failed to delete location: ' + errorData.message);
+    }
+  } catch (error) {
+    console.error('Error deleting location:', error);
+    alert('Failed to delete location.');
+  }
+}
+
+
+  </script>
+</body>
+</html>

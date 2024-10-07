@@ -5,11 +5,16 @@ const {
   createLocation,
   updateLocation,
   deleteLocation,
+  filterLocations,
+  getLocationById
 } = require("../Controllers/LocationController");
 
 router.get("/getLocations", getLocations);
 router.post("/createLocation", createLocation);
-router.put("/updateLocation/:name", updateLocation);
-router.delete("/deleteLocation/:name", deleteLocation);
+router.get('/getLocation/:id', getLocationById);
+router.put("/updateLocation/:id", updateLocation);
+router.delete("/deleteLocation/:id", deleteLocation);
+router.get("/filterLocations", filterLocations);
+
 
 module.exports = router;

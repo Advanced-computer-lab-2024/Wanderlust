@@ -1,4 +1,5 @@
 const locationModel = require("../Models/Locations.js");
+const preferenceTagModel = require("../Models/PreferenceTag.js");
 const { default: mongoose } = require("mongoose");
 
 // Create a new location
@@ -26,12 +27,10 @@ const createLocation = async (req, res) => {
 
     await newLocation.save(); // Save the new location in the database
 
-    res
-      .status(201)
-      .json({
-        message: "Location created successfully",
-        location: newLocation,
-      });
+    res.status(201).json({
+      message: "Location created successfully",
+      location: newLocation,
+    });
   } catch (error) {
     res.status(500).json({ message: "Error creating location", error });
   }
@@ -40,7 +39,7 @@ const createLocation = async (req, res) => {
 // Get all locations
 const getLocations = async (req, res) => {
   try {
-    const locations = await locationModel.find().populate("tag", "name"); // Retrieve all locations from the database
+    const locations = await locationModel.find().populate("tags"); // Retrieve all locations from the database
     res.status(200).json(locations); // Send the locations as a response
   } catch (error) {
     res.status(500).json({ message: "Error retrieving locations", error });
@@ -50,8 +49,9 @@ const getLocations = async (req, res) => {
 // Update an existing location by name
 const updateLocation = async (req, res) => {
   try {
-    const { name } = req.params; // Get the location name from the route parameters
+    const { id } = req.params; // Get the location ID from the route parameters
     const {
+      name,
       description,
       pictures,
       location,
@@ -61,8 +61,8 @@ const updateLocation = async (req, res) => {
     } = req.body; // Destructure updated data from request body
 
     const updatedLocation = await locationModel.findOneAndUpdate(
-      { name }, // Find location by name
-      { description, pictures, location, openingHours, ticketPrices, tags },
+      { _id: id }, // Find location by ID
+      { name, description, pictures, location, openingHours, ticketPrices, tags }, // Update the fields, including name
       { new: true } // Return the updated document
     );
 
@@ -70,23 +70,22 @@ const updateLocation = async (req, res) => {
       return res.status(404).json({ message: "Location not found" });
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Location updated successfully",
-        location: updatedLocation,
-      });
+    res.status(200).json({
+      message: "Location updated successfully",
+      location: updatedLocation,
+    });
   } catch (error) {
     res.status(500).json({ message: "Error updating location", error });
   }
 };
 
+
 // Delete a location by name
 const deleteLocation = async (req, res) => {
   try {
-    const { name } = req.params; // Get the location name from the route parameters
+    const { id } = req.params; // Get the location ID from the route parameters
 
-    const deletedLocation = await locationModel.findOneAndDelete({ name }); // Find and delete location by name
+    const deletedLocation = await locationModel.findByIdAndDelete(id); // Find and delete location by ID
 
     if (!deletedLocation) {
       return res.status(404).json({ message: "Location not found" });
@@ -98,9 +97,35 @@ const deleteLocation = async (req, res) => {
   }
 };
 
+const filterLocations = async (req, res) => {
+  const { name } = req.query;
+  try {
+    const tag = await preferenceTagModel.findOne({ name });
+    const locations = await locationModel.find({ tags: { $in: tag._id } }).populate("tags");
+    res.status(200).json(locations);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+// Get a location by ID
+const getLocationById = async (req, res) => {
+  try {
+    const location = await locationModel.findById(req.params.id).populate("tags");
+    if (!location) {
+      return res.status(404).json({ message: "Location not found" });
+    }
+    res.status(200).json(location);
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving location", error });
+  }
+};
+
+
 module.exports = {
   createLocation,
   getLocations,
   updateLocation,
   deleteLocation,
+  filterLocations,
+  getLocationById,
 };

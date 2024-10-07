@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tourist Activity</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      nav {
+        background-color: #333;
+        padding: 10px;
+        margin-bottom: 20px;
+      }
+
+      nav a {
+        color: white;
+        text-decoration: none;
+        padding: 10px;
+        margin-right: 10px;
+        display: inline-block;
+      }
+
+      nav a:hover {
+        background-color: #575757;
+        border-radius: 4px;
+      }
+      .activity {
+        background: white;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .activity h3 {
+        margin: 0;
+      }
+
+      .delete-button {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+
+      .delete-button:hover {
+        background-color: #ff1a1a;
+      }
+
+      .update-form {
+        display: none;
+        background: white;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .update-form input,
+      .update-form select {
+        width: 100%;
+        margin: 5px 0;
+        padding: 8px;
+      }
+
+      .update-button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+
+      .update-button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a>Tourist</a>
+      <a href="tourist_profile.html">Profile</a>
+      <a href="tourist_Itinerary.html">Itinerary</a>
+      <a href="tourist_activity.html">Activity</a>
+      <a href="tourist_locations.html">Locations</a>
+      <a href="/server/frontend/Main.html">Back to Main Page</a>
+    </nav>
+
+    <h1>Tourist Activity</h1>
+    <input type="text" id="searchInput" placeholder="Search for Itinerary..." />
+    <button onclick="searchActivity()">Search</button>
+
+    <div class="sort-container">
+      <label for="sortBy">Sort by:</label>
+      <select id="sortBy">
+        <option value="price">Price</option>
+        <option value="rating">Rating</option>
+      </select>
+
+      <label for="orderBy">Order:</label>
+      <select id="orderBy">
+        <option value="1">Ascending</option>
+        <option value="-1">Descending</option>
+      </select>
+
+      <button onclick="sortActivities()">Sort</button>
+    </div>
+    <div class="filter-form">
+      <h2>Filter Options</h2>
+
+      <!-- Budget Filter -->
+      <div class="form-group">
+        <label for="min-budget">Min Budget:</label>
+        <input
+          type="number"
+          id="min-budget"
+          name="min-budget"
+          placeholder="Min"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="max-budget">Max Budget:</label>
+        <input
+          type="number"
+          id="max-budget"
+          name="max-budget"
+          placeholder="Max"
+        />
+      </div>
+
+      <!-- Date Filter -->
+      <div class="form-group">
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" />
+      </div>
+
+      <!-- Category Filter -->
+      <div class="form-group">
+        <label for="category">Category:</label>
+        <input
+          type="text"
+          id="category"
+          name="category"
+          placeholder="Enter category"
+        />
+      </div>
+
+      <!-- Ratings Filter -->
+      <div class="form-group">
+        <label for="ratings">Ratings:</label>
+        <input
+          type="number"
+          id="ratings"
+          name="ratings"
+          min="1"
+          max="5"
+          placeholder="1 to 5"
+        />
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn" onclick="filterActivities()">
+        Filter
+      </button>
+    </div>
+
+    <div id="activityContainer">
+      <!-- activity content will be loaded here -->
+    </div>
+    <script>
+      async function filterActivities() {
+        var minBudget = document.getElementById("min-budget").value;
+        var maxBudget = document.getElementById("max-budget").value;
+        var date = document.getElementById("date").value;
+        var category = document.getElementById("category").value;
+        var ratings = document.getElementById("ratings").value;
+        let url = "http://localhost:8000/api/activity/filterActivities?";
+        if (minBudget) url += `minBudget=${minBudget}&`;
+        if (maxBudget) url += `maxBudget=${maxBudget}&`;
+        if (date) url += `date=${date}&`;
+        if (category) url += `category=${category}&`;
+        if (ratings) url += `ratings=${ratings}&`;
+        url =
+          url.slice(-1) === "&" || url.slice(-1) === "?"
+            ? url.slice(0, -1)
+            : url;
+        const response = await fetch(url);
+        const data = await response.json();
+        displayActivity(response, data);
+      }
+      function displayActivity(response, data) {
+        const container = document.getElementById("activityContainer");
+        container.innerHTML = "";
+
+        if (response.ok && data.length > 0) {
+          data.forEach((activity) => {
+            const activityElement = document.createElement("div");
+            activityElement.className = "activity";
+            activityElement.innerHTML = `
+              <h2>${activity.name}</h2>
+              <p><strong>Price:</strong> ${activity.price}</p>
+              <p><strong>Date:</strong> ${activity.date}</p>
+              <p><strong>Time:</strong> ${activity.time}</p>
+              <p><strong>Location:</strong> ${activity.location}</p>
+              <p><strong>Discount:</strong> ${activity.specialDiscounts}</p>    
+              <p><strong>Available:</strong> ${activity.bookingOpen}</p>
+              <p><strong>Rating:</strong> ${activity.rating}</p>              
+              <p><strong>Category:</strong> ${activity.category.name}</p>              
+              <p><strong>Tag:</strong> ${activity.tags.name}</p>              
+            `;
+            container.appendChild(activityElement);
+          });
+        } else {
+          container.innerHTML =
+            "<p>No itineraries available at the moment.</p>";
+        }
+      }
+      // Function to fetch activity data from the API
+      async function fetchActivities() {
+        try {
+          const response = await fetch(
+            "http://localhost:8000/api/activity/getActivity"
+          ); // Adjust the API endpoint as needed
+          const data = await response.json();
+          displayActivity(response, data);
+        } catch (error) {
+          console.error("Error fetching Activities:", error);
+          document.getElementById("activityContainer").innerHTML =
+            "<p>Failed to load Activities.</p>";
+        }
+      }
+      async function searchActivity() {
+        const query = document.getElementById("searchInput").value;
+        try {
+          const response = await fetch(
+            `http://localhost:8000/api/activity/searchActivity?query=${query}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          const data = await response.json();
+          displayActivity(response, data);
+        } catch (error) {
+          console.error("Error searching activities:", error);
+          document.getElementById("activityContainer").innerHTML =
+            "<p>Failed to search activities.</p>";
+        }
+      }
+
+      // Function to sort and display activities
+      async function sortActivities() {
+        const sortBy = document.getElementById("sortBy").value;
+        const orderBy = document.getElementById("orderBy").value;
+
+        try {
+          const response = await fetch(
+            `http://localhost:8000/api/activity/sortActivities?sortBy=${sortBy}&orderBy=${orderBy}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          const data = await response.json();
+          displayActivity(response, data);
+        } catch (error) {
+          console.error("Error fetching sorted activities:", error);
+          document.getElementById("activityContainer").innerHTML =
+            "<p>Failed to load activities.</p>";
+        }
+      }
+
+      window.onload = fetchActivities;
+    </script>
+  </body>
+</html>

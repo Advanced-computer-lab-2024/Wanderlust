@@ -7,11 +7,11 @@ const itinerarySchema = new mongoose.Schema({
           type: String,
           required: true
        },
-    activities: {
+    activities: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Activity',
       required: true
-    }, 
+    }], 
     locations: [{ type: String, required: true }], 
     timeline: {
         start: { type: Date, required: true }, // Start date and time of the itinerary
@@ -25,11 +25,15 @@ const itinerarySchema = new mongoose.Schema({
       type: Number,
        required: true
        }, 
+    rating: { 
+      type: Number, 
+      required: false 
+    },
     availableDates: [{ 
       type: Date, 
       required: true }], 
     accessibility: {
-       type: Boolean, 
+       type: String, 
       default: false }, 
     pickupLocation: { 
       type: String,
