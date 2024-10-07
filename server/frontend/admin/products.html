@@ -112,7 +112,8 @@
     <header>
         <div class="container">
             <nav>
-                <a href="adminDashboard.html">Dashboard</a>
+                <a href="#" onclick="confirmRedirect()">Homepage</a>
+                <a href="adminDashboard.html">Admin dashboard</a>
                 <a href="addAdmin.html">Add Admin</a>
                 <a href="addTourismGovernor.html">Add Tourism Governor</a>
                 <a href="allusers.html">get all users</a>
@@ -361,9 +362,8 @@ async function filterProducts() {
     const maxPrice = document.getElementById('maxPrice').value;
 
     try {
-        const response = await axios.get('http://localhost:8000/api/product/filterProductsByPrice', {
-            params: { minPrice, maxPrice }
-        });
+        const response = await axios.get(`http://localhost:8000/api/product/filterProductsByPrice?minPrice=${minPrice}&maxPrice=${maxPrice}`);
+        console.log(response.data);
         if (response.status === 200) {
             const products = response.data.products;
             const productsList = document.getElementById('productsList');
@@ -394,5 +394,13 @@ async function filterProducts() {
         window.onload = fetchProducts;
        
     </script>
+    <script>
+        function confirmRedirect() {
+            const userConfirmed = confirm("You will have to log in again. Do you want to proceed?");
+            if (userConfirmed) {
+                window.location.href = '../Main.html'; 
+            }
+        }
+        </script>
 </body>
 </html>

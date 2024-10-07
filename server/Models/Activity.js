@@ -40,11 +40,11 @@ const ActivitySchema = new Schema({
     ref: 'ActivityCat', 
     required: false
   },
-  tags: {
+  tags: [{
     type: mongoose.Types.ObjectId,
     ref: 'PreferenceTag',
     required: false
-  },
+  }],
   specialDiscounts: {
     type: String,
     required: false

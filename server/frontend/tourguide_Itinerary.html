@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <!-- Itinerary content will be loaded here -->
   </div>
 
-  <button id="toggleUpdateButton" onclick="toggleUpdateForm(itinerary)">Edit Itinerary</button>
+  <button id="toggleUpdateButton" style="display:none;" onclick="toggleUpdateForm(itinerary)">Edit Itinerary</button>
    <div id="updateFormContainer" class="update-form" style="display:none;"> 
     <h2>Update Itinerary</h2>
     <form id="updateItineraryForm">
@@ -454,9 +454,11 @@ async function fetchItineraries() {
           <p><strong>Price:</strong> $${itinerary.price}</p>
           <p><strong>Language of Tour:</strong> ${itinerary.languageOfTour}</p>
           <p><strong>Locations:</strong> ${itinerary.locations.join(', ')}</p>
+          <p><strong>Available Dates:</strong> ${itinerary.availableDates.join(', ')}</p>
           <h3>Activities:</h3>
           ${activitiesHTML} <!-- Dynamically inserted activities -->
           <p><strong>Accessibility:</strong> ${itinerary.accessibility}</p>
+          <p><strong>Pickup Location:</strong> ${itinerary.pickupLocation}</p>
           <p><strong>Dropoff Location:</strong> ${itinerary.dropoffLocation}</p>
           <button class="delete-button" onclick="deleteItinerary('${itinerary._id}')">Delete Itinerary</button>
           <button class="update-button" onclick="toggleUpdateForm('${itinerary._id}')">Update Itinerary</button>

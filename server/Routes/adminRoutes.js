@@ -8,6 +8,6 @@ router.delete("/delete", adminController.deleteAccount);
 router.get("/usernames", adminController.getAllUserDetails);
 router.post("/create", adminController.createAdmin);
 router.post("/login", adminController.adminLogin);
-router.post("/profile", adminController.getAdminDetails);
+router.get("/profile", adminController.getAdminDetails);
 
 module.exports = router;

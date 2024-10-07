@@ -112,7 +112,8 @@
     <header>
         <div class="container">
             <nav>
-                <a href="adminDashboard.html">Dashboard</a>
+                <a href="#" onclick="confirmRedirect()">Homepage</a>
+                <a href="adminDashboard.html">Admin dashboard</a>
                 <a href="addAdmin.html">Add Admin</a>
                 <a href="addTourismGovernor.html">Add Tourism Governor</a>
                 <a href="allusers.html">get all users</a>
@@ -246,5 +247,13 @@
         }
         window.onload = fetchTags;
     </script>
+    <script>
+        function confirmRedirect() {
+            const userConfirmed = confirm("You will have to log in again. Do you want to proceed?");
+            if (userConfirmed) {
+                window.location.href = '../Main.html'; 
+            }
+        }
+        </script>
 </body>
 </html>

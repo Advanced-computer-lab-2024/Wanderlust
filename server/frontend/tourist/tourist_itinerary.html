@@ -235,10 +235,9 @@
                   activity.time
                 }</h4>
                   <p><strong>Activity Name:</strong> ${activity.name}</p>
-                  <p>Location: <a href="${activity.location}" target="_blank">${
-                  activity.location
-                }</a></p>
+              
                   <p>Price: ${activity.price}</p>
+                
                   <p><strong>Category:</strong> ${activity.category.name}</p>
                   <p><strong>Tags:</strong> ${
                     Array.isArray(activity.tags)
@@ -266,9 +265,13 @@
               <p><strong>Language of Tour:</strong> ${
                 itinerary.languageOfTour
               }</p>
-              <p><strong>Locations:</strong> ${itinerary.locations.join(
-                ", "
-              )}</p>
+              <p><strong>Rating:</strong> ${itinerary.rating}</p>
+            <p><strong>Locations:</strong> ${itinerary.locations.join(', ')}</p>
+            <p><strong>Available Dates:</strong> ${itinerary.availableDates.join(', ')}</p>
+             <p><strong>Accessibility:</strong> ${itinerary.accessibility}</p>
+            <p><strong>Pickup Location:</strong> ${itinerary.pickupLocation}</p>
+          <p><strong>Dropoff Location:</strong> ${itinerary.dropoffLocation}</p>
+
               <h3>Activities:</h3>
               ${activitiesHTML}
 

@@ -97,14 +97,7 @@ app.get("/getAdvertiser", getAdvertiser);
 app.get("/getAdvertiserByUsername", getAdvertiserByUsername);
 app.post("/getAdvertiserByUsername", getAdvertiserByUsername);
 app.put("/updateAdvertiser", updateAdvertiser);
-//routes for activity
 
-//routes for activity category
-// app.use(express.json());
-// app.post("/createCategory", createCategory);
-// app.get("/getCategories", getCategories);
-// app.put("/updateCategory", updateCategory);
-// app.delete("/deleteCategory", deleteCategory);
 app.use(express.json());
 app.post("/createUser", createUser);
 //routes for Itinerary
