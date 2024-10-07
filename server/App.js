@@ -8,6 +8,7 @@ require("dotenv").config();
 //Check db connection links in README file
 
 //calling for controllers
+const { createUser } = require("./Controllers/userController");
 const {
   createTourGuide,
   getTourGuide,
@@ -104,7 +105,8 @@ app.put("/updateAdvertiser", updateAdvertiser);
 // app.get("/getCategories", getCategories);
 // app.put("/updateCategory", updateCategory);
 // app.delete("/deleteCategory", deleteCategory);
-
+app.use(express.json());
+app.post("/createUser", createUser);
 //routes for Itinerary
 app.use(express.json());
  app.post("/createItinerary", createItinerary);

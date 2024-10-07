@@ -11,7 +11,7 @@ const getTourist = async (req, res) => {
 };
 
 const createTourist = async (req, res) => {
-  const {
+  var {
     username,
     email,
     password,
@@ -20,6 +20,7 @@ const createTourist = async (req, res) => {
     dateOfBirth,
     job,
   } = req.body;
+  dateOfBirth = new Date(dateOfBirth);
   try {
     const tourist = await touristModel.create({
       username,

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #e9ecef; /* Light gray background */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 600px; /* Increased max width for the form */
+            padding: 100px; /* Increased padding for more space */
+            background-color: #fff; /* White background for the form */
+            border-radius: 10px; /* More rounded corners */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Enhanced shadow */
+            transition: transform 0.3s; /* Smooth scaling on hover */
+        }
+
+        .container:hover {
+            transform: scale(1.02); /* Slightly scale up on hover */
+        }
+
+        h1 {
+            text-align: center;
+            color: #333; /* Dark text color */
+            margin-bottom: 20px; /* Space below heading */
+        }
+
+        .form-group {
+            margin-bottom: 15px; /* Space between form groups */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555; /* Darker text for labels */
+            font-weight: bold; /* Bold labels */
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 12px; /* Increased padding for better touch targets */
+            border: 1px solid #ccc;
+            border-radius: 5px; /* Slightly more rounded corners */
+            box-sizing: border-box; /* Include padding and border in width */
+            font-size: 16px; /* Consistent font size */
+            transition: border-color 0.3s; /* Smooth transition */
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="tel"]:focus,
+        select:focus {
+            border-color: #007BFF; /* Change border color on focus */
+            outline: none; /* Remove outline */
+        }
+
+        .button1 {
+            display: block; /* Make the button a block element */
+            width: 100%;
+            max-width: 300px; /* Set a max width */
+            padding: 12px; /* Increased padding */
+            font-size: 16px; /* Font size for button text */
+            color: #fff; /* White text */
+            background-color: #007BFF; /* Blue background */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor on hover */
+            transition: background-color 0.3s, transform 0.3s; /* Smooth transition */
+            margin: 20px auto; /* Center the button */
+        }
+
+        .button1:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+            transform: translateY(-2px); /* Slightly lift the button on hover */
+        }
+
+        #touristFields {
+            border: 1px solid #e0e0e0; /* Light border around tourist fields */
+            padding: 15px; /* Padding around the fields */
+            border-radius: 5px; /* Rounded corners */
+            background-color: #f8f9fa; /* Light background for extra fields */
+            margin-top: 10px; /* Space above the tourist fields */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Register</h1>
+        <form id="registrationForm">
+            <div class="form-group">
+                <label for="role">Register as:</label>
+                <select id="role" name="role" required>
+                    <option value="" disabled selected>Select your role</option>
+                    <option value="tour_guide">Tour Guide</option>
+                    <option value="advertiser">Advertiser</option>
+                    <option value="seller">Seller</option>
+                    <option value="tourist">Tourist</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <!-- Additional fields for Tourist -->
+            <div id="touristFields" style="display: none;">
+                <div class="form-group">
+                    <label for="mobile">Mobile Number</label>
+                    <input type="tel" id="mobile" name="mobile" required>
+                </div>
+                <div class="form-group">
+                    <label for="nationality">Nationality</label>
+                    <input type="text" id="nationality" name="nationality" required>
+                </div>
+                <div class="form-group">
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob" name="dob" required>
+                </div>
+                <div class="form-group">
+                    <label for="status">Are you a Job Holder or a Student?</label>
+                    <select id="status" name="status" required>
+                        <option value="" disabled selected>Select your status</option>
+                        <option value="job">Job Holder</option>
+                        <option value="student">Student</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="button"  class="button1" onclick="register()">Register</button>
+        </form>
+    </div>
+    <script>
+        async function register(){
+            const role = document.getElementById('role').value;
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            if( role === 'tourist'){
+                const mobileNumber = document.getElementById('mobile').value;
+                const nationality = document.getElementById('nationality').value;
+                const dateOfBirth = document.getElementById('dob').value;
+                const job = document.getElementById('status').value;
+                checkBirthDate(dob);
+
+            const data = { username, email, password, mobileNumber, nationality, dateOfBirth, job };
+            const response = await fetch('http://localhost:8000/api/tourist/createTourist', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            const tourist = await response.json();
+
+            console.log(data);
+        } else {
+            const data = { username, email, password , role};
+            const response = await fetch('http://localhost:8000/createUser', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            const user = await response.json();
+
+            console.log(data);
+        }
+        if (response.ok) {
+            window.location.href = 'Main.html';
+        } else {
+            alert('Registration failed. Please try again.');
+        }
+
+
+    }
+        function checkBirthDate(dob){
+            const birthDate = new Date(dob);
+                    const age = new Date().getFullYear() - birthDate.getFullYear();
+                    if (age < 18) {
+                        alert('You must be at least 18 years old to register as a tourist.');
+                        return false;
+                    }
+                    return true;
+        }
+
+    
+        // Show/hide additional fields based on role selection
+        document.getElementById('role').addEventListener('change', function() {
+            const touristFields = document.getElementById('touristFields');
+            if (this.value === 'tourist') {
+                touristFields.style.display = 'block'; // Show fields for tourists
+            } else {
+                touristFields.style.display = 'none'; // Hide fields for tourists
+            }
+        });
+    </script>
+</body>
+</html>
