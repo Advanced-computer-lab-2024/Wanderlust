@@ -16,6 +16,15 @@ const {
 } = require("./Controllers/tourGuideController");
 
 const {
+  createLocation,
+  getLocations,
+  updateLocation,
+  deleteLocation,
+  filterLocations,
+  getLocationById,
+} = require("./Controllers/LocationController");
+
+const { 
   createItinerary,
   getItinerary,
   updateItinerary,
@@ -63,6 +72,7 @@ const locationRoutes = require("./Routes/locationsRoutes");
 const tourGuideRoutes = require("./Routes/tourGuideRoutes");
 const advertiserRoutes = require("./Routes/advertiserRoutes");
 const categoryRoutes = require("./Routes/categoryRoutes");
+const sellerRoutes = require("./Routes/sellerRoutes");
 
 //Routes
 app.use("/api/tourist", touristRoutes);
@@ -72,6 +82,7 @@ app.use("/api/preferenceTag", preferenceTagRoutes);
 app.use("/api/activity", activityRoutes);
 app.use("/api/location", locationRoutes);
 app.use("/api/category", categoryRoutes);
+app.use("/api/seller", sellerRoutes);
 //routes for tour guide
 app.use(express.json());
 app.post("/createtgprofile", createTourGuide);
@@ -96,10 +107,23 @@ app.put("/updateAdvertiser", updateAdvertiser);
 
 //routes for Itinerary
 app.use(express.json());
-app.post("/createItinerary", createItinerary);
-app.get("/getItinerary", getItinerary);
-app.put("/updateItinerary", updateItinerary);
-app.delete("/deleteItinerary", deleteItinerary);
-app.get("/sortItineraries", sortItineraries);
-app.get("/searchItinerary", searchItinerary);
-app.get("/filterItineraries", filterItinerairies);
+ app.post("/createItinerary", createItinerary);
+  app.get("/getItinerary", getItinerary);
+  app.put("/updateItinerary", updateItinerary);
+  app.delete("/deleteItinerary", deleteItinerary);
+  app.get("/sortItineraries", sortItineraries);
+
+app.use(express.json());
+app.post("/createLocation", createLocation);
+app.get("/getLocations", getLocations);
+app.put("/updateLocation/:id", updateLocation);
+
+app.delete("/deleteLocation/:id", deleteLocation);
+app.get('/getLocation/:id', getLocationById);
+
+
+  //createLocation,
+  //getLocations,
+  //updateLocation,
+  //deleteLocation,
+  //filterLocations,

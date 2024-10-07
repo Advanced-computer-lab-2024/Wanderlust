@@ -28,20 +28,22 @@ const getSellers = async (req, res) => {
 // Update an existing Seller
 const updateSeller = async (req, res) => {
     try {
-        const { name } = req.params; // Assuming the Seller name is passed as a route parameter
-        const { email, password, role, username, description } = req.body; // Updated Seller data in the request body
- 
-        const updatedSeller = await SellerModel.findOneAndUpdate({ name }, { email, password, role, username, description }, { new: true });
- 
+        const { id } = req.params; // Get the seller ID from the route parameters
+        const { name, email, password, role, username, description } = req.body; // Updated Seller data in the request body
+
+        // Use findByIdAndUpdate to update by ID
+        const updatedSeller = await SellerModel.findByIdAndUpdate(id, { name, email, password, role, username, description }, { new: true });
+
         if (!updatedSeller) {
             return res.status(404).json({ message: 'Seller not found' });
         }
- 
+
         res.status(200).json({ message: 'Seller updated successfully', Seller: updatedSeller });
     } catch (error) {
         res.status(500).json({ message: 'Error updating Seller', error });
     }
- };
+};
+
  
 
 // Delete a Seller
@@ -60,5 +62,22 @@ const deleteSeller = async (req, res) => {
         res.status(500).json({ message: 'Error deleting Seller', error });
     }
  };
+ // Get a specific Seller by ID
+const getSellerById = async (req, res) => {
+    try {
+        const { id } = req.params; // Get the seller ID from the route parameters
+        const seller = await SellerModel.findById(id); // Find the seller by ID
+
+        if (!seller) {
+            return res.status(404).json({ message: 'Seller not found' });
+        }
+
+        res.status(200).json(seller); // Send the seller as a response
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving Seller', error });
+    }
+};
+
+module.exports = { createSeller, getSellers, getSellerById, updateSeller, deleteSeller };
+
  
-module.exports = {createSeller, getSellers, updateSeller, deleteSeller};

@@ -49,8 +49,9 @@ const getLocations = async (req, res) => {
 // Update an existing location by name
 const updateLocation = async (req, res) => {
   try {
-    const { name } = req.params; // Get the location name from the route parameters
+    const { id } = req.params; // Get the location ID from the route parameters
     const {
+      name,
       description,
       pictures,
       location,
@@ -60,8 +61,8 @@ const updateLocation = async (req, res) => {
     } = req.body; // Destructure updated data from request body
 
     const updatedLocation = await locationModel.findOneAndUpdate(
-      { name }, // Find location by name
-      { description, pictures, location, openingHours, ticketPrices, tags },
+      { _id: id }, // Find location by ID
+      { name, description, pictures, location, openingHours, ticketPrices, tags }, // Update the fields, including name
       { new: true } // Return the updated document
     );
 
@@ -78,12 +79,13 @@ const updateLocation = async (req, res) => {
   }
 };
 
+
 // Delete a location by name
 const deleteLocation = async (req, res) => {
   try {
-    const { name } = req.params; // Get the location name from the route parameters
+    const { id } = req.params; // Get the location ID from the route parameters
 
-    const deletedLocation = await locationModel.findOneAndDelete({ name }); // Find and delete location by name
+    const deletedLocation = await locationModel.findByIdAndDelete(id); // Find and delete location by ID
 
     if (!deletedLocation) {
       return res.status(404).json({ message: "Location not found" });
@@ -94,6 +96,7 @@ const deleteLocation = async (req, res) => {
     res.status(500).json({ message: "Error deleting location", error });
   }
 };
+
 const filterLocations = async (req, res) => {
   const { name } = req.query;
   try {
@@ -103,26 +106,20 @@ const filterLocations = async (req, res) => {
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
-};
-// Search for locations by name or tags
-const searchLocations = async (req, res) => {
-  const { query } = req.query;
+}
+// Get a location by ID
+const getLocationById = async (req, res) => {
   try {
-    const locations = await locationModel.find().populate("tags");
-    const filteredLocations = locations.filter((location) => {
-      const nameMatches = location.name
-        .toLowerCase()
-        .includes(query.toLowerCase());
-      const tagMatches =
-        location.tags &&
-        location.tags.name.toLowerCase().includes(query.toLowerCase());
-      return nameMatches || tagMatches;
-    });
-    res.status(200).json(filteredLocations);
+    const location = await locationModel.findById(req.params.id).populate("tags");
+    if (!location) {
+      return res.status(404).json({ message: "Location not found" });
+    }
+    res.status(200).json(location);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ message: "Error retrieving location", error });
   }
 };
+
 
 module.exports = {
   createLocation,
@@ -130,5 +127,5 @@ module.exports = {
   updateLocation,
   deleteLocation,
   filterLocations,
-  searchLocations,
+  getLocationById,
 };
