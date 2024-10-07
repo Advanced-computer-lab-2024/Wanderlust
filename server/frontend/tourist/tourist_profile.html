@@ -109,203 +109,6 @@
       <a href="tourist_itinerary.html">Itinerary</a>
       <a href="tourist_activity.html">Activity</a>
       <a href="tourist_locations.html">Locations</a>
-      <a href="tourist_products.html">Products</a>
-      <a href="../Main.html">Back to Main Page</a>
-    </nav>
-    <h1>Tourist Profile</h1>
-    <!-- No need for the search box since we're always searching for "ah1" -->
-    <div id="touristContainer">
-      <!-- Profile will be loaded here -->
-    </div>
-    <script>
-      // Function to fetch a Tour Guide profile for username "ah1"
-      // Function to fetch a Tour Guide profile by username
-      async function searchTourist() {
-        try {
-          const response = await fetch(
-            `http://localhost:8000/api/tourist/getTourist?username=Amr`,
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
-
-          const tourist = await response.json(); // Parse the response to JSON
-          const container = document.getElementById("touristContainer");
-          container.innerHTML = ""; // Clear any existing data
-          if (response.ok) {
-            const touristElement = document.createElement("div");
-            touristElement.className = "tourist";
-            // Creating elements dynamically for the profile
-            touristElement.innerHTML = `
-        <h2>${tourist.username}</h2>
-        <p><span class="experience">Date Of Birth:</span> ${tourist.dateOfBirth}</p>
-        <p class="contact">Contact: ${tourist.mobileNumber}</p>
-        <p class="contact">Email: ${tourist.email}</p>
-        <p class="contact">Nationality: ${tourist.nationality}</p>
-        <p class="contact">Job: ${tourist.job}</p>
-
-      `;
-            container.appendChild(touristElement);
-          } else {
-            container.innerHTML = "<p>Tourist not found.</p>";
-          }
-        } catch (error) {
-          console.error("Error fetching tourist:", error);
-          document.getElementById("touristContainer").innerHTML =
-            "<p>Failed to load tour guide profile.</p>";
-        }
-      }
-      // // Show the update form
-      // function showUpdateForm(userName, mobileNumber, YOE, previousWork) {
-      //   const form = document.getElementById(`updateForm-${userName}`);
-      //   form.style.display = form.style.display === 'block' ? 'none' : 'block'; // Toggle the form's visibility
-      // }
-      // // Function to update a tour guide
-      // async function updateTourGuide(userName) {
-      //   const mobileNumber = document.getElementById(`updateMobile-${userName}`).value;
-      //   const YOE = document.getElementById(`updateYOE-${userName}`).value;
-      //   const previousWork = document.getElementById(`updateWork-${userName}`).value;
-      //   try {
-      //     const response = await fetch('http://localhost:8000/updatetgprofile', {
-      //       method: 'PUT',
-      //       headers: {
-      //         'Content-Type': 'application/json',
-      //       },
-      //       body: JSON.stringify({
-      //         userName,
-      //         mobileNumber,
-      //         YOE,
-      //         previousWork
-      //       }),
-      //     });
-      //     if (response.ok) {
-      //       alert('Tour guide updated successfully!');
-      //       searchTourGuide(); // Refresh the profile after update
-      //     } else {
-      //       const errorData = await response.json();
-      //       alert(`Error: ${errorData.error}`);
-      //     }
-      //   } catch (error) {
-      //     console.error('Error updating tour guide:', error);
-      //     alert('Failed to update tour guide.');
-      //   }
-      // }
-      // Automatically load the profile for user "ah1" on page load
-      window.onload = searchTourist;
-    </script>
-  </body>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tourist Profiles</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        padding: 20px;
-      }
-      h1 {
-        text-align: center;
-      }
-      .tourist {
-        background-color: #fff;
-        padding: 15px;
-        margin: 10px 0;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-      }
-      .tourist h2 {
-        margin: 0;
-        font-size: 24px;
-      }
-      .tourist p {
-        margin: 5px 0;
-      }
-      .tourist .contact {
-        font-style: italic;
-      }
-      .tourist .experience {
-        color: #007bff;
-      }
-      .update-form {
-        display: none;
-        background-color: #f9f9f9;
-        padding: 15px;
-        margin-top: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-      }
-      .update-form input[type="text"] {
-        margin-bottom: 10px;
-        padding: 8px;
-        width: calc(100% - 20px);
-        border: 1px solid #ddd;
-        border-radius: 4px;
-      }
-      .update-form button {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 5px;
-        cursor: pointer;
-      }
-      .update-form button:hover {
-        background-color: #0056b3;
-      }
-      /* Styles for the navigation bar */
-      nav {
-        background-color: #333;
-        padding: 10px;
-        margin-bottom: 20px;
-      }
-      nav a {
-        color: white;
-        text-decoration: none;
-        padding: 10px;
-        margin-right: 10px;
-        display: inline-block;
-      }
-      nav a:hover {
-        background-color: #575757;
-        border-radius: 4px;
-      }
-      /* Add margin to the search box */
-      #search-container {
-        text-align: center;
-        margin-bottom: 20px;
-      }
-      input[type="text"] {
-        padding: 10px;
-        width: 250px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        margin-right: 10px;
-      }
-      button {
-        padding: 10px 20px;
-        border: none;
-        background-color: #007bff;
-        color: white;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-      button:hover {
-        background-color: #0056b3;
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Navigation Bar -->
-    <nav>
-      <a>Tourist</a>
-      <a href="tourist_profile.html">Profile</a>
-      <a href="tourist_itinerary.html">Itinerary</a>
-      <a href="tourist_activity.html">Activity</a>
-      <a href="tourist_locations.html">Locations</a>
       <a href="/server/frontend/Main.html">Back to Main Page</a>
     </nav>
     <h1>Tourist Profile</h1>
@@ -337,20 +140,24 @@
 
             // Creating elements dynamically for the profile
             touristElement.innerHTML = `
-              <h2>${tourist.userName}</h2>
+              <h2>${tourist.username}</h2>
               <p><span class="experience">Date Of Birth:</span> ${tourist.dateOfBirth}</p>
               <p class="contact">Contact: ${tourist.mobileNumber}</p>
               <p class="contact">Email: ${tourist.email}</p>
               <p class="contact">Nationality: ${tourist.nationality}</p>
               <p class="contact">Job: ${tourist.job}</p>
-              <button onclick="showUpdateForm('${tourist.userName}', '${tourist.mobileNumber}', '${tourist.dateOfBirth}', '${tourist.job}')">Update</button>
+              <button onclick="showUpdateForm('${tourist._id}')">Update</button>
     
-              <div id="updateForm-${tourist.userName}" class="update-form" style="display:none;">
+              <div id="updateForm-${tourist._id}" class="update-form" style="display:none;">
                 <h3>Update Tourist</h3>
-                <input type="text" id="updateMobile-${tourist.userName}" placeholder="Mobile Number" value="${tourist.mobileNumber}">
-                <input type="text" id="updateDOB-${tourist.userName}" placeholder="Date of Birth" value="${tourist.dateOfBirth}">
-                <input type="text" id="updateJob-${tourist.userName}" placeholder="Job" value="${tourist.job}">
-                <button onclick="updateTourist('${tourist.userName}')">Save</button>
+                <input type="text" id="updateUsername-${tourist._id}" placeholder="Username" value="${tourist.username}">
+                <input type="text" id="updateEmail-${tourist._id}" placeholder="Email" value="${tourist.email}">
+                <input type="password" id="updatePassword-${tourist._id}" placeholder="Password">
+                <input type="text" id="updateMobile-${tourist._id}" placeholder="Mobile Number" value="${tourist.mobileNumber}">
+                <input type="text" id="updateNationality-${tourist._id}" placeholder="Nationality" value="${tourist.nationality}">
+                <input type="date" id="updateDOB-${tourist._id}" placeholder="Date of Birth" value="${tourist.dateOfBirth}">
+                <input type="text" id="updateJob-${tourist._id}" placeholder="Job" value="${tourist.job}">
+                <button onclick="updateTourist('${tourist._id}')">Save</button>
               </div>
             `;
 
@@ -366,8 +173,8 @@
       }
 
       // Function to show or hide the update form
-      function showUpdateForm(userName) {
-        const form = document.getElementById(`updateForm-${userName}`);
+      function showUpdateForm(touristId) {
+        const form = document.getElementById(`updateForm-${touristId}`);
         form.style.display = form.style.display === "block" ? "none" : "block"; // Toggle the form's visibility
       }
 
