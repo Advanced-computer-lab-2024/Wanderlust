@@ -101,7 +101,7 @@ const filterLocations = async (req, res) => {
   const { name } = req.query;
   try {
     const tag = await preferenceTagModel.findOne({ name });
-    const locations = await locationModel.find({ tags: tag._id });
+    const locations = await locationModel.find({ tags: { $in: tag._id } }).populate("tags");
     res.status(200).json(locations);
   } catch (error) {
     res.status(400).json({ error: error.message });

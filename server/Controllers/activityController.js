@@ -123,7 +123,7 @@ const filterActivities = async (req, res) => {
       query.price = { $gte: minBudget, $lte: maxBudget };
     }
     if (date !== undefined) {
-      query.date = date;
+      query.date = new Date(date);
     }
     if (category !== undefined) {
       const cat = await ActivityCatModel.findOne({ name: category });

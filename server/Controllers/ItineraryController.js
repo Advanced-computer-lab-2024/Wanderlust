@@ -170,7 +170,7 @@ const filterItinerairies = async (req, res) => {
       query.price = { $gte: minBudget, $lte: maxBudget };
     }
     if (date !== undefined) {
-      query.availableDates = date;
+      query.availableDates = { $in : new Date(date)};
     }
     if (preference !== undefined) {
       const tag = await PreferenceTagModel.findOne({ name: preference });

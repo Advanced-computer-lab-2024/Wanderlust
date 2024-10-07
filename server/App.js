@@ -112,6 +112,8 @@ app.use(express.json());
   app.put("/updateItinerary", updateItinerary);
   app.delete("/deleteItinerary", deleteItinerary);
   app.get("/sortItineraries", sortItineraries);
+  app.get("/searchItinerary", searchItinerary);
+  app.get("/filterItineraries", filterItinerairies);
 
 app.use(express.json());
 app.post("/createLocation", createLocation);

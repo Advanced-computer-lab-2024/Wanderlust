@@ -156,13 +156,11 @@
             "http://localhost:8000/api/location/getLocations"
           ); 
           data = await response.json();
-          console.error(data);
         } else {
           response = await fetch(
             "http://localhost:8000/api/location/filterLocations?name="+tag
           );
           data = await response.json();
-          console.error(data);
         }
         fetchLocations(response,data);
       }
@@ -181,10 +179,9 @@
               <h2>${location.name}</h2>
               <p><strong>Description:</strong> ${location.description}</p>
               <p><strong>Opening Hours:</strong> ${location.openingHours}</p>
-              <p><strong>Price:</strong> $${location.ticketPrices}</p> 
-              <p><strong>Tag:</strong> ${location.tags.name}</p>    
-              <p><strong>Location:</strong> ${location.location}</p>                         
-              
+              <p><strong>Price:</strong> $${location.ticketPrices}</p>
+              <p><strong>Tag:</strong> ${location.tags.map(tag => tag.name).join(', ')}</p>    
+              <p><strong>Location:</strong> ${location.location}</p>                                       
             `;
               container.appendChild(locationElement);
             });
