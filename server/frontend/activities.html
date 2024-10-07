@@ -796,6 +796,11 @@ async function showUpdateForm(id) {
         console.error('Error showing update form:', error);
     }
 }
+
+function toggleCreateForm() {
+      const createFormContainer = document.getElementById('createFormContainer');
+      createFormContainer.style.display = createFormContainer.style.display === 'none' ? 'block' : 'none';
+    }
 // Function to toggle the update form visibility
 function toggleUpdateForm() {
   const updateFormContainer = document.getElementById('updateFormContainer');
