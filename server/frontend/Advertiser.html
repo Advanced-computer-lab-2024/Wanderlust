@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tour Guide Itinerary</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    nav {
+      background-color: #333;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+      margin-right: 10px;
+      display: inline-block;
+    }
+
+    nav a:hover {
+      background-color: #575757;
+      border-radius: 4px;
+    }
+
+    .itinerary {
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .activity {
+      margin: 10px 0;
+    }
+
+    .activity h3 {
+      margin: 0;
+    }
+
+    .delete-button {
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .delete-button:hover {
+      background-color: #ff1a1a;
+    }
+
+    .update-form {
+      display: none;
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .update-form input, .update-form select {
+      width: 100%;
+      margin: 5px 0;
+      padding: 8px;
+    }
+
+    .update-button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .update-button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  
+
+  <nav>
+    <a>Advertiser</a>
+    <a href="Main.html">Back to Main Page</a>
+  </nav>
+  <div class="profile-container">
+    <!-- Profile Header Section -->
+    <div class="profile-header">
+      <div class="info">
+        <h1 id="advertiserName">Advertiser Name</h1>
+        <p id="advertiserUsername">@advertiserusername</p>
+        <div class="contact-info">
+          <p><strong>Hotline:</strong> <span id="advertiserHotline">123-456-789</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Content Section -->
+    <div class="profile-content">
+      <!-- Company Information -->
+      <div class="profile-section">
+        <h2>Company Information</h2>
+        <p><strong>Website:</strong> <a href="#" id="advertiserWebsite" target="_blank">https://companywebsite.com</a></p>
+        <p><strong>Profile:</strong> <a href="#" id="advertiserProfile" target="_blank">https://companyprofile.com</a></p>
+      </div>
+
+      <!-- Additional Information -->
+      <div class="profile-section">
+        <h2>About the Company</h2>
+        <p>This section can contain a brief overview of the company, its mission, and what it offers.</p>
+      </div>
+
+      <!-- Update Form Section -->
+      <div class="update-form" id="updateForm">
+        <h3>Update My Info</h3>
+        <input type="text" id="updateHotline" placeholder="Hotline">
+        <input type="text" id="updateWebsite" placeholder="Company Website">
+        <input type="text" id="updateProfile" placeholder="Company Profile">
+        <button onclick="updateAdvertiser()">Save</button>
+      </div>
+
+      <button onclick="toggleUpdateForm()">Update Profile</button>
+    </div>
+
+    <!-- Profile Footer Section -->
+    <div class="profile-footer">
+      <button onclick="goBack()">Go Back to Advertisers</button>
+    </div>
+  </div>
+
+  <script>
+    // Function to load advertiser profile details dynamically
+    function loadAdvertiserProfile() {
+      const url = new URL(window.location.href);
+      const urlParams = new URLSearchParams(url.search);
+      const username = urlParams.get('username'); // Ensure 'username' is properly extracted
+
+      if (!username) {
+        console.error("Username not found in URL");
+        alert("Error: Username not found in the URL.");
+        return;  // Exit the function if username is missing
+      }
+
+      fetch('http://localhost:8000/getAdvertiserByUsername', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username }) // Send the username in the request body
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          // Update the page with the advertiser's data
+          document.getElementById('advertiserName').innerText = data.username;
+          document.getElementById('advertiserUsername').innerText = `@${data.username}`;
+          document.getElementById('advertiserHotline').innerText = data.hotline;
+          document.getElementById('advertiserWebsite').href = data.companyWebsite;
+          document.getElementById('advertiserWebsite').innerText = data.companyWebsite;
+          document.getElementById('advertiserProfile').href = data.companyProfile;
+          document.getElementById('advertiserProfile').innerText = data.companyProfile;
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching advertiser profile:', error);
+        alert('Failed to load advertiser profile.');
+      });
+    }
+
+    // Toggle the update form visibility
+    function toggleUpdateForm() {
+      const form = document.getElementById('updateForm');
+      form.style.display = form.style.display === 'block' ? 'none' : 'block';
+
+      // Populate the input fields with current data
+      document.getElementById('updateHotline').value = document.getElementById('advertiserHotline').innerText;
+      document.getElementById('updateWebsite').value = document.getElementById('advertiserWebsite').innerText;
+      document.getElementById('updateProfile').value = document.getElementById('advertiserProfile').innerText;
+    }
+
+    // Function to update an advertiser
+    async function updateAdvertiser() {
+      const username = document.getElementById('advertiserUsername').innerText.substring(1); // Extract username
+      const hotline = document.getElementById('updateHotline').value;
+      const companyWebsite = document.getElementById('updateWebsite').value;
+      const companyProfile = document.getElementById('updateProfile').value;
+
+      try {
+        const response = await fetch('http://localhost:8000/updateAdvertiser', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username,
+            hotline,
+            companyWebsite,
+            companyProfile
+          }),
+        });
+
+        if (response.ok) {
+          alert('Advertiser updated successfully!');
+          loadAdvertiserProfile(); // Refresh the profile after update
+        } else {
+          const errorData = await response.json();
+          alert(`Error: ${errorData.error}`);
+        }
+      } catch (error) {
+        console.error('Error updating advertiser:', error);
+        alert('Failed to update advertiser.');
+      }
+    }
+
+    // Function to navigate back to the list of advertisers
+    function goBack() {
+      window.history.back();
+    }
+
+    // Load the advertiser profile when the page is loaded
+    window.onload = loadAdvertiserProfile;
+  </script>
+
+</body>
+</html>

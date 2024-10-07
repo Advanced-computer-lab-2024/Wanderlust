@@ -53,6 +53,22 @@ const getActivity = async (req, res) => {
   }
 };
 
+const getActivityById = async (req, res) => {
+  try {
+    const id = req.query.id;
+    const activity = await Activity.findById(id)
+      .populate("category")
+      .populate("tags");
+    if (!activity) {
+      res.status(404).json({ error: "Activity not found" });
+    } else {
+      res.status(200).json(activity);
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 const updateActivity = async (req, res) => {
   const {
     id,
@@ -186,6 +202,7 @@ const searchActivity = async (req, res) => {
 module.exports = {
   createActivity,
   getActivity,
+  getActivityById,
   updateActivity,
   deleteActivity,
   filterActivities,

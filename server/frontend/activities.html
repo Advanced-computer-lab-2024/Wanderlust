@@ -266,6 +266,21 @@
         }
       });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const selectElement = document.getElementById('updateActivityTags');
+    
+      // Handle mousedown instead of click to prevent default behavior
+      selectElement.addEventListener('mousedown', function(event) {
+        event.preventDefault(); // Prevent the default behavior
+        const option = event.target;
+    
+        // Toggle selection state manually
+        if (option.tagName === 'OPTION') {
+          option.selected = !option.selected;
+        }
+      });
+    });
             </script>
         
 
@@ -315,27 +330,50 @@
     }
   </script>
 
-  <div id="updateFormContainer" class="update-form">
-    <h2>Update Activity</h2>
-    <input type="date" id="UpdateActivityName" placeholder="Name">
-    <input type="date" id="updateActivityDate" placeholder="Date">
-    <input type="time" id="updateActivityTime" placeholder="Time">
-    <input type="text" id="updateActivityLocation" placeholder="Location (URL)">
-    <button onclick="getCoordinates(true)">Get Coordinates</button> <!-- Button to get coordinates for update -->
-    <div id="updateMap"></div> <!-- Update map div -->
-    <input type="text" id="updateActivityPrice" placeholder="Price"> <!-- Changed to text -->
-    <select id="updateActivityCategory">
+<div id="updateFormContainer" class="update-form">
+  <h2>Update Activity</h2>
+  
+  <label for="UpdateActivityName">Name:</label>
+  <input type="text" id="UpdateActivityName" name="UpdateActivityName" placeholder="Enter activity name">
+  
+  <label for="updateActivityDate">Date:</label>
+  <input type="date" id="updateActivityDate" name="updateActivityDate" placeholder="Enter activity date">
+  
+  <label for="updateActivityTime">Time:</label>
+  <input type="time" id="updateActivityTime" name="updateActivityTime" placeholder="Enter activity time">
+  
+  <div id="updateMap" style="height: 200px; width: 100%; margin: 10px 0;"></div>
+  
+  <label for="updateActivityPrice">Price:</label>
+  <input type="text" id="updateActivityPrice" name="updateActivityPrice" placeholder="Enter price">
+  
+  <label for="updateActivityCategory">Category:</label>
+  <select id="updateActivityCategory" name="updateActivityCategory">
       <option value="">Select Category</option>
-    </select>
-    <input type="text" id="updateActivityTags" placeholder="Tags (comma separated)">
-    <input type="text" id="updateActivityDiscounts" placeholder="Special Discounts">
-    <input type="text" id="UpdateActivityDuration" placeholder="Duration">
-    <select id="updateBookingOpen">
+  </select>
+  
+  <label for="updateActivityTagsDropdown">Tags:</label>
+  <select id="updateActivityTagsDropdown" name="updateActivityTags" multiple>
+      <!-- Tag options will be populated by JavaScript -->
+  </select>
+  
+  <label for="updateActivityDiscounts">Special Discounts:</label>
+  <input type="text" id="updateActivityDiscounts" name="updateActivityDiscounts" placeholder="Enter special discounts">
+  
+  <label for="UpdateActivityDuration">Duration:</label>
+  <input type="text" id="UpdateActivityDuration" name="UpdateActivityDuration" placeholder="Enter duration">
+  
+  <label for="updateBookingOpen">Booking Status:</label>
+  <select id="updateBookingOpen" name="updateBookingOpen">
       <option value="true">Booking Open</option>
       <option value="false">Booking Closed</option>
-    </select>
-    <button onclick="updateActivity()">Update Activity</button>
-  </div>
+  </select>
+  
+  <!-- Add the map div here -->
+ 
+  
+  <button onclick="updateActivity()">Update Activity</button>
+</div>
 <script>
   let lats;
   let lngs;
@@ -351,6 +389,8 @@
   </script>
 
   <script>
+
+    
 
     
     // Function to create a new activity
@@ -441,38 +481,33 @@ async function fetchTags() {
     }
 
     const tags = await response.json();
-    console.log('Fetched tags:', tags); // Log fetched tags
 
-    const tagDropdown = document.getElementById('activityTagsDropdown');
-    const updateTagDropdown = document.getElementById('updateActivityTagsDropdown');
+    const tagDropdown = document.getElementById('activityTagsDropdown'); // For create form
+    const updateTagDropdown = document.getElementById('updateActivityTagsDropdown'); // For update form
 
     // Clear existing options
     tagDropdown.innerHTML = '<option value="">Select Tags</option>';
-    //updateTagDropdown.innerHTML = '<option value="">Select Tags</option>';
+    updateTagDropdown.innerHTML = '<option value="">Select Tags</option>';
 
-    // Populate the dropdowns with tags
+    // Populate both dropdowns with tags
     tags.forEach(tag => {
-      console.log('Adding tag:', tag); // Log each tag being added
       const option = document.createElement('option');
-      option.value = tag._id;  
-      option.text = tag.name;  
+      option.value = tag._id;
+      option.text = tag.name;
       tagDropdown.appendChild(option);
 
-      // const updateOption = document.createElement('option');
-      // updateOption.value = tag._id;
-      // updateOption.text = tag.name;
-      // updateTagDropdown.appendChild(updateOption);
+      const updateOption = document.createElement('option');
+      updateOption.value = tag._id;
+      updateOption.text = tag.name;
+      updateTagDropdown.appendChild(updateOption);
     });
-
-    // Log the final HTML of the dropdowns for verification
-    console.log('Activity Dropdown Options:', tagDropdown.innerHTML);
-    //console.log('Update Dropdown Options:', updateTagDropdown.innerHTML);
-    
   } catch (error) {
     console.error('Error fetching tags:', error);
   }
 }
 
+// Call fetchTags on page load
+document.addEventListener('DOMContentLoaded', fetchTags);
 // Call fetchTags when the page loads
 document.addEventListener('DOMContentLoaded', fetchTags);
 
@@ -679,96 +714,148 @@ async function fetchActivities() {
       }
     }
 
-    // Function to show update form
-    async function showUpdateForm(id) {
-      console.log("showUpdateForm function called with id:", id);
-      currentActivityId = id; // Store the activity ID to update
+  // Function to show update form
+// Function to show update form
+// Function to show update form
+// Function to show update form
+let updateLat; // To hold the updated latitude
+let updateLng; // To hold the updated longitude
 
-      const response = await fetch(`http://localhost:8000/api/activity/getActivity/${id}`);
-      const activity = await response.json();
+async function initUpdateMap(lat, lng) {
+    const { Map } = await google.maps.importLibrary("maps");
 
-      // Fill the update form with the activity data
-      document.getElementById('updateActivityDate').value = activity.date.split('T')[0]; // Date format adjustment
-      document.getElementById('updateActivityTime').value = activity.time;
-      document.getElementById('updateActivityLocation').value = activity.location; // Will get coordinates
-      document.getElementById('updateActivityPrice').value = activity.price;
-      document.getElementById('updateActivityCategory').value = activity.category.name;
-      document.getElementById('updateActivityTags').value = activity.tags.map(tag => tag.name).join(', ');
-      document.getElementById('updateActivityDiscounts').value = activity.specialDiscounts;
-      document.getElementById('updateBookingOpen').value = activity.bookingOpen ? 'true' : 'false';
+    const mapElement = document.getElementById("updateMap");
+    const myLatlng = { lat: lat, lng: lng }; // Use the provided latitude and longitude
 
-      toggleUpdateForm(); // Show update form
-    }
-
-    // Function to toggle the create form visibility
-    function toggleCreateForm() {
-      const createFormContainer = document.getElementById('createFormContainer');
-      createFormContainer.style.display = createFormContainer.style.display === 'none' ? 'block' : 'none';
-    }
-
-    // Function to toggle the update form visibility
-    function toggleUpdateForm() {
-      const updateFormContainer = document.getElementById('updateFormContainer');
-      updateFormContainer.style.display = updateFormContainer.style.display === 'none' ? 'block' : 'none';
-    }
-
-  // Function to update an activity
-async function updateActivity() {
-  console.log("updateActivity function called");
-  const updatedData = {
-    date: document.getElementById('updateActivityDate').value,
-    time: document.getElementById('updateActivityTime').value,
-    location: document.getElementById('updateActivityLocation').value,
-    price: document.getElementById('updateActivityPrice').value,
-    category: { name: document.getElementById('updateActivityCategory').value },
-    tags: document.getElementById('updateActivityTags').value.split(',').map(tag => ({ name: tag.trim() })),
-    specialDiscounts: document.getElementById('updateActivityDiscounts').value,
-    bookingOpen: document.getElementById('updateBookingOpen').value === 'true',
-  };
-
-  try {
-    const response = await fetch(`http://localhost:8000/api/activity/updateActivity`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedData),
+    const map = new Map(mapElement, {
+        zoom: 15,
+        center: myLatlng,
     });
-    if (response.ok) {
-      alert('Activity updated successfully!');
-      fetchActivities(); // Refresh the activity list
-      toggleUpdateForm(); // Hide the update form
-    } else {
-      alert('Failed to update activity.');
-    }
-  } catch (error) {
-    console.error('Error updating activity:', error); 
-  }
+
+    const marker = new google.maps.Marker({
+        position: myLatlng,
+        map: map,
+    });
+
+    // Update latitude and longitude when the map is clicked
+    map.addListener("click", (mapsMouseEvent) => {
+        const latLng = mapsMouseEvent.latLng.toJSON();
+        updateLat = latLng.lat; // Update the latitude
+        updateLng = latLng.lng; // Update the longitude
+
+        // Move the marker to the new location
+        marker.setPosition(latLng);
+        
+        // Update the location input field
+        document.getElementById('updateActivityLocation').value = `${updateLat}, ${updateLng}`;
+    });
 }
 
-// Function to show update form
-// Function to show update form
 async function showUpdateForm(id) {
-  console.log("showUpdateForm function called with id:", id);
-  currentActivityId = id; // Store the activity ID to update
+    try {
+        const response = await fetch(`http://localhost:8000/api/activity/getActivityById?id=${id}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        if (response.ok) {
+            const activity = await response.json();
+            console.log('Activity retrieved:', activity);
+            selectedActivity = activity; // Store the activity ID to update
 
-  const response = await fetch(`http://localhost:8000/api/activity/getActivity`);
-  const activity = await response.json();
+            // Fill the update form with the activity data
+            document.getElementById('UpdateActivityName').value = activity.name;
+            document.getElementById('updateActivityDate').value = activity.date.split('T')[0]; // Date format adjustment
+            document.getElementById('updateActivityTime').value = activity.time;
+            document.getElementById('updateActivityPrice').value = activity.price;
+            document.getElementById('updateActivityCategory').value = activity.category._id; // Use the category ID
+            document.getElementById('updateActivityDiscounts').value = activity.specialDiscounts;
+            document.getElementById('updateBookingOpen').value = activity.bookingOpen ? 'true' : 'false';
 
-  // Check if the activity object has a date property and it's a string
-  if (activity && activity.date && typeof activity.date === 'string') {
-    // Fill the update form with the activity data
-    document.getElementById('updateActivityDate').value = activity.date.split('T')[0]; // Date format adjustment
-    document.getElementById('updateActivityTime').value = activity.time;
-    document.getElementById('updateActivityLocation').value = activity.location; // Will get coordinates
-    document.getElementById('updateActivityPrice').value = activity.price;
-    document.getElementById('updateActivityCategory').value = activity.category.name;
-    document.getElementById('updateActivityTags').value = activity.tags.map(tag => tag.name).join(', ');
-    document.getElementById('updateActivityDiscounts').value = activity.specialDiscounts;
-    document.getElementById('updateBookingOpen').value = activity.bookingOpen ? 'true' : 'false';
-  } else {
-    console.error('Error: activity object does not have a date property or it\'s not a string');
+            // Populate the tags in the update form by selecting the relevant options
+            const tagDropdown = document.getElementById('updateActivityTagsDropdown'); // Correct ID for multi-select
+            const selectedTags = activity.tags.map(tag => tag._id); // Get the tag IDs
+
+            // Loop through the options in the dropdown and mark those that match the selected tags
+            for (let option of tagDropdown.options) {
+                option.selected = selectedTags.includes(option.value); // Mark the matching tags as selected
+            }
+
+            // Initialize the map with the activity's latitude and longitude
+            initUpdateMap(activity.lat, activity.lng);
+
+            // Store the initial lat and lng
+            updateLat = activity.lat;
+            updateLng = activity.lng;
+
+            toggleUpdateForm(); // Show update form
+        } else {
+            console.error('Failed to get activity by ID:', response.status);
+            throw new Error('Failed to get activity by ID');
+        }
+    } catch (error) {
+        console.error('Error showing update form:', error);
+    }
+}
+// Function to toggle the update form visibility
+function toggleUpdateForm() {
+  const updateFormContainer = document.getElementById('updateFormContainer');
+  updateFormContainer.style.display = updateFormContainer.style.display === 'none' ? 'block' : 'none';
+}
+// Function to update an activity
+async function updateActivity() {
+    console.log("updateActivity function called");
+    const id = selectedActivity._id; // Get the ID of the selected activity
+
+    // Create an object to hold updated data, including new lat and lng
+    const updatedData = {
+        name: document.getElementById('UpdateActivityName').value,
+        date: document.getElementById('updateActivityDate').value,
+        time: document.getElementById('updateActivityTime').value,
+        lat: updateLat, // Use the updated latitude
+        lng: updateLng, // Use the updated longitude
+        price: document.getElementById('updateActivityPrice').value,
+        category: document.getElementById('updateActivityCategory').value, // Use the category ID
+        tags: Array.from(document.getElementById('updateActivityTagsDropdown').selectedOptions) // Get selected options
+            .map(option => option.value), // Get the values (IDs) of the selected tags
+        specialDiscounts: document.getElementById('updateActivityDiscounts').value,
+        bookingOpen: document.getElementById('updateBookingOpen').value === 'true',
+    };
+
+    try {
+        const response = await fetch(`http://localhost:8000/api/activity/updateActivity`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, ...updatedData }), // Send the ID with the updated data
+        });
+        if (response.ok) {
+            alert('Activity updated successfully!');
+            fetchActivities(); // Refresh the activity list
+            toggleUpdateForm(); // Hide the update form
+        } else {
+            alert('Failed to update activity.');
+        }
+    } catch (error) {
+        console.error('Error updating activity:', error); 
+    }
+}
+// Function to get an activity by ID
+// Function to get an activity by ID
+// Function to get an activity by ID
+async function getActivityById(id) {
+  try {
+    const response = await fetch(`http://localhost:8000/api/activity/getActivityById`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+ 
+    });
+    if (response.ok) {
+      return await response.json();
+    } else {
+      throw new Error('Failed to get activity by ID');
+    }
+  } catch (error) {
+    console.error('Error getting activity by ID:', error);
   }
-
-  toggleUpdateForm(); // Show update form
 }
   </script>
 </body>
