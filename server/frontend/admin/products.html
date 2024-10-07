@@ -287,7 +287,7 @@
                         <span>Quantity: ${product.quantity}</span><br>
                         <span>Rating: ${product.rating}</span><br>
                         <span>Reviews: ${product.reviews}</span><br>
-                        <span>Seller: ${product.seller}</span><br>
+                        <span>Seller: ${product.seller.name}</span><br>
                         <button class="delete-button" onclick="deleteProduct('${product.name}')">Delete Product</button>
                     `;
                     productsList.appendChild(productItem);

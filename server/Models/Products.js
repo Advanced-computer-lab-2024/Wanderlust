@@ -33,7 +33,7 @@ const ProductSchema = new Schema({
     ref: "Seller",
   },
   picture: {
-    type: Buffer,
+    type: String,
   },
 });
 

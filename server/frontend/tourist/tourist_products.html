@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tourist Products</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 20px;
+      }
+        .container {
+            width: 50%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #77aaff 3px solid;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        header ul {
+            padding: 0;
+            list-style: none;
+        }
+        header li {
+            float: left;
+            display: inline;
+            padding: 0 20px 0 20px;
+        }
+        .form-container {
+            background: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h2 {
+            margin-top: 0;
+        }
+        .form-container label, .form-container input {
+            display: block;
+            margin: 10px 0;
+        }
+        .form-container button {
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .form-container button:hover {
+            background: #77aaff;
+        }
+        .products-container {
+            background: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .products-container h2 {
+            margin-top: 0;
+        }
+        .product-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        .delete-button {
+            background: #810808;
+            color: #fff;
+            border: none;
+            padding: 3px 7px;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-right: 10px;
+            font-size: 12px;
+        }
+        .delete-button:hover {
+            background: #af3f3f;
+        }
+        nav {
+        background-color: #333;
+        padding: 10px;
+        margin-bottom: 20px;
+      }
+
+      nav a {
+        color: white;
+        text-decoration: none;
+        padding: 10px;
+        margin-right: 10px;
+        display: inline-block;
+      }
+
+      nav a:hover {
+        background-color: #575757;
+        border-radius: 4px;
+      }
+    </style>
+</head>
+<body>
+    <nav>
+        <a>Tourist</a>
+        <a href="tourist_profile.html">Profile</a>
+        <a href="tourist_Itinerary.html">Itinerary</a>
+        <a href="tourist_activity.html">Activity</a>
+        <a href="tourist_locations.html">Locations</a>
+        <a href="tourist_products.html">Products</a>
+        <a href="/server/frontend/Main.html">Back to Main Page</a>
+      </nav>
+  
+    <div class="products-container">
+        <h2>Available Products</h2>
+        <label for="sortOrder">Sort by Rating:</label>
+        <select id="sortOrder" onchange="fetchProducts()">
+            <option value="desc">Highest to Lowest</option>
+            <option value="asc">Lowest to Highest</option>
+        </select>
+        <div class="form-group">
+            <label for="searchName">Product Name:</label>
+            <input type="text" class="form-control" id="searchName">
+            <button class="btn btn-primary mt-2" onclick="searchProducts()">Search</button>
+        </div>
+        <label for="minPrice">Min Price:</label>
+        <input type="number" id="minPrice" name="minPrice">
+        <label for="maxPrice">Max Price:</label>
+        <input type="number" id="maxPrice" name="maxPrice">
+        <button onclick="filterProducts()">Filter</button>
+        <div id="productsList"></div>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+            async function fetchProducts() {
+            const sortOrder = document.getElementById('sortOrder').value;
+            try {
+                const response = await fetch(`http://localhost:8000/api/product/sortedByRating?sort=${sortOrder}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const products = await response.json();
+                console.log('Fetched products:', products); 
+                const productsList = document.getElementById('productsList');
+                productsList.innerHTML = '';
+
+                products.forEach(product => {
+                    const productItem = document.createElement('div');
+                    productItem.className = 'product-item';
+                    productItem.innerHTML = `
+                        <span>Name: ${product.name}</span><br>
+                        <span>Price: $${product.price}</span><br>
+                        <span>Description: ${product.description}</span><br>
+                        <span>Quantity: ${product.quantity}</span><br>
+                        <span>Rating: ${product.rating}</span><br>
+                        <span>Reviews: ${product.reviews}</span><br>
+                        <span>Seller: ${product.seller.name}</span><br>
+                    `;
+                    productsList.appendChild(productItem);
+                });
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        }
+        async function searchProducts() {
+    const name = document.getElementById('searchName').value;
+    if (!name) {
+        alert('Please enter a product name to search');
+        return;
+    }
+
+    try {
+        const response = await axios.get('http://localhost:8000/api/product/searchProductByName', {
+            params: { name }
+        });
+        if (response.status === 200) {
+            const products = response.data.products;
+            const productsList = document.getElementById('productsList');
+            productsList.innerHTML = '';
+
+            products.forEach(product => {
+                const productItem = document.createElement('div');
+                productItem.className = 'product-item';
+                productItem.innerHTML = `
+                    <span>Name: ${product.name}</span><br>
+                    <span>Price: $${product.price}</span><br>
+                    <span>Description: ${product.description}</span><br>
+                    <span>Quantity: ${product.quantity}</span><br>
+                    <span>Rating: ${product.rating}</span><br>
+                    <span>Reviews: ${product.reviews}</span><br>
+                    <span>Seller: ${product.seller.name}</span><br>
+                `;
+                productsList.appendChild(productItem);
+            });
+        } else {
+            alert('No products found');
+        }
+    } catch (error) {
+        console.error('Error searching products:', error);
+    }
+}
+
+async function filterProducts() {
+    const minPrice = document.getElementById('minPrice').value;
+    const maxPrice = document.getElementById('maxPrice').value;
+
+    try {
+        const response = await axios.get('http://localhost:8000/api/product/filterProductsByPrice', {
+            params: { minPrice, maxPrice }
+        });
+        if (response.status === 200) {
+            const products = response.data.products;
+            const productsList = document.getElementById('productsList');
+            productsList.innerHTML = '';
+
+            products.forEach(product => {
+                const productItem = document.createElement('div');
+                productItem.className = 'product-item';
+                productItem.innerHTML = `
+                    <span>Name: ${product.name}</span><br>
+                    <span>Price: $${product.price}</span><br>
+                    <span>Description: ${product.description}</span><br>
+                    <span>Quantity: ${product.quantity}</span><br>
+                    <span>Rating: ${product.rating}</span><br>
+                    <span>Reviews: ${product.reviews}</span><br>
+                    <span>Seller: ${product.seller.name}</span><br>
+                `;
+                productsList.appendChild(productItem);
+            });
+        } else {
+            alert('No products found');
+        }
+    } catch (error) {
+        console.error('Error filtering products:', error);
+    }
+}
+        window.onload = fetchProducts;
+</script>
+</html>

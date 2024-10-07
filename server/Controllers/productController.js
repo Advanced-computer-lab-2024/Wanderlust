@@ -81,7 +81,7 @@ const searchProductByName = async (req, res) => {
       return res.status(400).json({ message: "Product name is required" });
     }
 
-    const products = await Product.find({ name: new RegExp(name, "i") });
+    const products = await Product.find({ name: new RegExp(name, "i") }).populate("seller");
     if (products.length === 0) {
       return res.status(404).json({ message: "No products found" });
     }
@@ -106,7 +106,7 @@ const filterProductsByPrice = async (req, res) => {
     if (minPrice) query.price = { $gte: Number(minPrice) };
     if (maxPrice) query.price = { ...query.price, $lte: Number(maxPrice) };
 
-    const products = await Product.find(query);
+    const products = await Product.find(query).populate("seller");
     if (products.length === 0) {
       return res.status(404).json({ message: "No products found" });
     }
@@ -121,7 +121,7 @@ const filterProductsByPrice = async (req, res) => {
 const getProductsSortedByRating = async (req, res) => {
   try {
     const sortOrder = req.query.sort === 'asc' ? 1 : -1;
-    const products = await Product.find().sort({ rating: sortOrder });
+    const products = await Product.find().sort({ rating: sortOrder }).populate("seller");
     res.status(200).json(products);
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -131,7 +131,7 @@ const getProductsSortedByRating = async (req, res) => {
 
 const viewProducts = async (req, res) => {
   try {
-    const products = await Product.find().populate("seller", "name");
+    const products = await Product.find().populate("seller");
     res.status(200).json(products);
   } catch (error) {
     console.error("Error fetching products:", error);
