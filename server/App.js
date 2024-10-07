@@ -33,6 +33,7 @@ const {
   sortItineraries,
   searchItinerary,
   filterItinerairies,
+  filterItinerariesByPref,
 } = require("./Controllers/ItineraryController");
 const {
   createAdvertiser,
@@ -109,6 +110,7 @@ app.use(express.json());
   app.get("/sortItineraries", sortItineraries);
   app.get("/searchItinerary", searchItinerary);
   app.get("/filterItineraries", filterItinerairies);
+  app.get("/filterItinerariesByPref", filterItinerariesByPref);
 
 app.use(express.json());
 app.post("/createLocation", createLocation);

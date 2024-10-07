@@ -155,15 +155,7 @@
       </div>
 
       <!-- Category Filter -->
-      <div class="form-group">
-        <label for="preference">Preference:</label>
-        <input
-          type="text"
-          id="preference"
-          name="preference"
-          placeholder="Enter preference"
-        />
-      </div>
+
 
       <!-- Ratings Filter -->
       <div class="form-group">
@@ -181,6 +173,20 @@
         Filter
       </button>
     </div>
+    <p></p>
+
+    <div class="form-group">
+      <label for="preference">Preference:</label>
+      <input
+        type="text"
+        id="preference"
+        name="preference"
+        placeholder="Enter preference"
+      />
+    </div>
+    <button type="submit" class="btn" onclick="filterItinerariesByPref()">
+      Filter
+    </button>
     <div id="itineraryContainer">
       <!-- Itinerary content will be loaded here -->
     </div>
@@ -190,18 +196,23 @@
   <script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
   ({key: "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg", v: "weekly"});</script>
     <script>
+      async function filterItinerariesByPref(){
+        var preference = document.getElementById("preference").value;
+        let url = "http://localhost:8000/filterItinerariesByPref?preference="+preference;
+        const response = await fetch(url);
+        const data = await response.json();
+        displayItinerary(response, data);
+      }
       // Function to fetch itinerary data from the API
       async function filterItineraries() {
         var minBudget = document.getElementById("min-budget").value;
         var maxBudget = document.getElementById("max-budget").value;
         var date = document.getElementById("date").value;
-        var preference = document.getElementById("preference").value;
         var language = document.getElementById("language").value;
         let url = "http://localhost:8000/filterItineraries?";
         if (minBudget) url += `minBudget=${minBudget}&`;
         if (maxBudget) url += `maxBudget=${maxBudget}&`;
         if (date) url += `date=${date}&`;
-        if (preference) url += `preference=${preference}&`;
         if (language) url += `language=${language}&`;
         url =
           url.slice(-1) === "&" || url.slice(-1) === "?"

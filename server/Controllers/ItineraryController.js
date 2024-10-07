@@ -163,7 +163,7 @@ const searchItinerary = async (req, res) => {
 
 const filterItinerairies = async (req, res) => {
   try {
-    const { minBudget, maxBudget, date, preference, language } = req.query;
+    const { minBudget, maxBudget, date, language } = req.query;
 
     const query = {};
     if (minBudget !== undefined && maxBudget !== undefined) {
@@ -172,10 +172,7 @@ const filterItinerairies = async (req, res) => {
     if (date !== undefined) {
       query.availableDates = { $in : new Date(date)};
     }
-    if (preference !== undefined) {
-      const tag = await PreferenceTagModel.findOne({ name: preference });
-      query.tags = tag._id;
-    }
+
     if (language !== undefined) {
       query.languageOfTour = language;
     }
@@ -195,6 +192,30 @@ const filterItinerairies = async (req, res) => {
   }
 };
 
+const filterItinerariesByPref = async (req, res) => {
+  try {
+    const { preference } = req.query;
+      const tag = await PreferenceTagModel.findOne({ name: preference });
+      if (!tag) {
+        return res.status(404).json({ message: "Preference tag not found" });
+      }
+      const activities = await Activity.find({ tags: tag._id });
+
+      const itineraries = await Itinerary.find({ activities: { $in: activities.map(a => a._id) } })
+        .populate({
+          path: 'activities',
+          populate: {
+            path: 'tags',
+            model: 'PreferenceTag'
+          }
+        });
+        res.status(200).json(itineraries);
+      }
+  catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
 module.exports = {
   createItinerary,
   getItinerary,
@@ -203,4 +224,5 @@ module.exports = {
   sortItineraries,
   searchItinerary,
   filterItinerairies,
+  filterItinerariesByPref,
 };
