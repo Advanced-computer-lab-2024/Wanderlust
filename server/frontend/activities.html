@@ -248,9 +248,26 @@
     <br>
     
     <label for="Tags">Tags:</label>
-    <select id="activityTagsDropdown" name="Tags" size="1" onclick="toggleDropdown(this)">
+    <select id="activityTagsDropdown" name="Tags" multiple >
       <!-- Category options will be populated here by JavaScript -->
     </select>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const selectElement = document.getElementById('activityTagsDropdown');
+    
+      // Handle mousedown instead of click to prevent default behavior
+      selectElement.addEventListener('mousedown', function(event) {
+        event.preventDefault(); // Prevent the default behavior
+        const option = event.target;
+    
+        // Toggle selection state manually
+        if (option.tagName === 'OPTION') {
+          option.selected = !option.selected;
+        }
+      });
+    });
+            </script>
+        
 
     
    
@@ -340,6 +357,11 @@
     async function createActivity() {
   if (lats && lngs) {
     console.log("createActivity function called");
+
+    // Get selected tags as an array of values
+    const selectedTags = Array.from(document.getElementById('activityTagsDropdown').selectedOptions)
+                              .map(option => option.value);
+
     const activityData = {
       name: document.getElementById('activityName').value,
       date: document.getElementById('activityDate').value,
@@ -349,7 +371,7 @@
       price: document.getElementById('activityPrice').value,
       duration: document.getElementById('activityDuration').value,
       category: document.getElementById('activityCategory').value, // Direct ID
-      tags: document.getElementById('activityTagsDropdown').value,
+      tags: selectedTags, // Array of selected tag IDs
       bookingOpen: document.getElementById('bookingOpen').value === 'true',
     };
 
@@ -364,7 +386,7 @@
         fetchActivities(); // Refresh the activity list
         toggleCreateForm(); // Hide the create form
       } else {
-        console.log(lats)
+        console.log(lats);
         console.log(activityData);
         alert('Failed to create activity.');
       }
@@ -375,7 +397,6 @@
     alert('Please click on the map to select a location.');
   }
 }
-
     // Function to fetch categories and populate the dropdown
 async function fetchCategories() {
   try {
