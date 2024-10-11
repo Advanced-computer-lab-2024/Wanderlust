@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const bcrypt = require('bcrypt');
 
 const AdminSchema = new Schema({
     name: {
@@ -16,10 +17,10 @@ const AdminSchema = new Schema({
         type: String,
         required: true,
         validate: {
-            validator: function(v) {
-                return /^(?=.*[a-zA-Z])(?=.*[0-9])[A-Za-z0-9]{6,}$/.test(v);
+            validator: function (v) {
+                return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(v);
             },
-            message: props => `${props.value} is not a valid password! Password must be at least 6 characters long and contain both letters and numbers.`
+            message:`Password must be at least 6 characters long and contain both letters in upper/lower caps and numbers.`
         }
     },
     username: {
@@ -35,17 +36,6 @@ const AdminSchema = new Schema({
         type: Date,
         default: Date.now
     }
-});
-
-//Middleware to set createdAt and updatedAt
-//...
-AdminSchema.pre('save', function(next) {
-    const now = Date.now();
-    this.updatedAt = now;
-    if (!this.createdAt) {
-        this.createdAt = now;
-    }
-    next();
 });
 
 const Admin = mongoose.model('Admin', AdminSchema);

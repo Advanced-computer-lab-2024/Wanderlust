@@ -2,20 +2,25 @@
 const tourGuideModel = require('../Models/tourGuide.js');
 const { default: mongoose, get } = require('mongoose');
 
-const createTourGuide = async(req,res) => {
-   const username = req.query.userName;
-   if (!username) {
-     return res.status(400).json({ error: 'userName query parameter is required' });
-   }
-    const {YOE,mobileNumber,previousWork}=req.body;
-    tourGuideModel.userName=username;
-    try{
-       const tourguide=await tourGuideModel.create({YOE,mobileNumber,previousWork});
-       res.status(200).json(tourguide)
-    }catch(error){
-       res.status(400).json({error:error.message})
-    }
- }
+const createTourGuide = async (req, res) => {
+  const { username, email, password, YOE, mobileNumber, previousWork, termsAccepted } = req.body;
+
+  if (!username || !email || !password || termsAccepted === undefined) {
+      return res.status(400).json({ error: 'Username, email, password, and terms acceptance are required' });
+  }
+  try {
+      // Check if the username already exists
+      const existingTourGuide = await tourGuideModel.findOne({ username });
+      if (existingTourGuide) {
+          return res.status(400).json({ error: 'Username already exists' });
+      }
+      // Create new tour guide
+      const tourguide = await tourGuideModel.create({ username, email, password, YOE, mobileNumber, previousWork, termsAccepted, role:"tour guide" });
+      res.status(200).json(tourguide);
+  } catch (error) {
+      res.status(400).json({ error: error.message });
+  }
+};
 
  const getTourGuide = async (req, res) => {
    const username = req.query.userName;
@@ -47,9 +52,6 @@ const updateTourGuide = async (req, res) => {
    };
   
 
-const deleteTourGuide = async (req, res) => {
-   //delete a user from the database
-  }
 
 
-module.exports = {createTourGuide, getTourGuide, updateTourGuide, deleteTourGuide};
+module.exports = {createTourGuide, getTourGuide, updateTourGuide};

@@ -7,6 +7,6 @@ router.post('/createSeller', createSeller);
 router.get('/getSellers', getSellers);
 router.get('/getSeller/:id', getSellerById);
 router.put('/updateSeller/:id', updateSeller);
-router.delete('/deleteSeller/:name', deleteSeller);
+//router.delete('/deleteSeller/:name', deleteSeller);
 
 module.exports = router;

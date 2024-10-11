@@ -3,17 +3,19 @@ const SellerModel = require('../Models/Seller.js');
 const { default: mongoose } = require('mongoose');
 
 const createSeller = async (req, res) => {
-   try {
-       const { name, email, password, role, username, description } = req.body; // Assuming the data is coming in the request body
+    const { username, email, password, mobileNumber, name, description, termsAccepted } = req.body;
 
-       const newSeller = new SellerModel({ name, email, password, role, username, description }); // Create a new Seller document
-       await newSeller.save(); // Save the Seller to the database
-
-       res.status(201).json({ message: 'Seller created successfully', Seller: newSeller });
-   } catch (error) {
-       res.status(500).json({ message: 'Error creating Seller', error });
-   }
-};
+    if (!termsAccepted) {
+      return res.status(400).json({ error: "Terms and conditions must be accepted." });
+    }
+  
+    try {
+      const seller = await SellerModel.create({ username, email, password, mobileNumber, name, description, termsAccepted, role:'tourist' });
+      res.status(200).json(seller);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  };
 
 // Get all Sellers
 const getSellers = async (req, res) => {
@@ -29,10 +31,10 @@ const getSellers = async (req, res) => {
 const updateSeller = async (req, res) => {
     try {
         const { id } = req.params; // Get the seller ID from the route parameters
-        const { name, email, password, role, username, description } = req.body; // Updated Seller data in the request body
+        const { name, email, description } = req.body; // Updated Seller data in the request body
 
         // Use findByIdAndUpdate to update by ID
-        const updatedSeller = await SellerModel.findByIdAndUpdate(id, { name, email, password, role, username, description }, { new: true });
+        const updatedSeller = await SellerModel.findByIdAndUpdate(id, { name, email, description }, { new: true });
 
         if (!updatedSeller) {
             return res.status(404).json({ message: 'Seller not found' });
@@ -44,24 +46,7 @@ const updateSeller = async (req, res) => {
     }
 };
 
- 
 
-// Delete a Seller
-const deleteSeller = async (req, res) => {
-    try {
-        const { name } = req.params; // Assuming the Seller name is passed as a route parameter
- 
-        const deletedSeller = await SellerModel.findOneAndDelete({ name }); // Find and delete the Seller by name
- 
-        if (!deletedSeller) {
-            return res.status(404).json({ message: 'Seller not found' });
-        }
- 
-        res.status(200).json({ message: 'Seller deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error deleting Seller', error });
-    }
- };
  // Get a specific Seller by ID
 const getSellerById = async (req, res) => {
     try {
@@ -78,6 +63,6 @@ const getSellerById = async (req, res) => {
     }
 };
 
-module.exports = { createSeller, getSellers, getSellerById, updateSeller, deleteSeller };
+module.exports = { createSeller, getSellers, getSellerById, updateSeller };
 
  

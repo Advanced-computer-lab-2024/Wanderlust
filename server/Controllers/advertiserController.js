@@ -3,15 +3,15 @@ const Activity = require("../Models/Activity.js");
 const { default: mongoose, get } = require("mongoose");
 
 const createAdvertiser = async (req, res) => {
-  const { username, companyWebsite, companyProfile, hotline } = req.body;
+  const { username, email, password, mobileNumber, website, companyProfile, hotline, termsAccepted } = req.body;
+
+  if (!termsAccepted) {
+    return res.status(400).json({ error: "Terms and conditions must be accepted." });
+  }
 
   try {
     const advertiser = await Advertiser.create({
-      username,
-      companyWebsite,
-      companyProfile,
-      hotline,
-    });
+      username, email, password, mobileNumber, website, companyProfile, hotline, termsAccepted,role: 'advertiser'  });
     res.status(200).json(advertiser);
   } catch (error) {
     res.status(400).json({ error: error.message });

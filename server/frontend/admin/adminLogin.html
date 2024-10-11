@@ -20,24 +20,55 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 300px;
         }
+        .login-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .login-container label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .login-container input,
+        .login-container select,
+        .login-container .button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .login-container .button {
+            background-color: #00bafd;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .login-container .button:hover {
+            background-color: #0eaae3;
+        }
     </style>
 </head>
 <body>
     <div class="login-container">
         <h2 class="text-center">Admin Login</h2>
-        <form onsubmit="return validateForm(event)">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" class="form-control" id="username" name="username">
-            </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" class="form-control" id="password" name="password">
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">Login</button>
-            <button type="button" class="btn btn-primary btn-block"onclick="goToHome()">Back to Home</button>
+        <form onsubmit="validateForm(event)">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password">
+            <label for="role">Role:</label>
+            <select id="role" name="role">
+                <option value="admin">Admin</option>
+                <option value="tourismGovernor">Tourism Governor</option>
+                <option value="tourguide">Tour Guide</option>
+                <option value="tourist">Tourist</option>
+                <option value="advertiser">Advertiser</option>
+                <option value="seller">Seller</option>
+            </select>
+            <input type="submit" value="Login" class="button">
+            <button type="button" onclick="goToHome()" class="button">Back to Homepage</button>
         </form>
-    </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
@@ -49,20 +80,23 @@
 
             var username = document.getElementById('username').value;
             var password = document.getElementById('password').value;
+            var role = document.getElementById('role').value;
 
-            if (username === "" || password === "") {
-                alert("Both fields are required.");
+            if (username === "" || password === "" || role === "") {
+                alert("All fields are required.");
                 return false;
             }
             try {
                 const response = await axios.post('http://localhost:8000/api/admin/login', {
                     username: username,
-                    password: password
+                    password: password,
+                    role: role
                 });
 
                 if (response.status === 200) {
                     alert('Login successful');
                     localStorage.setItem('adminUsername', username);
+                    localStorage.setItem('role', role);
                     window.location.href = 'adminDashboard.html';
                 } else {
                     alert('Login failed: ' + response.data.message);

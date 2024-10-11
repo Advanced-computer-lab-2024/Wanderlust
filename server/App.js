@@ -9,12 +9,6 @@ require("dotenv").config();
 
 //calling for controllers
 const { createUser } = require("./Controllers/userController");
-const {
-  createTourGuide,
-  getTourGuide,
-  updateTourGuide,
-  deleteTourGuide,
-} = require("./Controllers/tourGuideController");
 
 const {
   createLocation,
@@ -85,19 +79,8 @@ app.use("/api/activity", activityRoutes);
 app.use("/api/location", locationRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/seller", sellerRoutes);
-//routes for tour guide
-app.use(express.json());
-app.post("/createtgprofile", createTourGuide);
-app.get("/gettgprofile", getTourGuide);
-app.put("/updatetgprofile", updateTourGuide);
-app.delete("/deletetgprofile", deleteTourGuide);
-//routes for advertiser
-app.use(express.json());
-app.post("/createAdvertiserProfile", createAdvertiser);
-app.get("/getAdvertiser", getAdvertiser);
-app.get("/getAdvertiserByUsername", getAdvertiserByUsername);
-app.post("/getAdvertiserByUsername", getAdvertiserByUsername);
-app.put("/updateAdvertiser", updateAdvertiser);
+app.use("/api/tourGuide", tourGuideRoutes);
+app.use("/api/advertiser", advertiserRoutes);
 
 app.use(express.json());
 app.post("/createUser", createUser);
