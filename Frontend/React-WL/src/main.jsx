@@ -5,6 +5,6 @@ import './index.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <h1>Wanderlust</h1>
+    <App />
   </StrictMode>,
 )
