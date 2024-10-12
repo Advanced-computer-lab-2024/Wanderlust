@@ -19,16 +19,7 @@ const {
   getLocationById,
 } = require("./Controllers/LocationController");
 
-const { 
-  createItinerary,
-  getItinerary,
-  updateItinerary,
-  deleteItinerary,
-  sortItineraries,
-  searchItinerary,
-  filterItinerairies,
-  filterItinerariesByPref,
-} = require("./Controllers/ItineraryController");
+
 const {
   createAdvertiser,
   getAdvertiser,
@@ -69,6 +60,7 @@ const tourGuideRoutes = require("./Routes/tourGuideRoutes");
 const advertiserRoutes = require("./Routes/advertiserRoutes");
 const categoryRoutes = require("./Routes/categoryRoutes");
 const sellerRoutes = require("./Routes/sellerRoutes");
+const itineraryRoutes = require("./Routes/itineraryRoutes");
 
 //Routes
 app.use("/api/tourist", touristRoutes);
@@ -81,19 +73,10 @@ app.use("/api/category", categoryRoutes);
 app.use("/api/seller", sellerRoutes);
 app.use("/api/tourGuide", tourGuideRoutes);
 app.use("/api/advertiser", advertiserRoutes);
+app.use("/api/itinerary", itineraryRoutes);
 
 app.use(express.json());
 app.post("/createUser", createUser);
-//routes for Itinerary
-app.use(express.json());
- app.post("/createItinerary", createItinerary);
-  app.get("/getItinerary", getItinerary);
-  app.put("/updateItinerary", updateItinerary);
-  app.delete("/deleteItinerary", deleteItinerary);
-  app.get("/sortItineraries", sortItineraries);
-  app.get("/searchItinerary", searchItinerary);
-  app.get("/filterItineraries", filterItinerairies);
-  app.get("/filterItinerariesByPref", filterItinerariesByPref);
 
 app.use(express.json());
 app.post("/createLocation", createLocation);

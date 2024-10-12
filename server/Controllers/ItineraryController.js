@@ -1,5 +1,4 @@
-const { default: mongoose } = require("mongoose");
-
+const axios = require('axios');
 const Itinerary = require("../Models/Itinerary");
 const Activity = require("../Models/Activity");
 const PreferenceTagModel = require("../Models/PreferenceTag");
@@ -41,13 +40,38 @@ const createItinerary = async (req, res) => {
   }
 };
 
-const getItinerary = async (req, res) => {
+const getExchangeRates = async (req, res) => {
   try {
-    const itinerary = await Itinerary.find().populate({
-      path: "activities",
-      populate: { path: "category tags" }, // Populate nested fields if needed
+    const response = await axios.get('https://v6.exchangerate-api.com/v6/77676a6e9ec92dc31f556a19/latest/USD'); 
+    res.status(200).json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+//u have to enter currency wanted in postman example
+//http://localhost:8000/api/itinerary/getItinerary?currency=EUR
+const getItinerary = async (req, res) => {
+  const { currency } = req.query; // Get the selected currency from query parameters
+  try {
+    const itineraries = await Itinerary.find().populate({
+      path: 'activities',
+      populate: { path: 'category tags' }, // Populate nested fields if needed
     });
-    res.status(200).json(itinerary);
+    if (currency) {
+      const response = await axios.get('https://v6.exchangerate-api.com/v6/77676a6e9ec92dc31f556a19/latest/USD'); // Replace with your base currency
+      const rates = response.data.conversion_rates;
+      if (!rates[currency]) {
+        return res.status(400).json({ error: `Currency code ${currency} not found in exchange rates.` });
+      }
+      const conversionRate = rates[currency];
+      const convertedItineraries = itineraries.map((item) => {
+        const convertedItem = item.toObject(); // Convert Mongoose document to plain JavaScript object
+        convertedItem.price = (convertedItem.price * conversionRate).toFixed(2); // Convert price to selected currency
+        return convertedItem;
+      });
+      return res.status(200).json(convertedItineraries);
+    }
+    res.status(200).json(itineraries);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -225,4 +249,5 @@ module.exports = {
   searchItinerary,
   filterItinerairies,
   filterItinerariesByPref,
+  getExchangeRates
 };
