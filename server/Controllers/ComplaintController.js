@@ -4,12 +4,12 @@ const Complaint = require('../Models/Complaint');
 //create new complaint
 const createComplaint = async (req, res) => {
     try {
-        const { title, body, date } = req.body;
-        if (!title || !body || !date) {
-            return res.status(400).json({ message: 'Title, body, and date are required' });
+        const { title, body } = req.body;
+        if (!title || !body) {
+            return res.status(400).json({ message: 'Title and body are required' });
         }
 
-        const newComplaint = new Complaint({ title, body, date, userId: req.user._id });
+        const newComplaint = new Complaint({ title, body,  });
         await newComplaint.save();
         res.status(201).json({ message: 'Complaint created successfully', complaint: newComplaint });
     } catch (error) {
