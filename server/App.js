@@ -75,6 +75,7 @@ const tourGuideRoutes = require("./Routes/tourGuideRoutes");
 const advertiserRoutes = require("./Routes/advertiserRoutes");
 const categoryRoutes = require("./Routes/categoryRoutes");
 const sellerRoutes = require("./Routes/sellerRoutes");
+const ComplaintRoutes = require("./Routes/ComplaintRoutes");
 
 //Routes
 app.use("/api/tourist", touristRoutes);
@@ -85,6 +86,7 @@ app.use("/api/activity", activityRoutes);
 app.use("/api/location", locationRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/seller", sellerRoutes);
+app.use('/api', ComplaintRoutes);
 //routes for tour guide
 app.use(express.json());
 app.post("/createtgprofile", createTourGuide);
