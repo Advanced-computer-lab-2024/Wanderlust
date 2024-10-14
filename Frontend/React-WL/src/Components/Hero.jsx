@@ -11,10 +11,10 @@ const Hero = () => {
           <h1
             className="text-4xl font-extrabold text-white sm:text-5xl md:text-6xl"
           >
-            Become a React Dev
+            Your Journey Begins with a Click
           </h1>
           <p className="my-4 text-xl text-white">
-            Find the React job that fits your skills and needs
+          Effortlessly plan the perfect getaway with our all-in-one trip planner
           </p>
         </div>
       </div>
