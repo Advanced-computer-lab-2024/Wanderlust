@@ -23,7 +23,7 @@ const App = () => {
       <a
         href="jobs.html"
         className="block bg-black text-white text-center py-4 px-6 rounded-xl hover:bg-gray-700"
-        >View All Jobs</a
+        >View All</a
       >
     </section>
 
