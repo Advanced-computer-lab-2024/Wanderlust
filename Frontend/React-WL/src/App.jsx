@@ -3,6 +3,7 @@ import Navbar from './Components/Navbar'
 import Hero from './Components/Hero'
 import HomeCards from './Components/HomeCards'
 import Joblistings from './Components/Joblistings'
+import ItineraryList from './Components/ItineraryList'
 
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
     <Hero />
     <HomeCards />
     <Joblistings />
+    <ItineraryList />
  
 
    
