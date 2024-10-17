@@ -55,7 +55,7 @@ const Activity = ({ activity }) => {
                 </span>
               ))
             ) : (
-              <span className="text-gray-500 text-xs">No Tags Available</span>
+              <span className="text-gray-500 text-xs">No Tags</span>
             )}
           </div>
         </div>
