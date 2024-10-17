@@ -2,7 +2,7 @@ import React from 'react'
 import Navbar from './Components/Navbar'
 import Hero from './Components/Hero'
 import HomeCards from './Components/HomeCards'
-import Joblistings from './Components/Joblistings'
+import Activities from './Components/Activities'
 import ItineraryList from './Components/ItineraryList'
 
 const App = () => {
@@ -13,7 +13,7 @@ const App = () => {
     <Navbar />
     <Hero />
     <HomeCards />
-    <Joblistings />
+    <Activities />
     <ItineraryList />
  
 
