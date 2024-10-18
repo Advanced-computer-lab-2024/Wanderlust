@@ -1,0 +1,14 @@
+.Slider{
+    width: 100%;
+    margin-top: 20px;
+    margin-left: 10px;
+       
+    padding-right: 60%;
+}
+
+.minValue{
+    margin-top: 10px;
+}
+.maxValue{
+    display: inline;
+}

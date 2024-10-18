@@ -68,19 +68,6 @@ const Register = () => {
             const response = await axios.post("http://localhost:8000/api/tourist/createTourist", data);
             console.log(response.data);
         } else if (role === "tour_guide") {
-            const data = {
-                userName: formData.username,
-                mobileNumber: formData.mobileNumber,
-                YOE: formData.YOE,
-                previousWork: formData.previousWork,
-            };
-            console.log(data);
-            const response = await axios.post(
-                "http://localhost:8000/createtgprofile",
-                data
-            );
-            console.log(response);
-
             const dataUser = {
                 username: formData.username,
                 email: formData.email,
@@ -93,17 +80,31 @@ const Register = () => {
             );
             console.log(responseUser);
         } else if (role === "seller") {
+            const data = {
+                username: formData.username,
+                email: formData.email,
+                password: formData.password1,
+                role : 'seller',
+            }
+
             const response = await axios.post(
-                "http://localhost:8000/api/seller/createSeller",
-                formData
+                "http://localhost:8000/createUser",
+                data
             );
-            console.log(response);
+            console.log(response.data);
         } else if (role === "advertiser") {
+            const data = {
+                username: formData.username,
+                email: formData.email,
+                password: formData.password1,
+                role : 'advertiser',
+            }
+
             const response = await axios.post(
-                "http://localhost:8000/api/advertiser/createAdvertiserProfile",
-                formData
+                "http://localhost:8000/createUser",
+                data
             );
-            console.log(response);
+            console.log(response.data);
         }
     };
 
@@ -223,43 +224,6 @@ const Register = () => {
                         </>
                     )}
 
-                    {role === "tour_guide" && (
-                        <>
-                            <div className="mb-6">
-                                <label className="block text-gray-800 font-semibold">Mobile Number <span className="text-red-500"> *</span></label>
-                                <input
-                                    type="number"
-                                    name="mobileNumber"
-                                    value={formData.mobileNumber}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter your mobile number"
-                                    className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
-                                />
-                            </div>
-                            <div className="mb-6">
-                            <label className="block text-gray-800 font-semibold"> Years Of Experience <span className="text-red-500"> *</span></label>
-                            <input
-                                type="text"
-                                name="YOE"
-                                value={formData.YOE}
-                                onChange={handleInputChange}
-                                placeholder="Enter your years of experience"
-                                className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
-                            />
-                            </div>
-                            <div className="mb-6">
-                            <label className="block text-gray-800 font-semibold"> Previous Work <span className="text-red-500"> *</span></label>
-                            <input
-                                type="text"
-                                name="previousWork"
-                                value={formData.previousWork}
-                                onChange={handleInputChange}
-                                placeholder="Enter your previous work"
-                                className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
-                            />
-                            </div>
-                        </>
-                    )}
 
                     <button
                         onClick={handleSubmit}
