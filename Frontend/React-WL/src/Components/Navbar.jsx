@@ -6,9 +6,12 @@ const Navbar = () => {
   const location = useLocation();
 
   const getLinkClass = (path) => {
-    return location.pathname === path
-      ? 'text-white bg-black rounded-md px-3 py-2'
-      : 'text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2';
+    if(location.pathname === path){
+      return 'text-white bg-black rounded-md px-3 py-2';
+    }
+    else{
+      return 'text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2';
+    }
   };
 
   return (
@@ -41,9 +44,12 @@ const Navbar = () => {
                   <Link to="/tourist" className={getLinkClass('/tourist')}>
                     Tourist
                   </Link>
-                  <Link to="/register" className={getLinkClass('/register')}>
-                    Sign-Up
+                  <Link to="/login" className={"border "+getLinkClass('/login')}>
+                    Login
                   </Link>
+                  {/* <Link to="/register" className={getLinkClass('/register')}>
+                    Join Us
+                  </Link> */}
                 </div>
               </div>
             </div>
