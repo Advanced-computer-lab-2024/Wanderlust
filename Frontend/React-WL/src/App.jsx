@@ -1,34 +1,24 @@
-import React from 'react'
-import Navbar from './Components/Navbar'
-import Hero from './Components/Hero'
-import HomeCards from './Components/HomeCards'
-import Activities from './Components/Activities'
-import ItineraryList from './Components/ItineraryList'
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Navbar from './Components/Navbar';
+import HomePage from './Pages/HomePage';
+import RegisterPage from './Pages/RegisterPage';
 
 const App = () => {
   return (
-    <>
-   
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        {/* <Route path="/advertiser" element={<Advertiser />} />
+        <Route path="/seller" element={<Seller />} />
+        <Route path="/tourism-governor" element={<TourismGovernor />} />
+        <Route path="/tourist" element={<Tourist />} />
+        <Route path="/register" element={<Register />} />*/}
+      </Routes> 
+    </Router>
+  );
+};
 
-    <Navbar />
-    <Hero />
-    <HomeCards />
-    <Activities />
-    <ItineraryList />
- 
-
-   
-
-    <section className="m-auto max-w-lg my-10 px-6">
-      <a
-        href="jobs.html"
-        className="block bg-black text-white text-center py-4 px-6 rounded-xl hover:bg-gray-700"
-        >View All</a
-      >
-    </section>
-
-</>
-  )
-}
-
-export default App
+export default App;

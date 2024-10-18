@@ -9,7 +9,6 @@ const Register = () => {
         email: "",
         password1: "",
         password2: "",
-        name: "", // Admin
         mobileNumber: "", // Tourist, Tour Guide
         nationality: "", // Tourist
         dateOfBirth: "", // Tourist
@@ -55,23 +54,7 @@ const Register = () => {
             alert("Passwords do not match");
             return;
         }
-        if (role === "admin") {
-            const data = {
-                name: formData.name,
-                username: formData.username,
-                email: formData.email,
-                password: formData.password1,
-            };
-            axios
-                .post("http://localhost:8000/api/admin/create", data)
-                .then((response) => {
-                    console.log(response.data);
-                    alert("Admin created successfully");
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
-        } else if (role === "tourist") {
+         if (role === "tourist") {
             const data = {
                 username: formData.username,
                 email: formData.email,
@@ -131,27 +114,11 @@ const Register = () => {
                 <form action="" className="mt-6">
                     <select id="role" value={role} onChange={handleRoleChange}>
                         <option value="">Choose a role</option>
-                        <option value="admin">Admin</option>
                         <option value="tourist">Tourist</option>
                         <option value="tour_guide">Tour Guide</option>
                         <option value="seller">Seller</option>
                         <option value="advertiser">Advertiser</option>
                     </select>
-                    {role === "admin" && (
-                        <>
-                            <div className="mb-6">
-                                <label className="block text-gray-800 font-semibold">Name</label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter your name"
-                                    className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
-                                />
-                            </div>
-                        </>
-                    )}
                     <div className="mb-6">
                         <label htmlFor="username" className="block text-gray-800 font-semibold">
                             Username<span className="text-red-500"> *</span>
