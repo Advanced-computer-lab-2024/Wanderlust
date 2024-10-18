@@ -61,6 +61,7 @@ const advertiserRoutes = require("./Routes/advertiserRoutes");
 const categoryRoutes = require("./Routes/categoryRoutes");
 const sellerRoutes = require("./Routes/sellerRoutes");
 const itineraryRoutes = require("./Routes/itineraryRoutes");
+const ComplaintRoutes = require("./Routes/ComplaintRoutes");
 
 //Routes
 app.use("/api/tourist", touristRoutes);
@@ -74,6 +75,7 @@ app.use("/api/seller", sellerRoutes);
 app.use("/api/tourGuide", tourGuideRoutes);
 app.use("/api/advertiser", advertiserRoutes);
 app.use("/api/itinerary", itineraryRoutes);
+app.use("/api/Complaint", ComplaintRoutes);
 
 app.use(express.json());
 app.post("/createUser", createUser);
