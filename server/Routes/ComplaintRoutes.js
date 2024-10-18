@@ -14,5 +14,3 @@ module.exports = router;
 
 //run this command
 //npm i jsonwebtoken
-
-

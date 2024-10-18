@@ -9,7 +9,7 @@ const createComplaint = async (req, res) => {
             return res.status(400).json({ message: 'Title and body are required' });
         }
 
-        const newComplaint = new Complaint({ title, body,  });
+        const newComplaint = new Complaint({ title, body, userId: req.user._id });
         await newComplaint.save();
         res.status(201).json({ message: 'Complaint created successfully', complaint: newComplaint });
     } catch (error) {
@@ -73,6 +73,7 @@ const getComplaintsByUserId = async (req, res) => {
     }
 };
 
+
 module.exports = {
     createComplaint,
     updateComplaintStatus,
@@ -80,3 +81,4 @@ module.exports = {
     getComplaintById,
     getComplaintsByUserId
 };
+
