@@ -13,12 +13,48 @@ const userSchema = new Schema({
   password: {
     type: String,
     required: true,
+    validate: {
+      validator: function (v) {
+          return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(v);
+      },
+      message:`Password must be at least 6 characters long and contain both letters in upper/lower caps and numbers.`
+     }
   },
-  role:{
-    type:String,
-    required:true,
+  mobileNumber: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  role: {
+    type: String,
+    required: true
+  },
+  termsAccepted: {
+      type: Boolean,
+      required: true,
+      default: false,
+      validate: {
+        validator: function(v) {
+          return v === true;
+        },
+        message: 'You must accept the terms and conditions.'
+      }
+  },
+  createdAt: {
+      type: Date,
+      default: Date.now
+  },
+  updatedAt: {
+      type: Date,
+      default: Date.now
   }
+
 });
 
-const user = mongoose.model("user", userSchema);
-module.exports = user;
+userSchema.pre('save', function (next) {
+  this.updatedAt = Date.now();
+  next();
+});
+
+const User = mongoose.model("user", userSchema);
+module.exports = User;

@@ -9,12 +9,6 @@ require("dotenv").config();
 
 //calling for controllers
 const { createUser } = require("./Controllers/userController");
-const {
-  createTourGuide,
-  getTourGuide,
-  updateTourGuide,
-  deleteTourGuide,
-} = require("./Controllers/tourGuideController");
 
 const {
   createLocation,
@@ -25,16 +19,7 @@ const {
   getLocationById,
 } = require("./Controllers/LocationController");
 
-const { 
-  createItinerary,
-  getItinerary,
-  updateItinerary,
-  deleteItinerary,
-  sortItineraries,
-  searchItinerary,
-  filterItinerairies,
-  filterItinerariesByPref,
-} = require("./Controllers/ItineraryController");
+
 const {
   createAdvertiser,
   getAdvertiser,
@@ -75,6 +60,7 @@ const tourGuideRoutes = require("./Routes/tourGuideRoutes");
 const advertiserRoutes = require("./Routes/advertiserRoutes");
 const categoryRoutes = require("./Routes/categoryRoutes");
 const sellerRoutes = require("./Routes/sellerRoutes");
+const itineraryRoutes = require("./Routes/itineraryRoutes");
 
 //Routes
 app.use("/api/tourist", touristRoutes);
@@ -85,32 +71,12 @@ app.use("/api/activity", activityRoutes);
 app.use("/api/location", locationRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/seller", sellerRoutes);
-//routes for tour guide
-app.use(express.json());
-app.post("/createtgprofile", createTourGuide);
-app.get("/gettgprofile", getTourGuide);
-app.put("/updatetgprofile", updateTourGuide);
-app.delete("/deletetgprofile", deleteTourGuide);
-//routes for advertiser
-app.use(express.json());
-app.post("/createAdvertiserProfile", createAdvertiser);
-app.get("/getAdvertiser", getAdvertiser);
-app.get("/getAdvertiserByUsername", getAdvertiserByUsername);
-app.post("/getAdvertiserByUsername", getAdvertiserByUsername);
-app.put("/updateAdvertiser", updateAdvertiser);
+app.use("/api/tourGuide", tourGuideRoutes);
+app.use("/api/advertiser", advertiserRoutes);
+app.use("/api/itinerary", itineraryRoutes);
 
 app.use(express.json());
 app.post("/createUser", createUser);
-//routes for Itinerary
-app.use(express.json());
- app.post("/createItinerary", createItinerary);
-  app.get("/getItinerary", getItinerary);
-  app.put("/updateItinerary", updateItinerary);
-  app.delete("/deleteItinerary", deleteItinerary);
-  app.get("/sortItineraries", sortItineraries);
-  app.get("/searchItinerary", searchItinerary);
-  app.get("/filterItineraries", filterItinerairies);
-  app.get("/filterItinerariesByPref", filterItinerariesByPref);
 
 app.use(express.json());
 app.post("/createLocation", createLocation);

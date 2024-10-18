@@ -11,57 +11,31 @@ const getTourist = async (req, res) => {
 };
 
 const createTourist = async (req, res) => {
-  var {
-    username,
-    email,
-    password,
-    mobileNumber,
-    nationality,
-    dateOfBirth,
-    job,
-  } = req.body;
-  dateOfBirth = new Date(dateOfBirth);
+  const { username, email, password, mobileNumber, nationality, DOB, jobOrStudent, termsAccepted } = req.body;
+
   try {
-    const tourist = await touristModel.create({
-      username,
-      email,
-      password,
-      mobileNumber,
-      nationality,
-      dateOfBirth,
-      job,
-    });
-    res.status(200).json(tourist);
+      const newTourist = new touristModel({ username, email, password, mobileNumber, nationality, DOB, jobOrStudent, termsAccepted,role: 'tourist'  });
+      await newTourist.save();
+      res.status(201).json(newTourist);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+      res.status(400).json({ message: error.message });
   }
 };
 
 const updateTourist = async (req, res) => {
+  const { touristId } = req.params;
+  const { email, mobileNumber, nationality, jobOrStudent } = req.body;
+
   try {
-    const touristId = req.params.touristId;
-    const {
-      username,
-      email,
-      password,
-      mobileNumber,
-      nationality,
-      dateOfBirth,
-      job,
-    } = req.body;
+    const updatedFields = { email, mobileNumber, nationality, jobOrStudent };
     const tourist = await touristModel.findByIdAndUpdate(
       touristId,
-      {
-        username,
-        email,
-        password,
-        mobileNumber,
-        nationality,
-        dateOfBirth,
-        job,
-      },
+      updatedFields,
       { new: true }
     );
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
     res.status(200).json(tourist);
   } catch (error) {
     res.status(400).json({ error: error.message });

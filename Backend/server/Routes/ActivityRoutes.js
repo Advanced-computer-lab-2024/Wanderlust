@@ -9,7 +9,11 @@ const {
   filterActivities,
   sortActivities,
   searchActivity,
+  getActivitiesByCategoryName,
+  generateShareableLink,
+  sendActivityLinkViaEmail
 } = require("../Controllers/activityController");
+
 router.post("/createActivity", createActivity);
 router.get("/getActivity", getActivity);
 router.get("/getActivityById", getActivityById);
@@ -18,4 +22,8 @@ router.delete("/deleteActivity", deleteActivity);
 router.get("/filterActivities", filterActivities);
 router.get("/sortActivities", sortActivities);
 router.get("/searchActivity", searchActivity);
+router.get('/activities', getActivitiesByCategoryName);
+router.get('/share/:activityId', generateShareableLink);
+router.post('/shareMail/:activityId/email', sendActivityLinkViaEmail);
+
 module.exports = router;

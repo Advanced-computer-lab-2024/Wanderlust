@@ -1,45 +1,23 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const User = require('./user');
 
-
-const urlValidator = (v) => {
-  const urlRegex = /^(https?:\/\/)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
-  return urlRegex.test(v);
-};
-
-
-const AdvertiserSchema = new Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true
-},
-  companyWebsite: {
-    type: String,
-    required: true,
-    validate: {
-        validator: urlValidator,
-        message: props => `${props.value} is not a valid URL!`
+const advertiserSchema = new Schema({
+    website: {
+        type: String,
+        required: true
+    },
+    hotline: {
+        type: String,
+        required: true
+    },
+    companyProfile: {
+        type: String,
+        required: true
     }
-},
-companyProfile: {
-    type: String,
-    required: true,
-    validate: {
-        validator: urlValidator,
-        message: props => `${props.value} is not a valid URL!`
-    }
-},
-hotline: {
-    type: String,
-    required: true
-},
-
 });
 
-//Middleware to set createdAt and updatedAt
-//...
+// Merge the schemas
+const Advertiser = User.discriminator('Advertiser', advertiserSchema);
 
-
-const Advertiser = mongoose.model('Advertiser', AdvertiserSchema);
 module.exports = Advertiser;
