@@ -1,8 +1,16 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import logo from '../assets/Images/Wl-Logog.png';
 
 const Navbar = () => {
+  const location = useLocation();
+
+  const getLinkClass = (path) => {
+    return location.pathname === path
+      ? 'text-white bg-black rounded-md px-3 py-2'
+      : 'text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2';
+  };
+
   return (
     <>
       <nav className="bg-indigo-700 border-b border-indigo-500">
@@ -15,46 +23,25 @@ const Navbar = () => {
               </Link>
               <div className="md:ml-auto">
                 <div className="flex space-x-2">
-                  <Link
-                    to="/"
-                    className="text-white bg-black hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
-                  >
+                  <Link to="/" className={getLinkClass('/')}>
                     Home
                   </Link>
-                  <Link
-                    to="/tourguide"
-                    className="text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
-                  >
+                  <Link to="/tourguide" className={getLinkClass('/tourguide')}>
                     Tourguide
                   </Link>
-                  <Link
-                    to="/advertiser"
-                    className="text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
-                  >
+                  <Link to="/advertiser" className={getLinkClass('/advertiser')}>
                     Advertiser
                   </Link>
-                  <Link
-                    to="/seller"
-                    className="text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
-                  >
+                  <Link to="/seller" className={getLinkClass('/seller')}>
                     Seller
                   </Link>
-                  <Link
-                    to="/tourism-governor"
-                    className="text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
-                  >
+                  <Link to="/tourism-governor" className={getLinkClass('/tourism-governor')}>
                     Tourism Governor
                   </Link>
-                  <Link
-                    to="/tourist"
-                    className="text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
-                  >
+                  <Link to="/tourist" className={getLinkClass('/tourist')}>
                     Tourist
                   </Link>
-                  <Link
-                    to="/register"
-                    className="text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
-                  >
+                  <Link to="/register" className={getLinkClass('/register')}>
                     Sign-Up
                   </Link>
                 </div>
