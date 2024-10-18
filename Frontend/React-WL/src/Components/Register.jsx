@@ -110,8 +110,8 @@ const Register = () => {
     };
 
     return (
-        <div className="flex justify-center items-center h-screen bg-gray-200">
-            <div className="bg-white p-8 rounded shadow-2xl w-96">
+        <div className="max-w-md mx-auto mt-10">
+            <div className="bg-white p-8 rounded shadow-2xl w-full overflow-y-auto" style={{ maxHeight: "80vh" }}>
                 <h2 className="text-2xl font-bold text-gray-800">Register</h2>
                 <form action="" className="mt-6">
                     <select id="role" value={role} onChange={handleRoleChange}>
