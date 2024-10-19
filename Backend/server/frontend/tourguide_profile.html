@@ -129,7 +129,7 @@
     // Function to fetch a Tour Guide profile by username
     async function searchTourGuide() {
       try {
-        const response = await fetch(`http://localhost:8000/gettgprofile?userName=Amrhesham_11`);
+        const response = await fetch(`http://localhost:8000/api/tourGuide/gettgprofile?userName=Amrhesham_11`);
         const tourGuide = await response.json(); // Parse the response to JSON
         const container = document.getElementById('tourGuideContainer');
         container.innerHTML = ''; // Clear any existing data

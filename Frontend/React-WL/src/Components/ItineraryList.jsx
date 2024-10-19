@@ -1,96 +1,103 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import Navbar from '../Components/Navbar';
+import Card from '../Components/Card';
+import Activities from './Activity';
 
-const ItineraryList = () => {
-  const [itineraries, setItineraries] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+const Itinerary = () => {
+  const [itinerary, setItinerary] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchItineraries = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch('http://localhost:8000/getitinerary');
+    // Fetch itinerary data from the API
+    fetch('http://localhost:8000/api/itinerary/getitinerary')
+      .then(response => {
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error('Network response was not ok');
         }
-        const data = await response.json();
-        console.log('Fetched data:', data); // Log the fetched data
-        setItineraries(Array.isArray(data) ? data : [data]);
-      } catch (error) {
-        console.error('Error fetching itineraries:', error);
-        setError(error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchItineraries();
+        return response.json();
+      })
+      .then(data => {
+        console.log("Fetched data:", data);
+        if (Array.isArray(data) && data.length > 0) {
+          setItinerary(data);
+        } else {
+          console.log("Itinerary array is empty or undefined.");
+        }
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error("Error fetching data:", error);
+        setError(error);
+        setLoading(false);
+      });
   }, []);
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
-  if (isLoading) {
-    return <div className="text-center py-10">Loading itineraries...</div>;
+  if (loading) {
+    return <p>Loading itinerary...</p>;
   }
 
   if (error) {
-    return <div className="text-center py-10 text-red-500">Error: {error}</div>;
-  }
-
-  if (itineraries.length === 0) {
-    return <div className="text-center py-10">No itineraries found.</div>;
+    return <p>Error loading itinerary: {error.message}</p>;
   }
 
   return (
-    <section className="bg-blue-50 px-4 py-10">
-      <div className="container-xl lg:container m-auto">
-        <h2 className="text-3xl font-bold text-indigo-500 mb-6 text-center">
-          Browse Itineraries
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {itineraries.map((itinerary) => (
-            <div key={itinerary._id} className="bg-white rounded-xl shadow-md relative">
-              <div className="p-4">
-                <div className="mb-6">
-                  <div className="text-gray-600 my-2">
-                    {formatDate(itinerary.timeline.start)} - {formatDate(itinerary.timeline.end)}
-                  </div>
-                  <h3 className="text-xl font-bold">{itinerary.title}</h3>
-                </div>
+    <>
+     
+      <Card>
+      <div className="itinerary-container px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Itineraries</h1>
+        {itinerary.length > 0 ? (
+          itinerary.map((item) => (
+            <div key={item._id} className="bg-white rounded-xl shadow-md mb-6 p-4">
+              <h2 className="text-2xl font-semibold mb-2">{item.title}</h2>
+              <p className="text-gray-600 text-sm">{item.description}</p>
+              <p className="text-gray-500 text-xs">
+                Start Date: {item.timeline.start} <br />
+                End Date: {item.timeline.end}<br />
+                Price:{item.price}<br />
+                Language Of Tour: {item.languageOfTour}<br />
+              </p>
 
-                <div className="mb-5">
-                  <p>Locations: {itinerary.locations.join(', ')}</p>
-                  <p>Language: {itinerary.languageOfTour}</p>
-                  <p>Price: ${itinerary.price}</p>
-                </div>
+              <h3 className="text-xl font-semibold mt-4">Activities:</h3>
+              <ul className="list-disc list-inside">
+                {item.activities.map((activity, index) => (
+                  <Activities key = {activity.id} activity={activity} ></Activities>
+                ))}
+              </ul>
 
-                <div className="border border-gray-100 mb-5"></div>
+              <h3 className="text-xl font-semibold mt-4">Locations:</h3>
+              <ul className="list-disc list-inside">
+                {item.locations.map((location, index) => (
+                  <li key={index} className="text-gray-500 text-sm">{location}</li>
+                ))}
+              </ul>
 
-                <div className="flex flex-col lg:flex-row justify-between mb-4">
-                  <div className="text-orange-700 mb-3">
-                    <i className="fa-solid fa-location-dot text-lg"></i>
-                    {itinerary.pickupLocation}
-                  </div>
-                  <a
-                    href={`/itinerary/${itinerary._id}`}
-                    className="h-[36px] bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-center text-sm"
-                  >
-                    View Details
-                  </a>
-                </div>
-              </div>
+              <h3 className="text-xl font-semibold mt-4">Available Dates:</h3>
+              <ul className="list-disc list-inside">
+                {item.availableDates.map((availableDates, index) => (
+                  <li key={index} className="text-gray-500 text-sm">{availableDates}</li>
+                ))}
+              </ul>
+
+              <p className="text-gray-500 text-xs">
+                <strong>Accessibility:</strong> {item.accessibility} <br />
+                <strong>Pickup Location:</strong> {item.pickupLocation}<br />
+                <strong>Dropoff Location:</strong> {item.dropoffLocation}<br />
+                <strong>bookingOpen:</strong> {item.bookingOpen? "Yes" : "No"}<br />
+              </p>
+
+            
+       
             </div>
-          ))}
-        </div>
+          ))
+        ) : (
+          <p>No itinerary data available.</p>
+        )}
       </div>
-    </section>
+      </Card>
+    </>
   );
 };
 
-export default ItineraryList;
+export default Itinerary;

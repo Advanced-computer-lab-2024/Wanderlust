@@ -2,13 +2,21 @@ const express = require("express");
 const router = express.Router();
 const {
   createTourGuide,
-  getTourGuide,
-  updateTourGuide,
+
 } = require("../Controllers/tourGuideController");
 
+const {
+  getTourGuide,
+  updateTourGuide,
+  createTourGuideProfile,
+
+} = require("../Controllers/tourGuideProfileController");
+
 router.post("/create", createTourGuide);
-router.get("/getprofile", getTourGuide);
-router.put("/updateprofile", updateTourGuide);
+router.post("/createtgprofile", createTourGuideProfile);
+router.get("/gettgprofile", getTourGuide);
+router.put("/updatetgprofile", updateTourGuide);
+
 
 
 module.exports = router;
