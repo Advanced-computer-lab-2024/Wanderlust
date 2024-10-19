@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import Navbar from '../Components/Navbar';
 import Card from '../Components/Card';
 import Activities from './Activity';
+import { Calendar, MapPin, Globe, DollarSign, Users, Check } from 'lucide-react';
 
 const Itinerary = () => {
   const [itinerary, setItinerary] = useState([]);
@@ -9,95 +9,176 @@ const Itinerary = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch itinerary data from the API
-    fetch('http://localhost:8000/api/itinerary/getitinerary')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log("Fetched data:", data);
-        if (Array.isArray(data) && data.length > 0) {
-          setItinerary(data);
-        } else {
-          console.log("Itinerary array is empty or undefined.");
-        }
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error("Error fetching data:", error);
-        setError(error);
-        setLoading(false);
-      });
+    fetchItinerary();
   }, []);
 
-  if (loading) {
-    return <p>Loading itinerary...</p>;
-  }
+  const fetchItinerary = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/itinerary/getitinerary');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      if (Array.isArray(data) && data.length > 0) {
+        setItinerary(data);
+      } else {
+        console.log("Itinerary array is empty or undefined.");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  if (error) {
-    return <p>Error loading itinerary: {error.message}</p>;
-  }
+  const handleCreate = () => {
+    console.log("Create new itinerary");
+  };
+
+  const handleUpdate = (id) => {
+    console.log("Update itinerary with id:", id);
+  };
+
+  const handleDelete = (id) => {
+    console.log("Delete itinerary with id:", id);
+  };
+
+  if (loading) return (
+    <div className="flex justify-center items-center h-64">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+    </div>
+  );
+  
+  if (error) return (
+    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+      <strong className="font-bold">Error!</strong>
+      <span className="block sm:inline"> {error.message}</span>
+    </div>
+  );
 
   return (
-    <>
-     
-      <Card>
-      <div className="itinerary-container px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Itineraries</h1>
-        {itinerary.length > 0 ? (
-          itinerary.map((item) => (
-            <div key={item._id} className="bg-white rounded-xl shadow-md mb-6 p-4">
-              <h2 className="text-2xl font-semibold mb-2">{item.title}</h2>
-              <p className="text-gray-600 text-sm">{item.description}</p>
-              <p className="text-gray-500 text-xs">
-                Start Date: {item.timeline.start} <br />
-                End Date: {item.timeline.end}<br />
-                Price:{item.price}<br />
-                Language Of Tour: {item.languageOfTour}<br />
-              </p>
-
-              <h3 className="text-xl font-semibold mt-4">Activities:</h3>
-              <ul className="list-disc list-inside">
-                {item.activities.map((activity, index) => (
-                  <Activities key = {activity.id} activity={activity} ></Activities>
-                ))}
-              </ul>
-
-              <h3 className="text-xl font-semibold mt-4">Locations:</h3>
-              <ul className="list-disc list-inside">
-                {item.locations.map((location, index) => (
-                  <li key={index} className="text-gray-500 text-sm">{location}</li>
-                ))}
-              </ul>
-
-              <h3 className="text-xl font-semibold mt-4">Available Dates:</h3>
-              <ul className="list-disc list-inside">
-                {item.availableDates.map((availableDates, index) => (
-                  <li key={index} className="text-gray-500 text-sm">{availableDates}</li>
-                ))}
-              </ul>
-
-              <p className="text-gray-500 text-xs">
-                <strong>Accessibility:</strong> {item.accessibility} <br />
-                <strong>Pickup Location:</strong> {item.pickupLocation}<br />
-                <strong>Dropoff Location:</strong> {item.dropoffLocation}<br />
-                <strong>bookingOpen:</strong> {item.bookingOpen? "Yes" : "No"}<br />
-              </p>
-
-            
-       
+    <div className="bg-gray-100 min-h-screen py-8">
+      <div className="max-w-6xl mx-auto px-4">
+        <Card>
+          <div className="itinerary-container">
+            <div className="flex justify-between items-center mb-8">
+              <h1 className="text-4xl font-bold text-indigo-700">Itineraries</h1>
+              <button
+                onClick={handleCreate}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
+              >
+                <Calendar className="mr-2" size={20} />
+                Create New Itinerary
+              </button>
             </div>
-          ))
-        ) : (
-          <p>No itinerary data available.</p>
-        )}
+            {itinerary.length > 0 ? (
+              itinerary.map((item) => (
+                <ItineraryItem
+                  key={item._id}
+                  item={item}
+                  onUpdate={handleUpdate}
+                  onDelete={handleDelete}
+                />
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <Globe className="mx-auto text-gray-400" size={64} />
+                <p className="mt-4 text-xl text-gray-600">No itineraries available. Create your first adventure!</p>
+              </div>
+            )}
+          </div>
+        </Card>
       </div>
-      </Card>
-    </>
+    </div>
   );
 };
+
+const ItineraryItem = ({ item, onUpdate, onDelete }) => (
+  <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
+    <div className="p-6">
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h2 className="text-2xl font-semibold mb-2 text-indigo-600">{item.title}</h2>
+          <p className="text-gray-600 text-sm flex items-center">
+            <Calendar className="mr-2" size={16} />
+            {item.timeline.start} - {item.timeline.end}
+          </p>
+        </div>
+        <div>
+          <button
+            onClick={() => onUpdate(item._id)}
+            className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-1 px-3 rounded-lg mr-2 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            Update
+          </button>
+          <button
+            onClick={() => onDelete(item._id)}
+            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+      <ItineraryDetails item={item} />
+      <ItineraryActivities activities={item.activities} />
+      <ItinerarySection title="Locations" items={item.locations} icon={<MapPin size={18} />} />
+      <ItinerarySection title="Available Dates" items={item.availableDates} icon={<Calendar size={18} />} />
+    </div>
+  </div>
+);
+
+const ItineraryDetails = ({ item }) => (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4 mb-6">
+    <DetailItem icon={<DollarSign size={18} />} label="Price" value={item.price} />
+    <DetailItem icon={<Globe size={18} />} label="Language of Tour" value={item.languageOfTour} />
+    <DetailItem icon={<Users size={18} />} label="Accessibility" value={item.accessibility} />
+    <DetailItem icon={<MapPin size={18} />} label="Pickup Location" value={item.pickupLocation} />
+    <DetailItem icon={<MapPin size={18} />} label="Dropoff Location" value={item.dropoffLocation} />
+    <DetailItem icon={<Check size={18} />} label="Booking Open" value={item.bookingOpen ? "Yes" : "No"} />
+  </div>
+);
+
+const DetailItem = ({ icon, label, value }) => (
+  <div className="flex items-center">
+    <div className="text-indigo-500 mr-2">{icon}</div>
+    <div>
+      <span className="font-medium text-gray-700">{label}:</span>
+      <span className="ml-2 text-gray-600">{value}</span>
+    </div>
+  </div>
+);
+
+const ItineraryActivities = ({ activities }) => (
+  <div className="mb-6">
+    <h3 className="text-lg font-semibold mb-3 text-indigo-500 border-b border-indigo-100 pb-1 flex items-center">
+      <Users className="mr-2" size={20} />
+      Activities
+    </h3>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {activities.map((activity) => (
+        <div key={activity.id} className="bg-gray-50 rounded-lg p-3 hover:shadow-md transition duration-300">
+          <Activities activity={activity} />
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const ItinerarySection = ({ title, items, icon }) => (
+  <div className="mb-4">
+    <h3 className="text-lg font-semibold mb-2 text-indigo-500 border-b border-indigo-100 pb-1 flex items-center">
+      {icon}
+      <span className="ml-2">{title}</span>
+    </h3>
+    <ul className="list-disc list-inside pl-4">
+      {items.map((item, index) => (
+        <li key={index} className="text-gray-600 text-sm mb-1">
+          {item}
+        </li>
+      ))}
+    </ul>
+  </div>
+);
 
 export default Itinerary;
