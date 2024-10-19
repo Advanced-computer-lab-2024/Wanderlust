@@ -8,7 +8,7 @@ import LoginPage from './Pages/LoginPage';
 const App = () => {
   return (
     <Router>
-      <Navbar />
+      <Navbar t1={"Tour guide"} p1={"/tourguaide"} t2={"Advertiser"} t3={"Seller"} t4={"Tourism Govener"} t5={"Tourist"} t6={"Login"} />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<RegisterPage />} />

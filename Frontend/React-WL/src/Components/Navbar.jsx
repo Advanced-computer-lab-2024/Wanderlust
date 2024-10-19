@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import logo from '../assets/Images/Wl-Logog.png';
 
-const Navbar = () => {
+const Navbar = ({t1,t2,t3,t4,t5,t6,p1,p2,p3,p4,p5,p6}) => {
   const location = useLocation();
 
   const getLinkClass = (path) => {
@@ -29,23 +29,23 @@ const Navbar = () => {
                   <Link to="/" className={getLinkClass('/')}>
                     Home
                   </Link>
-                  <Link to="/tourguide" className={getLinkClass('/tourguide')}>
-                    Tourguide
+                  <Link to="{p1}" className={getLinkClass('/tourguide')}>
+                    {t1}
                   </Link>
                   <Link to="/advertiser" className={getLinkClass('/advertiser')}>
-                    Advertiser
+                    {t2}
                   </Link>
                   <Link to="/seller" className={getLinkClass('/seller')}>
-                    Seller
+                    {t3}
                   </Link>
                   <Link to="/tourism-governor" className={getLinkClass('/tourism-governor')}>
-                    Tourism Governor
+                    {t4}
                   </Link>
                   <Link to="/tourist" className={getLinkClass('/tourist')}>
-                    Tourist
+                   {t5}
                   </Link>
                   <Link to="/login" className={"border "+getLinkClass('/login')}>
-                    Login
+                    {t6}
                   </Link>
                   {/* <Link to="/register" className={getLinkClass('/register')}>
                     Join Us
