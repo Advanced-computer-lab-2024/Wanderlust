@@ -14,7 +14,7 @@ const Home = () => {
     <Hero />
     <HomeCards />
     <Activities />
-    <ItineraryList />
+    
  
 
    
