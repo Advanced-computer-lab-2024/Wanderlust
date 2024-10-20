@@ -1,10 +1,10 @@
 const userModel = require("../Models/user");
 
-const createUser = async (req, res) => {
-    const { username, email, password ,role} = req.body;
+const signUp = async (req, res) => {
+    const { username, email, password ,mobileNumber, role,termsAccepted} = req.body;
 
     try {
-        const newUser = new userModel({ username, email, password ,role});
+        const newUser = new userModel({ username, email, password,mobileNumber, role,termsAccepted});
         await newUser.save();
         res.status(201).json(newUser);
     } catch (error) {
@@ -12,4 +12,4 @@ const createUser = async (req, res) => {
     }
 };
 
-module.exports = { createUser };
+module.exports = { signUp };

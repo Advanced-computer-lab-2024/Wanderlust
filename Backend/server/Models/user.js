@@ -9,52 +9,47 @@ const userSchema = new Schema({
   email: {
     type: String,
     required: true,
+    unique: true,
   },
   password: {
     type: String,
     required: true,
     validate: {
       validator: function (v) {
-          return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(v);
+        return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(v);
       },
-      message:`Password must be at least 6 characters long and contain both letters in upper/lower caps and numbers.`
-     }
+      message: `Password must be at least 6 characters long and contain both letters in upper/lower caps and numbers.`,
+    },
   },
   mobileNumber: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
+  },
+  termsAccepted: {
+    type: Boolean,
+    required: [true, "You must accept the terms and conditions."],
   },
   role: {
     type: String,
-    required: true
+    enum: ["guest", "tour guide", "advertiser", "seller", "tourist"],
+    default: "guest",
   },
-  termsAccepted: {
-      type: Boolean,
-      required: true,
-      default: false,
-      validate: {
-        validator: function(v) {
-          return v === true;
-        },
-        message: 'You must accept the terms and conditions.'
-      }
+  roleApplicationStatus: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending",
   },
   createdAt: {
-      type: Date,
-      default: Date.now
+    type: Date,
+    default: Date.now,
   },
   updatedAt: {
-      type: Date,
-      default: Date.now
-  }
-
+    type: Date,
+    default: Date.now,
+  },
 });
 
-userSchema.pre('save', function (next) {
-  this.updatedAt = Date.now();
-  next();
-});
+const User = mongoose.model("User", userSchema);
 
-const User = mongoose.model("user", userSchema);
 module.exports = User;

@@ -8,8 +8,7 @@ require("dotenv").config();
 //Check db connection links in README file
 
 //calling for controllers
-const { createUser } = require("./Controllers/userController");
-
+const { signUp } = require('./Controllers/userController');
 const {
   createLocation,
   getLocations,
@@ -76,7 +75,7 @@ app.use("/api/advertiser", advertiserRoutes);
 app.use("/api/itinerary", itineraryRoutes);
 
 app.use(express.json());
-app.post("/createUser", createUser);
+app.post('/signup', signUp);
 
 app.use(express.json());
 app.post("/createLocation", createLocation);

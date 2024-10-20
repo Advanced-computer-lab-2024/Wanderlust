@@ -8,7 +8,7 @@ const {
 const router = express.Router();
 
 router.get("/getTourist", getTourist);
-router.post("/createTourist", createTourist);
+router.put("/createTourist/:userId", createTourist);
 router.put("/updateTourist/:touristId", updateTourist);
 router.get("/viewAll", viewAll);
 module.exports = router;

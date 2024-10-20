@@ -12,7 +12,7 @@ const {
 
 } = require("../Controllers/tourGuideProfileController");
 
-router.post("/create", createTourGuide);
+router.put("/create/:userId", createTourGuide);
 router.post("/createtgprofile", createTourGuideProfile);
 router.get("/gettgprofile", getTourGuide);
 router.put("/updatetgprofile", updateTourGuide);

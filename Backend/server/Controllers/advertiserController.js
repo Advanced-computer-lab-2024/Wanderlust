@@ -1,18 +1,30 @@
 const Advertiser = require("../Models/Advertiser.js");
 const Activity = require("../Models/Activity.js");
-const { default: mongoose, get } = require("mongoose");
+const User = require("../Models/user");
 
+//http://localhost:8000/api/advertiser/createAdvertiserProfile/userId
 const createAdvertiser = async (req, res) => {
-  const { username, email, password, mobileNumber, website, companyProfile, hotline, termsAccepted } = req.body;
-
-  if (!termsAccepted) {
-    return res.status(400).json({ error: "Terms and conditions must be accepted." });
-  }
-
+  const { userId } = req.params;
+  const { website, companyProfile, hotline } = req.body;
   try {
-    const advertiser = await Advertiser.create({
-      username, email, password, mobileNumber, website, companyProfile, hotline, termsAccepted,role: 'advertiser'  });
-    res.status(200).json(advertiser);
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const advertiser = new Advertiser({
+      userId: user._id,
+      website,
+      companyProfile,
+      hotline,
+    });
+    user.role = "advertiser";
+    user.roleApplicationStatus = "pending";
+    await advertiser.save();
+    await user.save();
+    res.status(200).json({
+      user,
+      advertiser,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
