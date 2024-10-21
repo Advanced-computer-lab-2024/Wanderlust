@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 require("dotenv").config();
+const cloudinary = require("cloudinary").v2;
+
 //Make sure to add your MongoDB URI in the .env file as MONGO_URI="your mongodb uri"
 //Check db connection links in README file
 
@@ -19,7 +21,6 @@ const {
   getLocationById,
 } = require("./Controllers/LocationController");
 
-
 const {
   createAdvertiser,
   getAdvertiser,
@@ -34,6 +35,13 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
 // configurations
+
+// Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 // Mongo DB
 const port = process.env.PORT || "8000";
 const MongoURI =
@@ -84,11 +92,10 @@ app.get("/getLocations", getLocations);
 app.put("/updateLocation/:id", updateLocation);
 
 app.delete("/deleteLocation/:id", deleteLocation);
-app.get('/getLocation/:id', getLocationById);
+app.get("/getLocation/:id", getLocationById);
 
-
-  //createLocation,
-  //getLocations,
-  //updateLocation,
-  //deleteLocation,
-  //filterLocations,
+//createLocation,
+//getLocations,
+//updateLocation,
+//deleteLocation,
+//filterLocations,
