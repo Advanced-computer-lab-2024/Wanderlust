@@ -7,7 +7,7 @@ const {
   updateAdvertiser,
 } = require("../Controllers/advertiserController");
 
-router.post("/createAdvertiserProfile", createAdvertiser);
+router.put("/createAdvertiserProfile/:userId", createAdvertiser);
 router.get("/getAdvertiser", getAdvertiser);
 router.get("/getAdvertiserByUsername", getAdvertiserByUsername);
 router.put("/updateAdvertiser", updateAdvertiser);

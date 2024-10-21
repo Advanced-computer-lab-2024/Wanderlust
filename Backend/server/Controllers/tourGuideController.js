@@ -1,31 +1,30 @@
-// #Task route solution
-const tourGuideModel = require('../Models/tourGuide.js');
-const { default: mongoose, get } = require('mongoose');
+const TourGuide = require("../Models/tourGuide");
+const User = require("../Models/user");
 
 const createTourGuide = async (req, res) => {
-  const { username, email, password,  YOE, mobileNumber, previousWork, termsAccepted  } = req.body;
-
-   if (!username || !email || !password || termsAccepted === undefined) {
-      return res.status(400).json({ error: 'Username, email, password, and terms acceptance are required' });
-   }
+  const { userId } = req.params;
+  const { YOE, previousWork } = req.body;
   try {
-      // Check if the username already exists
-      const existingTourGuide = await tourGuideModel.findOne({ username });
-      if (existingTourGuide) {
-          return res.status(400).json({ error: 'Username already exists' });
-      }
-      // Create new tour guide
-      const tourguide = await tourGuideModel.create({ username, email,password,YOE, mobileNumber, previousWork, termsAccepted, role:"tour guide" 
-        });
-      res.status(200).json(tourguide);
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const tourGuide = new TourGuide({
+      userId: user._id,
+      YOE,
+      previousWork,
+    });
+    user.role = "tour guide";
+    user.roleApplicationStatus = "pending";
+    await tourGuide.save();
+    await user.save();
+    res.status(200).json({
+      user,
+      tourGuide,
+    });
   } catch (error) {
-      res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message });
   }
 };
 
-
-
-
-
-
-module.exports = {createTourGuide};
+module.exports = { createTourGuide };

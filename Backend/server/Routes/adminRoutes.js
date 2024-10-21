@@ -8,7 +8,7 @@ router.post("/addTourismGovernor",adminController.addTourismGovernor);
 router.delete("/delete", adminController.deleteAccount);
 router.get("/usernames", adminController.getAllUserDetails);
 router.post("/create", adminController.createAdmin);
-//router.post("/login", adminController.adminLogin);
+router.get("/pendingUsers", adminController.getPendingUsers);
 router.get("/profile", adminController.getAdminDetails);
 //router.post("/updatepassword", adminController.authenticateAdmin,adminController.updateAdminPassword);
 

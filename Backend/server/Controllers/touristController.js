@@ -3,6 +3,7 @@ const locationsModel = require("../Models/Locations");
 const activityModel = require("../Models/Activity");
 const itineraryModel = require("../Models/Itinerary");
 const { default: mongoose } = require("mongoose");
+const User = require("../Models/user");
 
 const getTourist = async (req, res) => {
   const username = req.query.username;
@@ -11,14 +12,29 @@ const getTourist = async (req, res) => {
 };
 
 const createTourist = async (req, res) => {
-  const { username, email, password, mobileNumber, nationality, DOB, jobOrStudent, termsAccepted } = req.body;
-
+  const { userId } = req.params;
+  const { nationality, DOB, jobOrStudent} = req.body;
   try {
-      const newTourist = new touristModel({ username, email, password, mobileNumber, nationality, DOB, jobOrStudent, termsAccepted,role: 'tourist'  });
-      await newTourist.save();
-      res.status(201).json(newTourist);
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const tourist = new touristModel({
+      userId: user._id,
+      nationality,
+      DOB,
+      jobOrStudent,
+    });
+    user.role = "tourist";
+    user.roleApplicationStatus = "approved";
+    await tourist.save();
+    await user.save();
+    res.status(200).json({
+      user,
+      tourist,
+    });
   } catch (error) {
-      res.status(400).json({ message: error.message });
+    res.status(400).json({ error: error.message });
   }
 };
 
