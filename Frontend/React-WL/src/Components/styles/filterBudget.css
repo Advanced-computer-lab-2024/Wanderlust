@@ -2,7 +2,7 @@
     width: 100%;
     margin-top: 20px;
     margin-left: 10px;
-       
+    display: flex;
     padding-right: 60%;
 }
 
@@ -11,4 +11,22 @@
 }
 .maxValue{
     display: inline;
+}
+
+.Datediv{
+    margin-top: 5px;
+    display: flex;
+}
+
+#filtertext{
+    margin-top: 10px;
+    margin-left: 23px;
+    margin-right: 7px;
+}
+.sliderleft{
+    width: 100%;
+}
+.slidertext{
+    width: 100%;
+    margin-left: 20px;
 }
