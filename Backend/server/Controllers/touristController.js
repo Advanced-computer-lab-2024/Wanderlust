@@ -31,12 +31,9 @@ const createTourist = async (req, res) => {
       DOB,
       jobOrStudent,
     });
-    user.role = "tourist";
     user.roleApplicationStatus = "approved";
     await tourist.save();
-    await user.save();
     res.status(200).json({
-      user,
       tourist,
     });
   } catch (error) {

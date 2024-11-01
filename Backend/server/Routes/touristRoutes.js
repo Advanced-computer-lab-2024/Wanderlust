@@ -9,7 +9,7 @@ const {
 const router = express.Router();
 
 router.get("/getTourist", getTourist);
-router.put("/createTourist/:userId", createTourist);
+router.post("/createTourist/:userId", createTourist);
 router.put("/updateTourist/:username", updateTourist);
 router.get("/viewAll", viewAll);
 router.put("/redeemPoints/:username", redeemPoints);
