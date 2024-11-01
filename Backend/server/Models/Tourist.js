@@ -1,11 +1,11 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const User = require('./user');
+const User = require("./user");
 
 const touristSchema = new Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
   nationality: {
@@ -20,6 +20,15 @@ const touristSchema = new Schema({
     type: String,
     required: true,
   },
+  points: {
+    type: Number,
+    default: 0,
+  },
+  wallet: {
+    type: Number,
+    default: 0,
+  },
+  badge: { type: String, default: "None" },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -30,6 +39,6 @@ const touristSchema = new Schema({
   },
 });
 
-const Tourist = mongoose.model('Tourist', touristSchema);
+const Tourist = mongoose.model("Tourist", touristSchema);
 
 module.exports = Tourist;
