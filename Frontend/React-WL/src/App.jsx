@@ -19,7 +19,7 @@ import Tourist from './Pages/Tourist';
 import ItineraryTourist from './Pages/ItineraryTourist';
 import LocationTourist from './Pages/LocationTourist';
 import ActivityTourist from './Pages/ActivityTourist';
-
+import SellerPage from './Pages/SellerPage';
 const App = () => {
   return (
     <Router>
@@ -39,6 +39,7 @@ const App = () => {
         <Route path="/managepreferencetags" element={<AdminManagePreferenceTagsPage />} />
         <Route path="/advertiser" element={<Advertiser />} />
         <Route path="/activitiesPage" element={<ActivitiesPage />} />
+        <Route path="/seller" element={<SellerPage/>} />
 
 
 
