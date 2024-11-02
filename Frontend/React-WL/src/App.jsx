@@ -13,6 +13,9 @@ import AdminViewUsersPage from './Pages/AdminViewUsersPage';
 import AdminManageProductsPage from './Pages/AdminManageProductsPage';
 import AdminManageActivitiesPage from './Pages/AdminManageActivitiesPage';
 import AdminManagePreferenceTagsPage from './Pages/AdminManagePreferenceTagsPage';
+import Advertiser from './Pages/Advertiser';
+import ActivitiesPage from './Pages/ActivitiesPage';
+
 const App = () => {
   return (
     <Router>
@@ -30,6 +33,12 @@ const App = () => {
         <Route path="/manageproducts" element={<AdminManageProductsPage />} />
         <Route path="/manageactivities" element={<AdminManageActivitiesPage />} />
         <Route path="/managepreferencetags" element={<AdminManagePreferenceTagsPage />} />
+        <Route path="/advertiser" element={<Advertiser />} />
+        <Route path="/activitiesPage" element={<ActivitiesPage />} />
+
+
+
+
         {/* <Route path="/advertiser" element={<Advertiser />} />
         <Route path="/seller" element={<Seller />} />
         <Route path="/tourism-governor" element={<TourismGovernor />} />

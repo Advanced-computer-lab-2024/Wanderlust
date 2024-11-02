@@ -4,13 +4,14 @@ import Hero from '../Components/Hero'
 import HomeCards from '../Components/HomeCards'
 import Activities from '../Components/Activities'
 import ItineraryList from '../Components/ItineraryList'
+import Advertiser from './Advertiser'
 
 const Home = () => {
   return (
     <>
    
 
-   <Navbar t1={"Tour guide"} p1={"/tourguide"} t2={"Advertiser"} p2={"/a"} t3={"Seller"} p3={"/a"} t4={"Tourism Govener"} p4={"/a"} t5={"Tourist"} p5={"/a"} t6={"Login"} p6={"/Login"} />
+   <Navbar t1={"Tour guide"} p1={"/Tourguide"} t2={"Advertiser"} p2={"/advertiser"} t3={"Seller"} p3={"/a"} t4={"Tourism Govener"} p4={"/a"} t5={"Tourist"} p5={"/a"} t6={"Login"} p6={"/Login"} />
     <Hero />
     <HomeCards />
     <Activities />

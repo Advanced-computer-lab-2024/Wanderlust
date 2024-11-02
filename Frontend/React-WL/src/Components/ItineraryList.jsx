@@ -3,7 +3,7 @@ import Card from '../Components/Card';
 import Activities from './Activity';
 import { Calendar, MapPin, Globe, DollarSign, Users, Check } from 'lucide-react';
 
-const Itinerary = () => {
+const Itinerary = ({ showCreateButton = true, showUpdateButton = true, showDeleteButton = true }) => {
   const [itinerary, setItinerary] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -49,7 +49,7 @@ const Itinerary = () => {
       <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
     </div>
   );
-  
+
   if (error) return (
     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
       <strong className="font-bold">Error!</strong>
@@ -64,13 +64,15 @@ const Itinerary = () => {
           <div className="itinerary-container">
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-4xl font-bold text-indigo-700">Itineraries</h1>
-              <button
-                onClick={handleCreate}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
-              >
-                <Calendar className="mr-2" size={20} />
-                Create New Itinerary
-              </button>
+              {showCreateButton && (
+                <button
+                  onClick={handleCreate}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
+                >
+                  <Calendar className="mr-2" size={20} />
+                  Create New Itinerary
+                </button>
+              )}
             </div>
             {itinerary.length > 0 ? (
               itinerary.map((item) => (
@@ -79,6 +81,8 @@ const Itinerary = () => {
                   item={item}
                   onUpdate={handleUpdate}
                   onDelete={handleDelete}
+                  showUpdateButton={showUpdateButton}
+                  showDeleteButton={showDeleteButton}
                 />
               ))
             ) : (
@@ -94,7 +98,7 @@ const Itinerary = () => {
   );
 };
 
-const ItineraryItem = ({ item, onUpdate, onDelete }) => (
+const ItineraryItem = ({ item, onUpdate, onDelete, showUpdateButton, showDeleteButton }) => (
   <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
     <div className="p-6">
       <div className="flex justify-between items-start mb-4">
@@ -106,18 +110,22 @@ const ItineraryItem = ({ item, onUpdate, onDelete }) => (
           </p>
         </div>
         <div>
-          <button
-            onClick={() => onUpdate(item._id)}
-            className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-1 px-3 rounded-lg mr-2 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
-          >
-            Update
-          </button>
-          <button
-            onClick={() => onDelete(item._id)}
-            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
-          >
-            Delete
-          </button>
+          {showUpdateButton && (
+            <button
+              onClick={() => onUpdate(item._id)}
+              className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-1 px-3 rounded-lg mr-2 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+            >
+              Update
+            </button>
+          )}
+          {showDeleteButton && (
+            <button
+              onClick={() => onDelete(item._id)}
+              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+            >
+              Delete
+            </button>
+          )}
         </div>
       </div>
       <ItineraryDetails item={item} />
