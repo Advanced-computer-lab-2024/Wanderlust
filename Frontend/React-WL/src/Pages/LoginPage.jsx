@@ -23,6 +23,7 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
         let apiUrl = "";
 
         switch (role) {
@@ -47,7 +48,8 @@ const Login = () => {
         }
 
         try {
-            const response = await axios.post(apiUrl, formData);
+            console.log({ ...formData, role });
+            const response = await axios.post(apiUrl, { ...formData, role });
             console.log("Login successful:", response.data);
             // Redirect or perform other actions upon successful login
         } catch (error) {

@@ -6,7 +6,13 @@ import RegisterPage from './Pages/RegisterPage';
 import LoginPage from './Pages/LoginPage';
 import Tourguide from './Pages/Tourguide';
 import Itinerary from './Pages/Itinerary';
-
+import AdminDashboard from './Pages/AdminDashboard';
+import AddAdminPage from './Pages/AddAdminPage';
+import AddTourismGovernorPage from './Pages/AddTourismGovernorPage';
+import AdminViewUsersPage from './Pages/AdminViewUsersPage';
+import AdminManageProductsPage from './Pages/AdminManageProductsPage';
+import AdminManageActivitiesPage from './Pages/AdminManageActivitiesPage';
+import AdminManagePreferenceTagsPage from './Pages/AdminManagePreferenceTagsPage';
 const App = () => {
   return (
     <Router>
@@ -17,6 +23,13 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/tourguide" element={<Tourguide />} />
         <Route path="/itinerary" element={<Itinerary />} />
+        <Route path="/admindashboard" element={<AdminDashboard />} />
+        <Route path="/addadmin" element={<AddAdminPage />} />
+        <Route path="/addtourismgovernor" element={<AddTourismGovernorPage />} />
+        <Route path="/viewusers" element={<AdminViewUsersPage />} />
+        <Route path="/manageproducts" element={<AdminManageProductsPage />} />
+        <Route path="/manageactivities" element={<AdminManageActivitiesPage />} />
+        <Route path="/managepreferencetags" element={<AdminManagePreferenceTagsPage />} />
         {/* <Route path="/advertiser" element={<Advertiser />} />
         <Route path="/seller" element={<Seller />} />
         <Route path="/tourism-governor" element={<TourismGovernor />} />
