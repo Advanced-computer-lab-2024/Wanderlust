@@ -15,6 +15,10 @@ import AdminManageActivitiesPage from './Pages/AdminManageActivitiesPage';
 import AdminManagePreferenceTagsPage from './Pages/AdminManagePreferenceTagsPage';
 import Advertiser from './Pages/Advertiser';
 import ActivitiesPage from './Pages/ActivitiesPage';
+import Tourist from './Pages/Tourist';
+import ItineraryTourist from './Pages/ItineraryTourist';
+import LocationTourist from './Pages/LocationTourist';
+import ActivityTourist from './Pages/ActivityTourist';
 
 const App = () => {
   return (
@@ -39,6 +43,12 @@ const App = () => {
 
 
 
+        <Route path="/tourist" element={<Tourist />} />
+        <Route path="/ItineraryTourist" element={<ItineraryTourist />} />
+        <Route path="/LocationTourist" element={<LocationTourist />} />
+        <Route path="/ActivityTourist" element={<ActivityTourist />} />
+        
+      
         {/* <Route path="/advertiser" element={<Advertiser />} />
         <Route path="/seller" element={<Seller />} />
         <Route path="/tourism-governor" element={<TourismGovernor />} />

@@ -11,7 +11,7 @@ const Home = () => {
     <>
    
 
-   <Navbar t1={"Tour guide"} p1={"/Tourguide"} t2={"Advertiser"} p2={"/advertiser"} t3={"Seller"} p3={"/a"} t4={"Tourism Govener"} p4={"/a"} t5={"Tourist"} p5={"/a"} t6={"Login"} p6={"/Login"} />
+   <Navbar t1={"Tour guide"} p1={"/Tourguide"} t2={"Advertiser"} p2={"/advertiser"} t3={"Seller"} p3={"/a"} t4={"Tourism Govener"} p4={"/a"} t5={"Tourist"} p5={"/tourist"} t6={"Login"} p6={"/Login"} />
     <Hero />
     <HomeCards />
     <Activities />
