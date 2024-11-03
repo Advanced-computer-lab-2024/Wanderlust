@@ -3,7 +3,6 @@
     margin-top: 20px;
     margin-left: 10px;
     display: flex;
-    padding-right: 60%;
 }
 
 .minValue{
@@ -16,6 +15,7 @@
 .Datediv{
     margin-top: 5px;
     display: flex;
+
 }
 
 #filtertext{
@@ -29,4 +29,9 @@
 .slidertext{
     width: 100%;
     margin-left: 20px;
+}
+.filterButtonDiv{
+    margin-top: 10px;
+    margin-left: 20px;
+    display: flex;
 }

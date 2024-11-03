@@ -1,17 +1,121 @@
 import React, { useEffect, useState } from 'react';
 import Card from '../Components/Card';
+import axios from 'axios';
 import Activities from './Activity';
+import MultiRangeSlider from "multi-range-slider-react";
+import "./styles/FilterBudget.css";
 import { Calendar, MapPin, Globe, DollarSign, Users, Check } from 'lucide-react';
 
-const Itinerary = ({ showCreateButton = true, showUpdateButton = true, showDeleteButton = true }) => {
+const Itinerary = () => {
   const [itinerary, setItinerary] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [minValue, set_minValue] = useState(1);
+  const [maxValue, set_maxValue] = useState(10000);
+    useEffect(() => {
+      fetchItinerary();
+    }, []);
+  
+  
 
-  useEffect(() => {
-    fetchItinerary();
-  }, []);
 
+
+  const handleInput = (e) => {
+    set_minValue(e.minValue);
+    set_maxValue(e.maxValue);
+  };
+  const onFilter = () => {
+      var date = document.getElementById("date").value;
+      var language = document.getElementById("language").value;
+      console.log(minValue);
+      console.log(maxValue);
+      console.log(date);
+      console.log(language);
+      filterItinerary({language  , date});
+  }
+  const onFilterPref = () => {
+    var preference = document.getElementById("preferences").value;
+    filterItineraryByPref({preference});
+}
+  const filterItineraryByPref = async ({ preference }) => {
+    try {
+      if(preference === 'All'){
+        preference='undefined';
+      }
+      let url = `http://localhost:8000/api/itinerary/filterItinerariesByPref?preference=${preference}`;
+      const response = await axios.get(url);
+      const data = await response.data;
+      console.log(data);
+      if (Array.isArray(data) && data.length > 0) {
+        setItinerary(data);
+      } else {
+        setItinerary(data);
+        console.log("Itinerary array is empty or undefined.");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+      
+
+
+
+   const filterItinerary = async ({ language, date }) => {
+    try {
+      if(language === 'All'){
+        language=undefined;
+      }
+      if(date === ''){
+        date=undefined;
+      }
+      let url = "http://localhost:8000/api/itinerary/filterItineraries?";
+      if (minValue) url += `minBudget=${minValue}&`;
+      if (maxValue) url += `maxBudget=${maxValue}&`;
+      if (date) url += `date=${date}&`;
+      if (language) url += `language=${language}&`;
+      url =
+        url.slice(-1) === "&" || url.slice(-1) === "?"
+          ? url.slice(0, -1)
+          : url;
+      console.log(url);
+      const response = await axios.get(url);
+      const data = await response.data;
+      console.log(data);
+      if (Array.isArray(data) && data.length > 0) {
+        setItinerary(data);
+      } else {
+        setItinerary(data);
+        console.log("Itinerary array is empty or undefined.");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const searchItinerary = async () => {
+    try {
+      const query = document.getElementById("searchInput").value;
+      const response = await axios.get(`http://localhost:8000/api/itinerary/searchItinerary?query=${query}`);
+      const data = await response.data;
+      if (Array.isArray(data) && data.length > 0) {
+        setItinerary(data);
+      } else {
+        setItinerary(data);
+        console.log("Itinerary array is empty or undefined.");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const fetchItinerary = async () => {
     try {
       const response = await fetch('http://localhost:8000/api/itinerary/getitinerary');
@@ -49,7 +153,7 @@ const Itinerary = ({ showCreateButton = true, showUpdateButton = true, showDelet
       <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
     </div>
   );
-
+  
   if (error) return (
     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
       <strong className="font-bold">Error!</strong>
@@ -58,13 +162,96 @@ const Itinerary = ({ showCreateButton = true, showUpdateButton = true, showDelet
   );
 
   return (
-    <div className="bg-gray-100 min-h-screen py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        <Card>
-          <div className="itinerary-container">
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-4xl font-bold text-indigo-700">Itineraries</h1>
-              {showCreateButton && (
+    <div className="flex flex-col md:flex-row">
+      <div className="bg-white rounded-xl shadow-md p-3 md:w-1/3">
+        <div className="mb-2">
+          <div className="Slider">
+            <div className="sliderleft">
+              <MultiRangeSlider
+                className="slider"
+                min={1}
+                max={1000}
+                step={10}
+                minValue={minValue}
+                maxValue={maxValue}
+                ruler={false}
+                barInnerColor="#4338ca"
+                onInput={(e) => {
+                  handleInput(e);
+                }}
+              />
+            </div>
+            <div className="slidertext">
+              <p className="minValue">
+                Min Value:<span className="text-indigo-500 text-base font-semibold mb-1"> ${minValue}</span>
+              </p>
+              <p className="maxValue">
+                Max Value: <span className="text-indigo-500 text-base font-semibold mb-1">${maxValue}</span>
+              </p>
+            </div>
+          </div>
+          <div className="Datediv">
+            <p id="filtertext" className="text-base font-semibold mb-1">Date:</p>
+            <input id="date" type="date" className="border border-gray-300 p-2 rounded-lg w-full" />
+          </div>
+          <div className="Datediv">
+            <p id="filtertext" className="text-base font-semibold mb-1">Language:</p>
+            <select id="language" className="border border-gray-300 p-2 rounded-lg w-full">
+              <option value="All">All</option>
+              <option value="English">English</option>
+              <option value="Spanish">Spanish</option>
+              <option value="French">French</option>
+              <option value="German">German</option>
+            </select>
+          </div>
+          <div className="filterButtonDiv mt-4">
+            <button
+              onClick={onFilter}
+              className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg w-full shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+            >
+              Filter
+            </button>
+          </div>
+          <div className="Datediv mt-4">
+            <p id="filtertext" className="text-base font-semibold mb-1">Preferences:</p>
+            <select id="preferences" className="border border-gray-300 p-2 rounded-lg w-full">
+              <option value="All">All</option>
+              <option value="Beaches">Beaches</option>
+              <option value="Family-Friendly">Family-Friendly</option>
+              <option value="Budget-Friendly">Budget-Friendly</option>
+              <option value="Shopping">Shopping</option>
+            </select>
+          </div>
+          <div className="filterButtonDiv mt-4">
+            <button
+              onClick={onFilterPref}
+              className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg w-full shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+            >
+              Filter
+            </button>
+          </div>
+          <div className="mt-4">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search for Itinerary..."
+              className="border border-gray-300 p-2 rounded-lg w-full"
+            />
+            <button
+              onClick={searchItinerary}
+              className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg w-full mt-2 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+            >
+              Search
+            </button>
+          </div>
+        </div>
+      </div>
+      <div className="bg-gray-100 min-h-screen py-8 md:w-2/3">
+        <div className="max-w-6xl mx-auto px-4">
+          <Card>
+            <div className="itinerary-container">
+              <div className="flex justify-between items-center mb-8">
+                <h1 className="text-4xl font-bold text-indigo-700">Itineraries</h1>
                 <button
                   onClick={handleCreate}
                   className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
@@ -72,33 +259,31 @@ const Itinerary = ({ showCreateButton = true, showUpdateButton = true, showDelet
                   <Calendar className="mr-2" size={20} />
                   Create New Itinerary
                 </button>
+              </div>
+              {itinerary.length > 0 ? (
+                itinerary.map((item) => (
+                  <ItineraryItem
+                    key={item._id}
+                    item={item}
+                    onUpdate={handleUpdate}
+                    onDelete={handleDelete}
+                  />
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <Globe className="mx-auto text-gray-400" size={64} />
+                  <p className="mt-4 text-xl text-gray-600">No itineraries available. Create your first adventure!</p>
+                </div>
               )}
             </div>
-            {itinerary.length > 0 ? (
-              itinerary.map((item) => (
-                <ItineraryItem
-                  key={item._id}
-                  item={item}
-                  onUpdate={handleUpdate}
-                  onDelete={handleDelete}
-                  showUpdateButton={showUpdateButton}
-                  showDeleteButton={showDeleteButton}
-                />
-              ))
-            ) : (
-              <div className="text-center py-8">
-                <Globe className="mx-auto text-gray-400" size={64} />
-                <p className="mt-4 text-xl text-gray-600">No itineraries available. Create your first adventure!</p>
-              </div>
-            )}
-          </div>
-        </Card>
+          </Card>
+        </div>
       </div>
     </div>
   );
 };
 
-const ItineraryItem = ({ item, onUpdate, onDelete, showUpdateButton, showDeleteButton }) => (
+const ItineraryItem = ({ item, onUpdate, onDelete }) => (
   <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
     <div className="p-6">
       <div className="flex justify-between items-start mb-4">
@@ -110,22 +295,18 @@ const ItineraryItem = ({ item, onUpdate, onDelete, showUpdateButton, showDeleteB
           </p>
         </div>
         <div>
-          {showUpdateButton && (
-            <button
-              onClick={() => onUpdate(item._id)}
-              className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-1 px-3 rounded-lg mr-2 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
-            >
-              Update
-            </button>
-          )}
-          {showDeleteButton && (
-            <button
-              onClick={() => onDelete(item._id)}
-              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
-            >
-              Delete
-            </button>
-          )}
+          <button
+            onClick={() => onUpdate(item._id)}
+            className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-1 px-3 rounded-lg mr-2 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            Update
+          </button>
+          <button
+            onClick={() => onDelete(item._id)}
+            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            Delete
+          </button>
         </div>
       </div>
       <ItineraryDetails item={item} />
