@@ -35,6 +35,10 @@ const ProductSchema = new Schema({
   picture: {
     type: String,
   },
+  archived: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const Product = mongoose.model("Product", ProductSchema);

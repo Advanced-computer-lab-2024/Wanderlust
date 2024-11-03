@@ -81,7 +81,9 @@ const searchProductByName = async (req, res) => {
       return res.status(400).json({ message: "Product name is required" });
     }
 
-    const products = await Product.find({ name: new RegExp(name, "i") }).populate("seller");
+    const products = await Product.find({
+      name: new RegExp(name, "i"),
+    }).populate("seller");
     if (products.length === 0) {
       return res.status(404).json({ message: "No products found" });
     }
@@ -120,8 +122,10 @@ const filterProductsByPrice = async (req, res) => {
 
 const getProductsSortedByRating = async (req, res) => {
   try {
-    const sortOrder = req.query.sort === 'asc' ? 1 : -1;
-    const products = await Product.find().sort({ rating: sortOrder }).populate("seller");
+    const sortOrder = req.query.sort === "asc" ? 1 : -1;
+    const products = await Product.find()
+      .sort({ rating: sortOrder })
+      .populate("seller");
     res.status(200).json(products);
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -129,7 +133,18 @@ const getProductsSortedByRating = async (req, res) => {
   }
 };
 
-const viewProducts = async (req, res) => {
+//For tourists
+const viewAvailableProducts = async (req, res) => {
+  try {
+    const products = await Product.find({ archived: false }).populate("seller");
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+// For admin
+const viewAllProducts = async (req, res) => {
   try {
     const products = await Product.find().populate("seller");
     res.status(200).json(products);
@@ -153,6 +168,37 @@ const deleteProductByName = async (req, res) => {
   }
 };
 
+const archiveProduct = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const archivedProduct = await Product.findOneAndUpdate(
+      { name },
+      { archived: true }
+    );
+    if (!archivedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json({ message: "Product archived successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const unarchiveProduct = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const unarchivedProduct = await Product.findOneAndUpdate(
+      { name },
+      { archived: false }
+    );
+    if (!unarchivedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json({ message: "Product unarchived successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
   addProduct,
@@ -160,6 +206,9 @@ module.exports = {
   searchProductByName,
   filterProductsByPrice,
   getProductsSortedByRating,
-  viewProducts,
-  deleteProductByName
+  viewAvailableProducts,
+  viewAllProducts,
+  deleteProductByName,
+  archiveProduct,
+  unarchiveProduct,
 };

@@ -1,14 +1,28 @@
 const express = require("express");
 const router = express.Router();
-const productController = require("../Controllers/productController");
+const {
+  addProduct,
+  updateProductByName,
+  searchProductByName,
+  filterProductsByPrice,
+  getProductsSortedByRating,
+  viewAllProducts,
+  viewAvailableProducts,
+  deleteProductByName,
+  archiveProduct,
+  unarchiveProduct,
+} = require("../Controllers/productController");
 
 //put /api before the call
-router.post("/addProduct", productController.addProduct);
-router.put("/updateProductByName", productController.updateProductByName);
-router.get("/searchProductByName", productController.searchProductByName);
-router.get("/filterProductsByPrice", productController.filterProductsByPrice);
-router.get("/sortedByRating", productController.getProductsSortedByRating);
-router.get("/viewProducts", productController.viewProducts);
-router.delete("/deleteproduct", productController.deleteProductByName);
+router.post("/addProduct", addProduct);
+router.put("/updateProductByName", updateProductByName);
+router.get("/searchProductByName", searchProductByName);
+router.get("/filterProductsByPrice", filterProductsByPrice);
+router.get("/sortedByRating", getProductsSortedByRating);
+router.get("/viewAllProducts", viewAllProducts);
+router.get("/viewAvailableProducts", viewAvailableProducts);
+router.delete("/deleteproduct", deleteProductByName);
+router.put("/archiveProduct", archiveProduct);
+router.put("/unarchiveProduct", unarchiveProduct);
 
 module.exports = router;
