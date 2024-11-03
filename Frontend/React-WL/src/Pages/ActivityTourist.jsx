@@ -1,7 +1,7 @@
 import React from 'react'
 import Navbar from '../Components/Navbar'
 import Itineraries from '../Components/Itinerary-nobuttons'
-import Activities from '../Components/Activities'
+import Activities from '../Components/Activities-nobuttons'
 import Locations from '../Components/LocationList'
 
 const ActivityTourist = () => {
