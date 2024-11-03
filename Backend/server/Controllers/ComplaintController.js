@@ -2,7 +2,14 @@ const { default: mongoose } = require('mongoose');
 const Complaint = require('../Models/Complaint');
 const jwt = require('jsonwebtoken');
 
-//create new complaint
+/* 
+    to use this in postman you to login with a valid acount
+    then copy the toke and add it to the header under "Authorization" and add "Bearer" before the token
+    add stuff like id and status in params
+    use secret key when logging in 
+*/
+
+// create new complaint
 const createComplaint = async (req, res) => {
     try {
         const { title, body } = req.body;
@@ -22,6 +29,7 @@ const createComplaint = async (req, res) => {
 };
 
 // Update complaint status (admin only)
+// pass id and status
 const updateComplaintStatus = async (req, res) => {
     try {
         const { id, status } = req.body;
@@ -45,6 +53,7 @@ const updateComplaintStatus = async (req, res) => {
 };
 
 // Get all complaints (admin only) sorted by date & filter 
+// this outputs complaints sorted by date and in params pass status to filter
 const getAllComplaints = async (req, res) => {
     try {
         const token = req.headers.authorization.split(' ')[1];
@@ -62,6 +71,7 @@ const getAllComplaints = async (req, res) => {
 };
 
 // Get complaint details by ID (admin only)
+// pass the complaint id in params
 const getComplaintById = async (req, res) => {
     try {
         const token = req.headers.authorization.split(' ')[1];
