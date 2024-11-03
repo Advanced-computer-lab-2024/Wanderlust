@@ -4,7 +4,7 @@ import axios from 'axios';
 import Activities from './Activity-nobuttons';
 import MultiRangeSlider from "multi-range-slider-react";
 import "./styles/FilterBudget.css";
-import { Calendar, MapPin, Globe, DollarSign, Users, Check } from 'lucide-react';
+import { Calendar, MapPin, Globe, DollarSign, Users, Check, Star } from 'lucide-react';
 
 const Itinerary = () => {
   const [itinerary, setItinerary] = useState([]);
@@ -309,6 +309,8 @@ const ItineraryDetails = ({ item }) => (
     <DetailItem icon={<MapPin size={18} />} label="Pickup Location" value={item.pickupLocation} />
     <DetailItem icon={<MapPin size={18} />} label="Dropoff Location" value={item.dropoffLocation} />
     <DetailItem icon={<Check size={18} />} label="Booking Open" value={item.bookingOpen ? "Yes" : "No"} />
+    <DetailItem icon={<Star size={18} />} label="Rating" value={item.rating} />
+
   </div>
 );
 

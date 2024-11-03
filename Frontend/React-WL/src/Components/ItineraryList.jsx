@@ -11,7 +11,7 @@ const Itinerary = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [minValue, set_minValue] = useState(1);
-  const [maxValue, set_maxValue] = useState(10000);
+  const [maxValue, set_maxValue] = useState(1000);
     useEffect(() => {
       fetchItinerary();
     }, []);
@@ -80,7 +80,6 @@ const Itinerary = () => {
         url.slice(-1) === "&" || url.slice(-1) === "?"
           ? url.slice(0, -1)
           : url;
-      console.log(url);
       const response = await axios.get(url);
       const data = await response.data;
       console.log(data);
