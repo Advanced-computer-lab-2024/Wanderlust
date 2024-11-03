@@ -52,6 +52,29 @@ const updateComplaintStatus = async (req, res) => {
     }
 };
 
+//admin reply to complaint by comaplaint id
+const replyToComplaint = async (req, res) => {
+    try {
+        const { id, reply } = req.body;
+        if (!id || !reply) {
+            return res.status(400).json({ message: 'ID and reply are required' });
+        }
+
+        const token = req.headers.authorization.split(' ')[1];
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decodedToken.id;
+
+        const updatedComplaint = await Complaint.findByIdAndUpdate(id, { adminReply: reply }, { new: true });
+        if (!updatedComplaint) {
+            return res.status(404).json({ message: 'Complaint not found' });
+        }
+
+        res.status(200).json({ message: 'Reply added successfully', complaint: updatedComplaint });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
 // Get all complaints (admin only) sorted by date & filter 
 // this outputs complaints sorted by date and in params pass status to filter
 const getAllComplaints = async (req, res) => {
@@ -110,5 +133,6 @@ module.exports = {
     updateComplaintStatus,
     getAllComplaints,
     getComplaintById,
-    getComplaintsByUserId
+    getComplaintsByUserId,
+    replyToComplaint
 };

@@ -19,6 +19,10 @@ const ComplaintsSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
+    },
+    adminReply: {
+        type: String,
+        default: ''
     }
 }, { timestamps: true });
 

@@ -10,6 +10,7 @@ router.put('/complaint/status', authenticateUser, admin, ComplaintController.upd
 router.get('/complaints', authenticateUser, admin, ComplaintController.getAllComplaints);//dome 
 router.get('/complaint/:id', authenticateUser, admin, ComplaintController.getComplaintById);//done 
 router.get('/myComplaints', authenticateUser, ComplaintController.getComplaintsByUserId);//done
+router.put('/reply' , authenticateUser, admin, ComplaintController.replyToComplaint);
 
 module.exports = router;
 
