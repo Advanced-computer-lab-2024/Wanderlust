@@ -4,7 +4,7 @@ import axios from 'axios';
 import Activities from './Activity';
 import MultiRangeSlider from "multi-range-slider-react";
 import "./styles/FilterBudget.css";
-import { Calendar, MapPin, Globe, DollarSign, Users, Check } from 'lucide-react';
+import { Calendar, MapPin, Globe, DollarSign, Users, Check, Star } from 'lucide-react';
 
 const Itinerary = () => {
   const [itinerary, setItinerary] = useState([]);
@@ -116,6 +116,28 @@ const Itinerary = () => {
       setLoading(false);
     }
   };
+  const sortItinerary = async () => {
+    try {
+      const sortBy = document.getElementById("sortBy").value;
+      const orderBy = document.getElementById("orderBy").value;
+      const response = await axios.get(`http://localhost:8000/api/itinerary/sortItineraries?sortBy=${sortBy}&orderBy=${orderBy}`);
+      const data = await response.data;
+      if (Array.isArray(data) && data.length > 0) {
+        setItinerary(data);
+      } else {
+        setItinerary(data);
+        console.log("Itinerary array is empty or undefined.");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
   const fetchItinerary = async () => {
     try {
       const response = await fetch('http://localhost:8000/api/itinerary/getitinerary');
@@ -162,11 +184,11 @@ const Itinerary = () => {
   );
 
   return (
-    <div className="flex flex-col md:flex-row">
-      <div className="bg-white rounded-xl shadow-md p-3 md:w-1/3">
-        <div className="mb-2">
-          <div className="Slider">
-            <div className="sliderleft">
+    <div className="flex flex-col md:flex-row gap-6">
+      <div className="bg-white rounded-xl shadow-md p-6 md:w-1/3">
+        <div className="mb-4">
+          <div className="Slider mb-6">
+            <div className="sliderleft mb-4">
               <MultiRangeSlider
                 className="slider"
                 min={1}
@@ -181,21 +203,21 @@ const Itinerary = () => {
                 }}
               />
             </div>
-            <div className="slidertext">
-              <p className="minValue">
-                Min Value:<span className="text-indigo-500 text-base font-semibold mb-1"> ${minValue}</span>
+            <div className="slidertext flex justify-between">
+              <p className="minValue text-gray-700">
+                Min Value: <span className="text-indigo-500 font-semibold">${minValue}</span>
               </p>
-              <p className="maxValue">
-                Max Value: <span className="text-indigo-500 text-base font-semibold mb-1">${maxValue}</span>
+              <p className="maxValue text-gray-700">
+                Max Value: <span className="text-indigo-500 font-semibold">${maxValue}</span>
               </p>
             </div>
           </div>
-          <div className="Datediv">
-            <p id="filtertext" className="text-base font-semibold mb-1">Date:</p>
+          <div className="Datediv mb-4">
+            <label htmlFor="date" className="text-gray-700 font-semibold mb-1 block">Date:</label>
             <input id="date" type="date" className="border border-gray-300 p-2 rounded-lg w-full" />
           </div>
-          <div className="Datediv">
-            <p id="filtertext" className="text-base font-semibold mb-1">Language:</p>
+          <div className="Datediv mb-4">
+            <label htmlFor="language" className="text-gray-700 font-semibold mb-1 block">Language:</label>
             <select id="language" className="border border-gray-300 p-2 rounded-lg w-full">
               <option value="All">All</option>
               <option value="English">English</option>
@@ -204,7 +226,7 @@ const Itinerary = () => {
               <option value="German">German</option>
             </select>
           </div>
-          <div className="filterButtonDiv mt-4">
+          <div className="filterButtonDiv mb-4">
             <button
               onClick={onFilter}
               className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg w-full shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
@@ -212,8 +234,8 @@ const Itinerary = () => {
               Filter
             </button>
           </div>
-          <div className="Datediv mt-4">
-            <p id="filtertext" className="text-base font-semibold mb-1">Preferences:</p>
+          <div className="Datediv mb-4">
+            <label htmlFor="preferences" className="text-gray-700 font-semibold mb-1 block">Preferences:</label>
             <select id="preferences" className="border border-gray-300 p-2 rounded-lg w-full">
               <option value="All">All</option>
               <option value="Beaches">Beaches</option>
@@ -222,7 +244,7 @@ const Itinerary = () => {
               <option value="Shopping">Shopping</option>
             </select>
           </div>
-          <div className="filterButtonDiv mt-4">
+          <div className="filterButtonDiv mb-4">
             <button
               onClick={onFilterPref}
               className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg w-full shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
@@ -230,18 +252,36 @@ const Itinerary = () => {
               Filter
             </button>
           </div>
-          <div className="mt-4">
+          <div className="mb-4">
             <input
               type="text"
               id="searchInput"
               placeholder="Search for Itinerary..."
-              className="border border-gray-300 p-2 rounded-lg w-full"
+              className="border border-gray-300 p-2 rounded-lg w-full mb-2"
             />
             <button
               onClick={searchItinerary}
-              className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg w-full mt-2 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+              className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg w-full shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
             >
               Search
+            </button>
+          </div>
+          <div className="mb-4">
+            <label htmlFor="sortBy" className="text-gray-700 font-semibold mb-1 block">Sort by:</label>
+            <select id="sortBy" className="border border-gray-300 p-2 rounded-lg w-full mb-2">
+              <option value="price">Price</option>
+              <option value="rating">Rating</option>
+            </select>
+            <label htmlFor="orderBy" className="text-gray-700 font-semibold mb-1 block">Order:</label>
+            <select id="orderBy" className="border border-gray-300 p-2 rounded-lg w-full mb-2">
+              <option value="1">Ascending</option>
+              <option value="-1">Descending</option>
+            </select>
+            <button
+              onClick={sortItinerary}
+              className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg w-full shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+            >
+              Sort
             </button>
           </div>
         </div>
@@ -325,6 +365,7 @@ const ItineraryDetails = ({ item }) => (
     <DetailItem icon={<MapPin size={18} />} label="Pickup Location" value={item.pickupLocation} />
     <DetailItem icon={<MapPin size={18} />} label="Dropoff Location" value={item.dropoffLocation} />
     <DetailItem icon={<Check size={18} />} label="Booking Open" value={item.bookingOpen ? "Yes" : "No"} />
+    <DetailItem icon={<Star size={18} />} label="Rating" value={item.rating} />
   </div>
 );
 
