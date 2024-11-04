@@ -4,7 +4,7 @@ import axios from 'axios';
 import Activities from './Activity';
 import { Calendar, MapPin, Globe, DollarSign, Users, Check } from 'lucide-react';
 import CreateItineraryForm from './CreateItineraryForm';
-import axios from 'axios';
+import { Star } from 'lucide-react';
 import MultiRangeSlider from "multi-range-slider-react";
 import "./styles/FilterBudget.css";
 import UpdateItineraryForm from './UpdateItineraryForm';
@@ -40,31 +40,17 @@ const [deleteConfirmId, setDeleteConfirmId] = useState(null);
       console.log(language);
       filterItinerary({language  , date});
   }
-
-
-
-   const filterItinerary = async ({ language, date }) => {
+  const onFilterPref = () => {
+    var preference = document.getElementById("preferences").value;
+    filterItineraryByPref({preference});
+}
+  const filterItineraryByPref = async ({ preference }) => {
     try {
-      // if(!language){
-      //   language='';
-      // }
-      // if(!date){
-      //   date=''
-      // }
-      let url = "http://localhost:8000/api/itinerary/filterItineraries?";
-      if (minValue) url += `minBudget=${minValue}&`;
-      if (maxValue) url += `maxBudget=${maxValue}&`;
-      if (date) url += `date=${date}&`;
-      if (language) url += `language=${language}&`;
-      url =
-        url.slice(-1) === "&" || url.slice(-1) === "?"
-          ? url.slice(0, -1)
-          : url;
-      console.log(url);
+      if(preference === 'All'){
+        preference='undefined';
+      }
+      let url = `http://localhost:8000/api/itinerary/filterItinerariesByPref?preference=${preference}`;
       const response = await axios.get(url);
-      // if (!response.ok) {
-      //   throw new Error('Network response was not ok');
-      // }
       const data = await response.data;
       console.log(data);
       if (Array.isArray(data) && data.length > 0) {
@@ -80,6 +66,81 @@ const [deleteConfirmId, setDeleteConfirmId] = useState(null);
       setLoading(false);
     }
   }
+      
+
+
+
+   const filterItinerary = async ({ language, date }) => {
+    try {
+      if(language === 'All'){
+        language=undefined;
+      }
+      if(date === ''){
+        date=undefined;
+      }
+      let url = "http://localhost:8000/api/itinerary/filterItineraries?";
+      if (minValue) url += `minBudget=${minValue}&`;
+      if (maxValue) url += `maxBudget=${maxValue}&`;
+      if (date) url += `date=${date}&`;
+      if (language) url += `language=${language}&`;
+      url =
+        url.slice(-1) === "&" || url.slice(-1) === "?"
+          ? url.slice(0, -1)
+          : url;
+      const response = await axios.get(url);
+      const data = await response.data;
+      console.log(data);
+      if (Array.isArray(data) && data.length > 0) {
+        setItinerary(data);
+      } else {
+        setItinerary(data);
+        console.log("Itinerary array is empty or undefined.");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const searchItinerary = async () => {
+    try {
+      const query = document.getElementById("searchInput").value;
+      const response = await axios.get(`http://localhost:8000/api/itinerary/searchItinerary?query=${query}`);
+      const data = await response.data;
+      if (Array.isArray(data) && data.length > 0) {
+        setItinerary(data);
+      } else {
+        setItinerary(data);
+        console.log("Itinerary array is empty or undefined.");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const sortItinerary = async () => {
+    try {
+      const sortBy = document.getElementById("sortBy").value;
+      const orderBy = document.getElementById("orderBy").value;
+      const response = await axios.get(`http://localhost:8000/api/itinerary/sortItineraries?sortBy=${sortBy}&orderBy=${orderBy}`);
+      const data = await response.data;
+      if (Array.isArray(data) && data.length > 0) {
+        setItinerary(data);
+      } else {
+        setItinerary(data);
+        console.log("Itinerary array is empty or undefined.");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchItinerary = async () => {
     try {
@@ -314,7 +375,7 @@ const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   />
 )}
     </div>
-    </>
+  
   );
 };
 
