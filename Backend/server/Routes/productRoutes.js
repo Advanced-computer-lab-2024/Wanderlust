@@ -11,7 +11,10 @@ const {
   deleteProductByName,
   archiveProduct,
   unarchiveProduct,
+  rateProduct,
 } = require("../Controllers/productController");
+const { authenticateUser  } = require('../Controllers/authController');
+const tourist = require('../Middleware/touristMiddleware');
 
 //put /api before the call
 router.post("/addProduct", addProduct);
@@ -24,5 +27,6 @@ router.get("/viewAvailableProducts", viewAvailableProducts);
 router.delete("/deleteproduct", deleteProductByName);
 router.put("/archiveProduct", archiveProduct);
 router.put("/unarchiveProduct", unarchiveProduct);
+router.post('/product/rate', authenticateUser, tourist, rateProduct);
 
 module.exports = router;

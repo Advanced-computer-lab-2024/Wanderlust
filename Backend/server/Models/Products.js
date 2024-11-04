@@ -19,15 +19,25 @@ const ProductSchema = new Schema({
     type: Number,
     required: true,
   },
-  rating: {
-    type: Number,
-    min: 1,
-    max: 5,
-    required: true,
-  },
-  reviews: {
-    type: [String],
-  },
+  ratings: [
+    {
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+      },
+      rating: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 5
+      },
+      review: {
+        type: String,
+        required: false
+      }
+    }
+  ],
   seller: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Seller",
@@ -39,7 +49,7 @@ const ProductSchema = new Schema({
     type: Boolean,
     default: false,
   },
-});
+}, { timestamps: true });
 
 const Product = mongoose.model("Product", ProductSchema);
 
