@@ -23,6 +23,10 @@ const AdminDashboardComponent = () => {
     const handleManagePreferenceTags = () => {
         navigate('/managepreferencetags');
     };
+    const handleManageComplaints = () => {
+        navigate('/managecomplaints');
+    }
+
     return (
         <div className="p-4">
             <div className="mb-4">
@@ -58,6 +62,11 @@ const AdminDashboardComponent = () => {
                     <h2 className='text-gray-800 font-semibold'>Manage Preference Tags</h2>
                     <p>View and manage all preference tags.</p>
                     <button className="btn btn-primary" onClick={handleManagePreferenceTags}>Manage Preference Tags</button>
+                </div>
+                <div className="flex-fill border rounded p-4 shadow-sm" style={{ flex: '1 1 calc(33.333% - 20px)' }}>
+                    <h2 className='text-gray-800 font-semibold'>Manage Complaints</h2>
+                    <p>View and manage all complaints.</p>
+                    <button className="btn btn-primary" onClick={handleManageComplaints}>Manage Complaints</button>
                 </div>
             </div>
         </div>

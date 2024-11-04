@@ -85,7 +85,7 @@ const getAllComplaints = async (req, res) => {
 
         const { sortBy, status } = req.query;
         const filterCriteria = status ? { status } : {};
-        const sortCriteria = sortBy === 'date' ? { date: -1 } : {};
+        const sortCriteria = sortBy === 'date' ? { createdAt: -1 } : { createdAt : 1 };
         const complaints = await Complaint.find(filterCriteria).sort(sortCriteria);
         res.status(200).json(complaints);
     } catch (error) {

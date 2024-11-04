@@ -13,6 +13,7 @@ import AdminViewUsersPage from './Pages/AdminViewUsersPage';
 import AdminManageProductsPage from './Pages/AdminManageProductsPage';
 import AdminManageActivitiesPage from './Pages/AdminManageActivitiesPage';
 import AdminManagePreferenceTagsPage from './Pages/AdminManagePreferenceTagsPage';
+import AdminManageComplaintsPage from './Pages/AdminManageComplaintsPage';
 import Advertiser from './Pages/Advertiser';
 import ActivitiesPage from './Pages/ActivitiesPage';
 import Tourist from './Pages/Tourist';
@@ -23,6 +24,8 @@ import SellerPage from './Pages/SellerPage';
 import ProductTourist from './Pages/ProductTourist';
 import TourismGovernor from './Pages/TourismGovernor';
 import TgProfile from './Pages/tgprofile';
+import Complaint from './Components/Admin/Complaint';
+
 
 const App = () => {
   return (
@@ -41,10 +44,12 @@ const App = () => {
         <Route path="/manageproducts" element={<AdminManageProductsPage />} />
         <Route path="/manageactivities" element={<AdminManageActivitiesPage />} />
         <Route path="/managepreferencetags" element={<AdminManagePreferenceTagsPage />} />
+        <Route path="/managecomplaints" element={<AdminManageComplaintsPage />} />
         <Route path="/advertiser" element={<Advertiser />} />
         <Route path="/activitiesPage" element={<ActivitiesPage />} />
         <Route path="/seller" element={<SellerPage/>} />
         <Route path="/TourismGovernor" element={<TourismGovernor />} />
+        <Route path="/complaint" element={<Complaint />} />
 
 
 
