@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const tourGuideSchema = new Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
   YOE: {
@@ -28,8 +28,14 @@ const tourGuideSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  IdURL: {
+    type: String, // URL for ID document
+  },
+  certificatesURL: {
+    type: String, // URL for certificates
+  },
 });
 
-const TourGuide = mongoose.model('TourGuide', tourGuideSchema);
+const TourGuide = mongoose.model("TourGuide", tourGuideSchema);
 
 module.exports = TourGuide;
