@@ -4,6 +4,7 @@ import Hero from '../Components/Hero'
 import HomeCards from '../Components/HomeCards'
 import Activities from '../Components/Activities'
 import ItineraryList from '../Components/ItineraryList'
+import TourGuideProfile from '../Components/TourGuideProfile'
 import Advertiser from './Advertiser'
 
 const Home = () => {

@@ -5,10 +5,8 @@ import Itineraries from '../Components/ItineraryList'; // Assuming this is where
 const Itinerary = () => {
   return (
     <>
-      <Navbar t1={"Profile"} p1={"/tgProfile"} t2={"Itinerary"} p2={"/Itinerary"} />
-      <Itineraries 
-       
-      /> 
+    <Navbar t1={"Profile"} p1={"/TgProfile"} t2={"Itinerary"} p2={"/Itinerary"} />
+    <Itineraries />
     </>
   );
 };

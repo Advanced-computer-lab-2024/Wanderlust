@@ -2,23 +2,30 @@ import React, { useEffect, useState } from 'react';
 import Card from '../Components/Card';
 import axios from 'axios';
 import Activities from './Activity';
+import { Calendar, MapPin, Globe, DollarSign, Users, Check } from 'lucide-react';
+import CreateItineraryForm from './CreateItineraryForm';
+import axios from 'axios';
 import MultiRangeSlider from "multi-range-slider-react";
 import "./styles/FilterBudget.css";
-import { Calendar, MapPin, Globe, DollarSign, Users, Check, Star } from 'lucide-react';
+import UpdateItineraryForm from './UpdateItineraryForm';
+
+
 
 const Itinerary = () => {
   const [itinerary, setItinerary] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [minValue, set_minValue] = useState(1);
-  const [maxValue, set_maxValue] = useState(1000);
-    useEffect(() => {
-      fetchItinerary();
-    }, []);
-  
-  
+  const [maxValue, set_maxValue] = useState(10000);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+const [selectedItinerary, setSelectedItinerary] = useState(null);
+const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
 
+  useEffect(() => {
+    fetchItinerary();
+  }, []);
 
   const handleInput = (e) => {
     set_minValue(e.minValue);
@@ -33,44 +40,17 @@ const Itinerary = () => {
       console.log(language);
       filterItinerary({language  , date});
   }
-  const onFilterPref = () => {
-    var preference = document.getElementById("preferences").value;
-    filterItineraryByPref({preference});
-}
-  const filterItineraryByPref = async ({ preference }) => {
-    try {
-      if(preference === 'All'){
-        preference='undefined';
-      }
-      let url = `http://localhost:8000/api/itinerary/filterItinerariesByPref?preference=${preference}`;
-      const response = await axios.get(url);
-      const data = await response.data;
-      console.log(data);
-      if (Array.isArray(data) && data.length > 0) {
-        setItinerary(data);
-      } else {
-        setItinerary(data);
-        console.log("Itinerary array is empty or undefined.");
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  }
-      
 
 
 
    const filterItinerary = async ({ language, date }) => {
     try {
-      if(language === 'All'){
-        language=undefined;
-      }
-      if(date === ''){
-        date=undefined;
-      }
+      // if(!language){
+      //   language='';
+      // }
+      // if(!date){
+      //   date=''
+      // }
       let url = "http://localhost:8000/api/itinerary/filterItineraries?";
       if (minValue) url += `minBudget=${minValue}&`;
       if (maxValue) url += `maxBudget=${maxValue}&`;
@@ -80,7 +60,11 @@ const Itinerary = () => {
         url.slice(-1) === "&" || url.slice(-1) === "?"
           ? url.slice(0, -1)
           : url;
+      console.log(url);
       const response = await axios.get(url);
+      // if (!response.ok) {
+      //   throw new Error('Network response was not ok');
+      // }
       const data = await response.data;
       console.log(data);
       if (Array.isArray(data) && data.length > 0) {
@@ -96,46 +80,6 @@ const Itinerary = () => {
       setLoading(false);
     }
   }
-
-  const searchItinerary = async () => {
-    try {
-      const query = document.getElementById("searchInput").value;
-      const response = await axios.get(`http://localhost:8000/api/itinerary/searchItinerary?query=${query}`);
-      const data = await response.data;
-      if (Array.isArray(data) && data.length > 0) {
-        setItinerary(data);
-      } else {
-        setItinerary(data);
-        console.log("Itinerary array is empty or undefined.");
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  const sortItinerary = async () => {
-    try {
-      const sortBy = document.getElementById("sortBy").value;
-      const orderBy = document.getElementById("orderBy").value;
-      const response = await axios.get(`http://localhost:8000/api/itinerary/sortItineraries?sortBy=${sortBy}&orderBy=${orderBy}`);
-      const data = await response.data;
-      if (Array.isArray(data) && data.length > 0) {
-        setItinerary(data);
-      } else {
-        setItinerary(data);
-        console.log("Itinerary array is empty or undefined.");
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
 
   const fetchItinerary = async () => {
     try {
@@ -159,15 +103,48 @@ const Itinerary = () => {
 
   const handleCreate = () => {
     console.log("Create new itinerary");
+    setIsCreateModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsCreateModalOpen(false);
+  };
+
+  const handleCreateSuccess = () => {
+    // Refresh the itinerary list
+    fetchItinerary();
   };
 
   const handleUpdate = (id) => {
     console.log("Update itinerary with id:", id);
+    const itineraryToUpdate = itinerary.find(item => item._id === id);
+    setSelectedItinerary(itineraryToUpdate);
+    setIsUpdateModalOpen(true);
   };
 
-  const handleDelete = (id) => {
-    console.log("Delete itinerary with id:", id);
+  const handleUpdateSuccess = () => {
+    fetchItinerary();
+    setIsUpdateModalOpen(false);
+    setSelectedItinerary(null);
   };
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await axios.delete(`http://localhost:8000/api/itinerary/deleteitinerary`, {
+        data: { id: id }  // Send ID in request body
+      });
+  
+      if (response.status === 200) {
+        console.log('Successfully deleted itinerary');
+        fetchItinerary();
+        setDeleteConfirmId(null);
+      }
+    } catch (error) {
+      console.error('Error deleting itinerary:', error);
+      setError('Failed to delete itinerary');
+    }
+  };
+  
 
   if (loading) return (
     <div className="flex justify-center items-center h-64">
@@ -318,11 +295,31 @@ const Itinerary = () => {
           </Card>
         </div>
       </div>
+
+      {isCreateModalOpen && (
+        <CreateItineraryForm
+          onClose={handleCloseModal}
+          onSubmit={handleCreateSuccess}
+        />
+      )}
+
+{isUpdateModalOpen && selectedItinerary && (
+  <UpdateItineraryForm
+    itinerary={selectedItinerary}
+    onClose={() => {
+      setIsUpdateModalOpen(false);
+      setSelectedItinerary(null);
+    }}
+    onSubmit={handleUpdateSuccess}
+  />
+)}
     </div>
+    </>
   );
 };
 
-const ItineraryItem = ({ item, onUpdate, onDelete }) => (
+const ItineraryItem = ({ item, onUpdate, onDelete,deleteConfirmId,setDeleteConfirmId  }) => (
+  
   <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
     <div className="p-6">
       <div className="flex justify-between items-start mb-4">
@@ -334,18 +331,36 @@ const ItineraryItem = ({ item, onUpdate, onDelete }) => (
           </p>
         </div>
         <div>
-          <button
-            onClick={() => onUpdate(item._id)}
-            className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-1 px-3 rounded-lg mr-2 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
-          >
-            Update
-          </button>
-          <button
-            onClick={() => onDelete(item._id)}
-            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
-          >
-            Delete
-          </button>
+        <button
+  onClick={() => onUpdate(item._id)}
+  className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-1 px-3 rounded-lg mr-2 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+>
+  Update
+</button>
+              {deleteConfirmId === item._id ? (
+            <div className="inline-flex items-center space-x-2">
+              <span className="text-sm text-gray-600">Are you sure?</span>
+              <button
+                onClick={() => onDelete(item._id)}
+                className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => setDeleteConfirmId(null)}
+                className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-1 px-3 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+              >
+                No
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setDeleteConfirmId(item._id)}
+              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+            >
+              Delete
+            </button>
+          )}
         </div>
       </div>
       <ItineraryDetails item={item} />

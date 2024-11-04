@@ -5,7 +5,7 @@ const Tourguide = () => {
   return (
     <>
     
-    <Navbar t1={"Profile"} p1={"/tgProfile"} t2={"Itinerary"}  p2={"/Itinerary"}  />
+    <Navbar t1={"Profile"} p1={"./TgProfile"} t2={"Itinerary"} p2={"/Itinerary"} />
    
     </>
   )
