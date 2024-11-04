@@ -34,6 +34,9 @@ const tourGuideSchema = new Schema({
   certificatesURL: {
     type: String, // URL for certificates
   },
+  photoURL: {
+    type: String,
+  },
 });
 
 const TourGuide = mongoose.model("TourGuide", tourGuideSchema);
