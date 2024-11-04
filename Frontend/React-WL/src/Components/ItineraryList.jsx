@@ -344,6 +344,8 @@ const [deleteConfirmId, setDeleteConfirmId] = useState(null);
                     item={item}
                     onUpdate={handleUpdate}
                     onDelete={handleDelete}
+                    deleteConfirmId={deleteConfirmId}      
+                    setDeleteConfirmId={setDeleteConfirmId}  
                   />
                 ))
               ) : (
@@ -463,7 +465,7 @@ const ItineraryActivities = ({ activities }) => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {activities.map((activity) => (
         <div key={activity.id} className="bg-gray-50 rounded-lg p-3 hover:shadow-md transition duration-300">
-          <Activities activity={activity} />
+          <Activities activity={activity} showDeleteButton={false} showUpdateButton={false}/>
         </div>
       ))}
     </div>

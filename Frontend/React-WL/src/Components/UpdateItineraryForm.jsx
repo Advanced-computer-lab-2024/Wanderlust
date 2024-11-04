@@ -161,7 +161,7 @@ const UpdateItineraryForm = ({ itinerary, onClose, onSubmit }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 overflow-y-auto py-8">
+    <div className="fixed inset-0 bg-white bg-opacity-11 flex items-start justify-center z-50 overflow-y-auto py-8">
       <div className="relative w-full max-w-4xl mx-4 my-8">
         <Card className="bg-white p-6 rounded-lg shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-6">
