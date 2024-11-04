@@ -17,7 +17,7 @@ const ComplaintsSchema = new Schema({
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'Tourist',
         required: true
     },
     adminReply: {

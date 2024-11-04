@@ -25,6 +25,7 @@ import ProductTourist from './Pages/ProductTourist';
 import TourismGovernor from './Pages/TourismGovernor';
 import TgProfile from './Pages/tgprofile';
 import Complaint from './Components/Admin/Complaint';
+import ComplaintsTouristPage from './Pages/ComplaintsTouristPage';
 
 
 const App = () => {
@@ -59,6 +60,8 @@ const App = () => {
         <Route path="/LocationTourist" element={<LocationTourist />} />
         <Route path="/ActivityTourist" element={<ActivityTourist />} />
         <Route path="/ProductTourist" element={<ProductTourist />} />
+        <Route path="/ComplaintsTourist" element={<ComplaintsTouristPage />} />
+
         
       
         <Route path="/TgProfile" element={<TgProfile />} />
