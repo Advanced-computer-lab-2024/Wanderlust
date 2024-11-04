@@ -38,6 +38,21 @@ const ViewComplaint = () => {
             alert('Failed to update status: ' + response.data.message);
         }
     }
+    const replyToComplaint = async () => {
+        const token = localStorage.getItem('jwtToken');
+        const response = await axios.put('http://localhost:8000/api/Complaint/reply', 
+            { id: complaintId, reply: complaint.adminReply }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        if (response.status === 200) {
+            setComplaint({ ...complaint, adminReply: response.data.complaint.adminReply });
+            alert('Reply updated successfully');
+        } else {
+            alert('Failed to update reply: ' + response.data.message);
+        }
+    }
 
     return(
         <>
@@ -52,7 +67,14 @@ const ViewComplaint = () => {
                         <span><span className='text-gray-800 font-semibold'>status:</span> {complaint.status}</span><br />
                         <span><span className='text-gray-800 font-semibold'>Body:</span> {complaint.body}</span><br />
                         <span><span className='text-gray-800 font-semibold'>Reply:</span> {complaint.adminReply}</span><br />
-                        <button className="btn bg-indigo-500 hover:bg-indigo-600 text-white mt-2 mr-2">Reply</button>
+                        <input 
+                            type="text" 
+                            value={complaint.adminReply || ''} 
+                            onChange={(e) => setComplaint({ ...complaint, adminReply: e.target.value })} 
+                            className="form-control mt-2" 
+                            placeholder="Enter your reply here" 
+                        />
+                        <button onClick={replyToComplaint} className="btn bg-indigo-500 hover:bg-indigo-600 text-white mt-2 mr-2">Reply</button>
                         <button onClick={changeStatus} className="btn bg-indigo-500 hover:bg-indigo-600 text-white mt-2">Change Status</button>
                     </div>
             </div>
