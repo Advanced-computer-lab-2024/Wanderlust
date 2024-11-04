@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../Controllers/adminController');
-const { login, updatePassword, authenticateUser } = require('../Controllers/authController');
+const { login, updatePassword, authenticateUser, getLoggedInUser } = require('../Controllers/authController');
 
 router.use(express.json())
 router.post("/addTourismGovernor",adminController.addTourismGovernor);
@@ -14,5 +14,6 @@ router.get("/profile", adminController.getAdminDetails);
 
 router.post('/login', login);
 router.post('/updatepassword', authenticateUser, updatePassword);
+router.get('/getLoggedInUser', getLoggedInUser);
 
 module.exports = router;
