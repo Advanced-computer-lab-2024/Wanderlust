@@ -1,4 +1,5 @@
 const Product = require("../Models/Products.js");
+const jwt = require('jsonwebtoken');
 
 // Add a new product
 const addProduct = async (req, res) => {
@@ -143,6 +144,39 @@ const viewAvailableProducts = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+//tourist rate a product they purschased
+const rateProduct = async (req, res) => {
+  try {
+      const { productId, rating, review } = req.body;
+      if (!productId || !rating) {
+          return res.status(400).json({ message: 'Product ID and rating are required' });
+      }
+
+      const token = req.headers.authorization.split(' ')[1];
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+      const userId = decodedToken.id;
+
+      const product = await Product.findById(productId);
+      if (!product) {
+          return res.status(404).json({ message: 'Product not found' });
+      }
+
+      const existingRating = product.ratings.find(r => r.userId.toString() === userId);
+      if (existingRating) {
+          existingRating.rating = rating;
+          existingRating.review = review;
+      } else {
+          product.ratings.push({ userId, rating, review });
+      }
+
+      await product.save();
+      res.status(200).json({ message: 'Rating added successfully', product });
+  } catch (error) {
+      console.error('Error rating product:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 // For admin
 const viewAllProducts = async (req, res) => {
   try {
@@ -211,4 +245,5 @@ module.exports = {
   deleteProductByName,
   archiveProduct,
   unarchiveProduct,
+  rateProduct,
 };
