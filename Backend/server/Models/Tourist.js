@@ -33,6 +33,10 @@ const touristSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  preferences: {
+    type: [String],
+    default: [],
+  },
   updatedAt: {
     type: Date,
     default: Date.now,

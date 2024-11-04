@@ -11,7 +11,8 @@ const {
   searchActivity,
   getActivitiesByCategoryName,
   generateShareableLink,
-  sendActivityLinkViaEmail
+  sendActivityLinkViaEmail,
+  rateActivity
 } = require("../Controllers/activityController");
 
 router.post("/createActivity", createActivity);
@@ -25,5 +26,6 @@ router.get("/searchActivity", searchActivity);
 router.get('/activities', getActivitiesByCategoryName);
 router.get('/share/:activityId', generateShareableLink);
 router.post('/shareMail/:activityId/email', sendActivityLinkViaEmail);
+router.post('/rate/:activityId', rateActivity);
 
 module.exports = router;

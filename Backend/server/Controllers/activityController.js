@@ -2,6 +2,7 @@ const Activity = require("../Models/Activity.js");
 const { default: mongoose, get } = require("mongoose");
 const { findById } = require("../Models/tourGuide.js");
 const ActivityCatModel = require("../Models/ActivityCat.js");
+const User = require('../Models/user');
 
 const createActivity = async (req, res) => {
   const {
@@ -279,6 +280,45 @@ const sendActivityLinkViaEmail = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+//6712cf83465daa3af226a8d4 tourist id for testing
+//6702fbfc96b940f8259bba39 activity id for testing
+
+const rateActivity = async (req, res) => {
+  const { activityId } = req.params;
+  const { userId, rating, comment } = req.body;
+
+  if (rating < 1 || rating > 5) {
+    return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+  }
+
+  try {
+    const activity = await Activity.findById(activityId);
+    if (!activity) {
+      return res.status(404).json({ message: 'Activity not found' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const newComment = {
+      userId: user._id,
+      rating,
+      comment,
+    };
+    activity.comments.push(newComment);
+    // Update the average rating
+    const totalRatings = activity.comments.reduce((acc, curr) => acc + curr.rating, 0);
+    activity.rating = totalRatings / activity.comments.length;
+
+    await activity.save();
+
+    res.status(200).json({ message: 'Rating and comment added successfully', activity });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
 
 module.exports = {
   createActivity,
@@ -291,5 +331,6 @@ module.exports = {
   searchActivity,
   getActivitiesByCategoryName,
   generateShareableLink,
-  sendActivityLinkViaEmail
+  sendActivityLinkViaEmail,
+  rateActivity
 };

@@ -1,6 +1,7 @@
 const { default: mongoose } = require('mongoose');
 const PreferenceTag = require('../Models/PreferenceTag');
-
+const Tourist = require('../Models/Tourist');
+const User = require('../Models/user');
 //create and Read both work, delete and update not yet
 
 // Create a new preference tag
@@ -66,10 +67,35 @@ const deletePreferenceTag = async (req, res) => {
         res.status(500).json({ message: 'Server error', error });
     }
 };
+//67292c47ce18dd9e4fc060cb tourist id for testing
+// Update tourist preferences
+const updateTouristPreferences = async (req, res) => {
+    const { touristId } = req.params;
+    const { preferences } = req.body;
+  
+    if (!Array.isArray(preferences)) {
+      return res.status(400).json({ message: 'Preferences must be an array of strings' });
+    }
+  
+    try {
+      const tourist = await Tourist.findById(touristId);
+      if (!tourist) {
+        return res.status(404).json({ message: 'Tourist not found' });
+      }
+  
+      tourist.preferences = preferences;
+      await tourist.save();
+  
+      res.status(200).json({ message: 'Preferences updated successfully', tourist });
+    } catch (error) {
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  };
 
 module.exports = {
     createPreferenceTag,
     getPreferenceTags,
     updatePreferenceTag,
-    deletePreferenceTag
+    deletePreferenceTag,
+    updateTouristPreferences
 };
