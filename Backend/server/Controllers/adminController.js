@@ -48,46 +48,27 @@ const createAdmin = async (req, res) => {
 
 //deleting account based on the id
 const deleteAccount = async (req, res) => {
+    const { id } = req.body;
+  
     try {
-        const { id } = req.body;
-        const adminAccount = await adminModel.findById(id);
-        const tourismGovernorAccount = await tourismGovernorModel.findById(id);
-        const tourguideAccount = await tourguideModel.findById(id);
-        const touristAccount = await touristModel.findById(id);
-        const advertiserAccount = await advertiserModel.findById(id);
-        const sellerAccount = await sellerModel.findById(id); 
-
-        if (adminAccount) {
-            await User.findByIdAndDelete(adminAccount.userId);
-            await adminAccount.deleteOne();
-            res.status(200).json({ message: 'Admin account deleted successfully' });
-          } else if (tourismGovernorAccount) {
-            await User.findByIdAndDelete(tourismGovernorAccount.userId);
-            await tourismGovernorAccount.deleteOne();
-            res.status(200).json({ message: 'Tourism governor account deleted successfully' });
-          } else if (tourguideAccount) {
-            await User.findByIdAndDelete(tourguideAccount.userId);
-            await tourguideAccount.deleteOne();
-            res.status(200).json({ message: 'Tourguide account deleted successfully' });
-          } else if (touristAccount) {
-            await User.findByIdAndDelete(touristAccount.userId);
-            await touristAccount.deleteOne();
-            res.status(200).json({ message: 'Tourist account deleted successfully' });
-          } else if (advertiserAccount) {
-            await User.findByIdAndDelete(advertiserAccount.userId);
-            await advertiserAccount.deleteOne();
-            res.status(200).json({ message: 'Advertiser account deleted successfully' });
-          } else if (sellerAccount) {
-            await User.findByIdAndDelete(sellerAccount.userId);
-            await sellerAccount.deleteOne();
-            res.status(200).json({ message: 'Seller account deleted successfully' });
-          } else {
-            res.status(404).json({ message: 'Account not found' });
-          }
+      let account = await adminModel.findById(id) ||
+                    await tourismGovernorModel.findById(id) ||
+                    await tourguideModel.findById(id) ||
+                    await touristModel.findById(id) ||
+                    await advertiserModel.findById(id) ||
+                    await sellerModel.findById(id) ||
+                    await User.findById(id);
+  
+      if (!account) {
+        return res.status(404).json({ message: 'Account not found' });
+      }
+  
+      await account.deleteOne();
+      res.status(200).json({ message: 'Account deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+      res.status(500).json({ message: 'Server error', error });
     }
-};
+  };
 
 // helper get all usernames on system and account type
 const getAllUserDetails = async (req, res) => {
@@ -106,6 +87,7 @@ const getAllUserDetails = async (req, res) => {
         res.status(500).json({ message: 'Server error', error });
     }
 };
+
 // Get all pending users
 const getPendingUsers = async (req, res) => {
     try {
