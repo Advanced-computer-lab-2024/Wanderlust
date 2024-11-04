@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const advertiserSchema = new Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
   website: {
@@ -24,6 +24,15 @@ const advertiserSchema = new Schema({
     enum: ["pending", "approved", "rejected"],
     default: "pending",
   },
+  IdURL: {
+    type: String,
+  },
+  taxationRegistryCardURL: {
+    type: String,
+  },
+  logoURL: {
+    type: String,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -34,6 +43,6 @@ const advertiserSchema = new Schema({
   },
 });
 
-const Advertiser = mongoose.model('Advertiser', advertiserSchema);
+const Advertiser = mongoose.model("Advertiser", advertiserSchema);
 
 module.exports = Advertiser;

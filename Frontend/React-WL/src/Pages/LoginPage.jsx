@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../Components/Navbar";
+import { useNavigate } from "react-router-dom";
 const Login = () => {
     const [role, setRole] = useState("");
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         username: "",
         password: "",
@@ -30,7 +32,9 @@ const Login = () => {
         const response = await axios.post("http://localhost:8000/api/admin/login", data);
         console.log(response.data.token);
         localStorage.setItem("jwtToken", response.data.token);
-
+        if(data.role === "admin") {
+            navigate("/admindashboard");
+        } 
         // const response2 = await axios.get("http://localhost:8000/api/admin/getLoggedInUser", {
         //     headers: {
         //         Authorization: `Bearer ${localStorage.getItem("jwtToken")}`

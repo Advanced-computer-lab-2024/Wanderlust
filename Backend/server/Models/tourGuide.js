@@ -57,6 +57,9 @@ const tourGuideSchema = new Schema({
       },
     },
   ],
+  photoURL: {
+    type: String,
+  },
 });
 
 const TourGuide = mongoose.model("TourGuide", tourGuideSchema);
