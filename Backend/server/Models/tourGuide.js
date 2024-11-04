@@ -12,7 +12,10 @@ const tourGuideSchema = new Schema({
     type: String,
   },
   IdURL: {
-    type: String,
+    type: String, // URL for ID document
+  },
+  certificatesURL: {
+    type: String, // URL for certificates
   },
 });
 
