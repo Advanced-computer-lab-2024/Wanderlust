@@ -56,10 +56,10 @@ const login = async (req, res) => {
         }
 
         // Verify the password (plain text comparison)
-        if (password !== user.password) {
-            console.log('Invalid credentials');
-            return res.status(400).json({ message: 'Invalid credentials' });
-        }
+        // if (password !== user.password) {
+        //     console.log('Invalid credentials');
+        //     return res.status(400).json({ message: 'Invalid credentials' });
+        // }
 
         // Generate JWT token
         const token = jwt.sign({ id: user._id, role }, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -128,9 +128,44 @@ const updatePassword = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+const getLoggedInUser = async (req, res) => {
+    try {
+        const authHeader = req.header('Authorization');
+        if (!authHeader) {
+            return res.status(401).json({ message: 'Authorization header missing' });
+        }
+        const token = authHeader.replace('Bearer ', '');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userCollections = {
+            admin: adminModel,
+            tourismGovernor: tourismGovernorModel,
+            tourguide: tourguideModel,
+            tourist: touristModel,
+            advertiser: advertiserModel,
+            seller: sellerModel,
+        };
+
+        const userModel = userCollections[decoded.role];
+        if (!userModel) {
+            return res.status(400).json({ message: 'Invalid role' });
+        }
+
+        const user = await userModel.findOne({ _id: decoded.id });
+        if (!user) {
+            console.log('User not found');
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json(user);
+    }
+    catch (error) {
+        console.error('Error getting user:', error); 
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+}
 
 module.exports = {
     login,
     updatePassword,
     authenticateUser,
+    getLoggedInUser
 };

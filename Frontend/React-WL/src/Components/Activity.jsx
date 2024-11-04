@@ -1,6 +1,13 @@
 import React from 'react';
+import { Edit3, Trash2 } from 'lucide-react';
 
-const Activity = ({ activity }) => {
+const Activity = ({
+  activity,
+  showUpdateButton = true,
+  showDeleteButton = true,
+  onUpdate,
+  onDelete,
+}) => {
   // Function to generate Google Maps embed URL
   const getGoogleMapsEmbedUrl = (lat, lng) => {
     return `https://www.google.com/maps/embed/v1/place?key=AIzaSyA_eS_8ocAw_f4vgD01n-_vDIXG16QixpI&q=${lat},${lng}`;
@@ -17,7 +24,9 @@ const Activity = ({ activity }) => {
         <div className="mb-2">
           <div className="text-gray-600 text-xs">{activity.category?.name || 'N/A'}</div>
           <h3 className="text-lg font-bold leading-tight">{activity.name}</h3>
-          <p className="text-gray-500 text-xs">{new Date(activity.date).toLocaleDateString()} {activity.time}</p>
+          <p className="text-gray-500 text-xs">
+            {new Date(activity.date).toLocaleDateString()} {activity.time}
+          </p>
         </div>
 
         {/* Google Maps Embed */}
@@ -43,13 +52,15 @@ const Activity = ({ activity }) => {
         <h3 className="text-indigo-500 text-base font-semibold mb-1">${activity.price}</h3>
         <p className="text-gray-500 text-xs">Duration: {activity.duration}</p>
         <p className="text-gray-500 text-xs">Rating: {activity.rating ? activity.rating : 'Not Rated'}</p>
-        <p className="text-gray-500 text-xs"><strong>Booking Open: {activity.bookingOpen ? 'Yes' : 'No'}</strong></p>
+        <p className="text-gray-500 text-xs">
+          <strong>Booking Open: {activity.bookingOpen ? 'Yes' : 'No'}</strong>
+        </p>
 
         <div className="mt-1">
           <h4 className="font-semibold text-xs">Tags:</h4>
           <div className="flex flex-wrap">
             {activity.tags && activity.tags.length > 0 ? (
-              activity.tags.map(tag => (
+              activity.tags.map((tag) => (
                 <span key={tag._id} className="bg-gray-200 text-gray-700 rounded-full px-2 py-0.5 text-xs mr-1 mb-1">
                   {tag.name}
                 </span>
@@ -58,6 +69,26 @@ const Activity = ({ activity }) => {
               <span className="text-gray-500 text-xs">No Tags</span>
             )}
           </div>
+        </div>
+
+        {/* Update and Delete Buttons */}
+        <div className="flex justify-end space-x-2 mt-4">
+          {showUpdateButton && (
+            <button
+              onClick={() => onUpdate(activity.id)}
+              className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-1 px-3 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
+            >
+              <Edit3 className="mr-1" size={16} /> Update
+            </button>
+          )}
+          {showDeleteButton && (
+            <button
+              onClick={() => onDelete(activity.id)}
+              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
+            >
+              <Trash2 className="mr-1" size={16} /> Delete
+            </button>
+          )}
         </div>
       </div>
     </div>

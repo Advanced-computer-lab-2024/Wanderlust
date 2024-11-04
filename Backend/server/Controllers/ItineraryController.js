@@ -219,6 +219,15 @@ const filterItinerairies = async (req, res) => {
 const filterItinerariesByPref = async (req, res) => {
   try {
     const { preference } = req.query;
+    
+    if ( preference === 'undefined') {
+      console.log("No preference tag provided");
+      const itineraries = await Itinerary.find().populate({
+        path: 'activities',
+        populate: { path: 'category tags' }
+      });
+      return res.status(200).json(itineraries);
+    }
       const tag = await PreferenceTagModel.findOne({ name: preference });
       if (!tag) {
         return res.status(404).json({ message: "Preference tag not found" });

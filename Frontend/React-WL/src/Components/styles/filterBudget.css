@@ -1,9 +1,8 @@
-.Slider{
+/* .Slider{
     width: 100%;
     margin-top: 20px;
     margin-left: 10px;
-       
-    padding-right: 60%;
+    display: flex;
 }
 
 .minValue{
@@ -12,3 +11,27 @@
 .maxValue{
     display: inline;
 }
+
+.Datediv{
+    margin-top: 5px;
+    display: flex;
+
+}
+
+#filtertext{
+    margin-top: 10px;
+    margin-left: 23px;
+    margin-right: 7px;
+}
+.sliderleft{
+    width: 100%;
+}
+.slidertext{
+    width: 100%;
+    margin-left: 20px;
+}
+.filterButtonDiv{
+    margin-top: 10px;
+    margin-left: 20px;
+    display: flex;
+} */

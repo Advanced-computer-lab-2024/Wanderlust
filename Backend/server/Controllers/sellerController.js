@@ -1,21 +1,36 @@
 // #Task route solution
 const SellerModel = require('../Models/Seller.js');
 const { default: mongoose } = require('mongoose');
+const User = require("../Models/user");
 
+//u have to sign up first and get the id given
+//http://localhost:8000/api/seller/createSeller/userId
 const createSeller = async (req, res) => {
-    const { username, email, password, mobileNumber, name, description, termsAccepted } = req.body;
-
-    if (!termsAccepted) {
-      return res.status(400).json({ error: "Terms and conditions must be accepted." });
-    }
-  
+    const { userId } = req.params;
+    const { description, productName } = req.body;
     try {
-      const seller = await SellerModel.create({ username, email, password, mobileNumber, name, description, termsAccepted, role:'tourist' });
-      res.status(200).json(seller);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  };
+        const user = await User.findById(userId);
+        if (!user) {
+          return res.status(404).json({ error: "User not found" });
+        }
+        const seller = new SellerModel({
+          userId: user._id,
+          description,
+          productName,
+        });
+        user.role = "seller";
+        user.roleApplicationStatus = "pending";
+        await seller.save();
+        await user.save();
+        res.status(200).json({
+          user,
+          seller,
+        });
+      } catch (error) {
+        res.status(400).json({ error: error.message });
+      }
+    };
+    
 
 // Get all Sellers
 const getSellers = async (req, res) => {

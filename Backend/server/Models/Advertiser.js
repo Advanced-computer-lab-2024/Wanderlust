@@ -1,23 +1,39 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const User = require('./user');
 
 const advertiserSchema = new Schema({
-    website: {
-        type: String,
-        required: true
-    },
-    hotline: {
-        type: String,
-        required: true
-    },
-    companyProfile: {
-        type: String,
-        required: true
-    }
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  website: {
+    type: String,
+    required: true,
+  },
+  hotline: {
+    type: String,
+    required: true,
+  },
+  companyProfile: {
+    type: String,
+    required: true,
+  },
+  roleApplicationStatus: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-// Merge the schemas
-const Advertiser = User.discriminator('Advertiser', advertiserSchema);
+const Advertiser = mongoose.model('Advertiser', advertiserSchema);
 
 module.exports = Advertiser;

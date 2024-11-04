@@ -1,38 +1,35 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const User = require('./user');
 
-const SellerSchema = new Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    },
-    description: {
-        type: String,
-        required:true
-    }
+const sellerSchema = new Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  productName: {
+    type: String,
+    required: true,
+  },
+  roleApplicationStatus: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-//Middleware to set createdAt and updatedAt
-//...
-SellerSchema.pre('save', function(next) {
-    const now = Date.now();
-    this.updatedAt = now;
-    if (!this.createdAt) {
-        this.createdAt = now;
-    }
-    next();
-});
+const Seller = mongoose.model('Seller', sellerSchema);
 
-const Seller = User.discriminator('Seller', SellerSchema);
 module.exports = Seller;
-
-

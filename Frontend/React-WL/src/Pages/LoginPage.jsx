@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-
+import Navbar from "../Components/Navbar";
 const Login = () => {
     const [role, setRole] = useState("");
     const [formData, setFormData] = useState({
@@ -20,45 +20,31 @@ const Login = () => {
     const handleRoleChange = (e) => {
         setRole(e.target.value);
     };
-
-    const handleSubmit = async (e) => {
+    const onLogin = async (e) => {
         e.preventDefault();
-        let apiUrl = "";
-
-        switch (role) {
-            case "tourist":
-                apiUrl = "http://localhost:8000/api/tourist/login";
-                break;
-            case "tourguide":
-                apiUrl = "http://localhost:8000/api/tourguide/login";
-                break;
-            case "seller":
-                apiUrl = "http://localhost:8000/api/seller/login";
-                break;
-            case "advertiser":
-                apiUrl = "http://localhost:8000/api/advertiser/login";
-                break;
-            case "admin":
-                apiUrl = "http://localhost:8000/api/admin/login";
-                break;
-            default:
-                alert("Please select a role");
-                return;
+        const data = {
+            username: formData.username,
+            password: formData.password,
+            role: role,
         }
+        const response = await axios.post("http://localhost:8000/api/admin/login", data);
+        console.log(response.data.token);
+        localStorage.setItem("jwtToken", response.data.token);
 
-        try {
-            const response = await axios.post(apiUrl, formData);
-            console.log("Login successful:", response.data);
-            // Redirect or perform other actions upon successful login
-        } catch (error) {
-            console.error("Error logging in:", error);
-        }
-    };
-
+        // const response2 = await axios.get("http://localhost:8000/api/admin/getLoggedInUser", {
+        //     headers: {
+        //         Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
+        //     }
+        // });
+        // console.log(response2.data);
+    }
     return (
+        <>
+   <Navbar t1={"Tour guide"} p1={"/tourguide"} t2={"Advertiser"} p2={"/a"} t3={"Seller"} p3={"/seller"} t4={"Tourism Govener"} p4={"/a"} t5={"Tourist"} p5={"/a"} t6={"Login"} p6={"/Login"} />
+
         <div className="max-w-md mx-auto mt-10 p-8 rounded shadow-2xl">
             <h1 className="text-2xl font-bold mb-6">Login</h1>
-            <form onSubmit={handleSubmit}>
+            <form>
                 <div className="mb-6">
                     <label htmlFor="role" className="block text-gray-800 font-semibold">
                         Role<span className="text-red-500"> *</span>
@@ -103,7 +89,7 @@ const Login = () => {
                         className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
                     />
                 </div>
-                <button type="submit" className="w-full bg-indigo-600 text-white p-2 rounded-md">
+                <button onClick={onLogin} className="w-full bg-indigo-600 text-white p-2 rounded-md">
                     Login
                 </button>
             </form>
@@ -114,6 +100,7 @@ const Login = () => {
                 </Link>
             </div>
         </div>
+        </>
     );
 };
 

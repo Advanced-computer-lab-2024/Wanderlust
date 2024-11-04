@@ -4,6 +4,7 @@ const tourguideModel = require('../Models/tourGuide');
 const touristModel = require('../Models/Tourist.js');
 const advertiserModel = require('../Models/Advertiser'); 
 const sellerModel = require('../Models/Seller.js');
+const User = require('../Models/user');
 //npm install jsonwebtoken
 const jwt = require('jsonwebtoken');
 
@@ -57,26 +58,32 @@ const deleteAccount = async (req, res) => {
         const sellerAccount = await sellerModel.findById(id); 
 
         if (adminAccount) {
+            await User.findByIdAndDelete(adminAccount.userId);
             await adminAccount.deleteOne();
             res.status(200).json({ message: 'Admin account deleted successfully' });
-        } else if (tourismGovernorAccount) {
+          } else if (tourismGovernorAccount) {
+            await User.findByIdAndDelete(tourismGovernorAccount.userId);
             await tourismGovernorAccount.deleteOne();
             res.status(200).json({ message: 'Tourism governor account deleted successfully' });
-        } else if (tourguideAccount) {
+          } else if (tourguideAccount) {
+            await User.findByIdAndDelete(tourguideAccount.userId);
             await tourguideAccount.deleteOne();
             res.status(200).json({ message: 'Tourguide account deleted successfully' });
-        } else if (touristAccount) {
+          } else if (touristAccount) {
+            await User.findByIdAndDelete(touristAccount.userId);
             await touristAccount.deleteOne();
             res.status(200).json({ message: 'Tourist account deleted successfully' });
-        } else if (advertiserAccount) {
+          } else if (advertiserAccount) {
+            await User.findByIdAndDelete(advertiserAccount.userId);
             await advertiserAccount.deleteOne();
             res.status(200).json({ message: 'Advertiser account deleted successfully' });
-        } else if (sellerAccount) { 
+          } else if (sellerAccount) {
+            await User.findByIdAndDelete(sellerAccount.userId);
             await sellerAccount.deleteOne();
             res.status(200).json({ message: 'Seller account deleted successfully' });
-        } else {
+          } else {
             res.status(404).json({ message: 'Account not found' });
-        }
+          }
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });
     }
@@ -87,23 +94,25 @@ const getAllUserDetails = async (req, res) => {
     try {
         const adminAccounts = await adminModel.find({}, '_id username email password role');
         const tourismGovernorAccounts = await tourismGovernorModel.find({}, '_id username email password role');
-        const tourguideAccounts = await tourguideModel.find({}, '_id username email password role');
-        const touristAccounts = await touristModel.find({}, '_id username email password role');
-        const advertiserAccounts = await advertiserModel.find({}, '_id username email password role');
-        const sellerAccounts = await sellerModel.find({}, '_id username email password role');
+        const userAccounts = await User.find({}, '_id username email password role');
 
         const accounts = [
             ...adminAccounts.map(account => ({ id: account._id, username: account.username, email: account.email, password: account.password, accountType: 'admin' })),
             ...tourismGovernorAccounts.map(account => ({ id: account._id, username: account.username, email: account.email, password: account.password, accountType: 'tourismGovernor' })),
-            ...tourguideAccounts.map(account => ({ id: account._id, username: account.username, email: account.email, password: account.password, accountType: 'tourguide' })),
-            ...touristAccounts.map(account => ({ id: account._id, username: account.username, email: account.email, password: account.password, accountType: 'tourist' })),
-            ...advertiserAccounts.map(account => ({ id: account._id, username: account.username, email: account.email, password: account.password, accountType: 'advertiser' })),
-            ...sellerAccounts.map(account => ({ id: account._id, username: account.username, email: account.email, password: account.password, accountType: 'seller' }))
+            ...userAccounts.map(account => ({id: account._id, username: account.username, email: account.email, password: account.password, accountType: account.role })),
         ];
-
         res.status(200).json(accounts);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });
+    }
+};
+// Get all pending users
+const getPendingUsers = async (req, res) => {
+    try {
+        const pendingUsers = await User.find({ roleApplicationStatus: 'pending' });
+        res.status(200).json(pendingUsers);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
@@ -130,4 +139,5 @@ module.exports = { createAdmin,
                     addTourismGovernor, 
                     deleteAccount, 
                     getAllUserDetails, 
-                    getAdminDetails};
+                    getAdminDetails,
+                    getPendingUsers};
