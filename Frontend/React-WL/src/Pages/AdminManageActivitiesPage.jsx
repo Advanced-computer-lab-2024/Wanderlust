@@ -4,7 +4,7 @@ import ManageActivities from '../Components/Admin/ManageActivities'
 const AdminManageActivitiesPage = () => {
   return (
     <>
-    <Navbar t1={"Admin Dashboard"} p1={"/admindashboard"} t6={"Login"} p6={"/Login"}/>
+    <Navbar t1={"Admin Dashboard"} p1={"/admindashboard"} t6={"Logout"} p6={"/Login"}/>
     <ManageActivities/>
     </>
   )

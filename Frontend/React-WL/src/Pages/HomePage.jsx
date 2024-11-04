@@ -9,30 +9,13 @@ import Advertiser from './Advertiser'
 
 const Home = () => {
   return (
-    <>
-   
-
-   <Navbar t1={"Tour guide"} p1={"/Tourguide"} t2={"Advertiser"} p2={"/advertiser"} t3={"Seller"} p3={"/seller"} t4={"Tourism Govener"} p4={"/TourismGovernor"} t5={"Tourist"} p5={"/tourist"} t6={"Login"} p6={"/Login"} />
-    <Hero />
-    <HomeCards />
-    <Activities showCreateButton={false}
-        showUpdateButton={false}
-        showDeleteButton={false} />
-    
- 
-
-   
-
-    <section className="m-auto max-w-lg my-10 px-6">
-      <a
-        href="jobs.html"
-        className="block bg-black text-white text-center py-4 px-6 rounded-xl hover:bg-gray-700"
-        >View All</a
-      >
-    </section>
-
-</>
+  <>
+    <Navbar t1={"Tour guide"} p1={"/Tourguide"} t2={"Advertiser"} p2={"/advertiser"} t3={"Seller"} p3={"/seller"} t4={"Tourism Govener"} p4={"/TourismGovernor"} t5={"Tourist"} p5={"/tourist"} t6={"Login"} p6={"/Login"} />
+      <Hero />
+      <Activities showCreateButton={false}
+          showUpdateButton={false}
+          showDeleteButton={false} />
+  </>
   )
 }
-
 export default Home
