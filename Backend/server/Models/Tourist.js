@@ -8,15 +8,6 @@ const touristSchema = new Schema({
     ref: "User",
     required: true,
   },
-  password: {
-    type: String,
-    required: true,
-},
-username: {
-    type: String,
-    required: true,
-    unique: true
-},
   nationality: {
     type: String,
     required: true,
