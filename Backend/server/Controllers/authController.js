@@ -180,7 +180,7 @@ const getLoggedInUser = async (req, res) => {
     }
 }
 
-const getLoggedInUsername = async (req, res) => {
+const getLoggedInInfo = async (req, res) => {
     try {
         const authHeader = req.header('Authorization');
         if (!authHeader) {
@@ -207,7 +207,7 @@ const getLoggedInUsername = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
         const actualUser = await actualUserModel.findOne({ _id : user.userId });
-        res.status(200).json(actualUser.username);
+        res.status(200).json(actualUser);
     }
     catch (error) {
         console.error('Error getting user:', error); 
@@ -220,5 +220,5 @@ module.exports = {
     updatePassword,
     authenticateUser,
     getLoggedInUser,
-    getLoggedInUsername
+    getLoggedInInfo
 };

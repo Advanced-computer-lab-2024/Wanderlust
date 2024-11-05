@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../Components/Navbar";
 import { useNavigate } from "react-router-dom";
+import GuestNavBar from "../Components/NavBars/GuestNavBar";
 const Login = () => {
     const [role, setRole] = useState("");
     const navigate = useNavigate();
@@ -41,7 +42,7 @@ const Login = () => {
         if(data.role === "advertiser") {
             navigate("/advertiser");
         } 
-        // const response2 = await axios.get("http://localhost:8000/api/admin/getLoggedInUser", {
+        // const response2 = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
         //     headers: {
         //         Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
         //     }
@@ -50,8 +51,7 @@ const Login = () => {
         }
     return (
         <>
-   <Navbar t1={"Tour guide"} p1={"/tourguide"} t2={"Advertiser"} p2={"/a"} t3={"Seller"} p3={"/seller"} t4={"Tourism Govener"} p4={"/a"} t5={"Tourist"} p5={"/a"} t6={"Login"} p6={"/Login"} />
-
+            <GuestNavBar />
             <div className="max-w-md mx-auto mt-10 p-8 rounded shadow-2xl">
                 <h1 className="text-2xl font-bold mb-6">Login</h1>
                 <form>
