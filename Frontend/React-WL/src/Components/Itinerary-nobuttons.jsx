@@ -3,7 +3,6 @@ import Card from '../Components/Card';
 import axios from 'axios';
 import Activities from './Activity-nobuttons';
 import MultiRangeSlider from "multi-range-slider-react";
-import "./styles/FilterBudget.css";
 import { Calendar, MapPin, Globe, DollarSign, Users, Check, Star } from 'lucide-react';
 
 const Itinerary = () => {

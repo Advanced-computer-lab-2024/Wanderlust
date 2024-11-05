@@ -6,7 +6,6 @@ import { Calendar, MapPin, Globe, DollarSign, Users, Check } from 'lucide-react'
 import CreateItineraryForm from './CreateItineraryForm';
 import { Star } from 'lucide-react';
 import MultiRangeSlider from "multi-range-slider-react";
-import "./styles/FilterBudget.css";
 import UpdateItineraryForm from './UpdateItineraryForm';
 
 
