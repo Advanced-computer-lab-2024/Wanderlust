@@ -7,19 +7,33 @@ const TouristProfile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [username, setUsername] = useState("");
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     fetchProfile();
+    fetchUsername();
   }, []);
 
   const fetchProfile = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/admin/getLoggedInUser", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
-        }
-      });
-      setProfile(response.data);
+      const [infoResponse, userResponse] = await Promise.all([
+        axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
+        }),
+        axios.get("http://localhost:8000/api/admin/getLoggedInUser", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
+        })
+      ]);
+
+      const combinedData = {
+        ...infoResponse.data,
+        ...userResponse.data
+      };
+
+      setProfile(combinedData);
+      console.log("Profile data:", combinedData);
+
     } catch (error) {
       console.error("Error fetching profile:", error);
       setError(error);
@@ -28,9 +42,23 @@ const TouristProfile = () => {
     }
   };
 
+  const fetchUsername = async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/api/admin/getLoggedInUserName", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
+      });
+      setUsername(response.data);
+    } catch (error) {
+      console.error("Error fetching username:", error);
+    }
+  };
+
   const handleAddPreference = () => {
-    // Logic to add a new preference goes here
     console.log("Add Preference clicked");
+  };
+
+  const toggleSettings = () => {
+    setShowSettings(!showSettings);
   };
 
   if (loading) return (
@@ -54,7 +82,6 @@ const TouristProfile = () => {
         
         {/* Top section for Level, Points, Wallet, and Settings */}
         <div className="flex justify-between items-center mb-8">
-          {/* Left side icons for Level, Points, and Wallet */}
           <div className="flex space-x-6">
             <div className="flex items-center text-indigo-600">
               <Star className="w-6 h-6 mr-1" />
@@ -71,11 +98,14 @@ const TouristProfile = () => {
           </div>
 
           {/* Right side settings icon */}
-          <div className="flex items-center text-indigo-600">
+          <div className="flex items-center text-indigo-600 cursor-pointer" onClick={toggleSettings}>
             <Settings className="w-6 h-6 mr-1" />
             <span className="text-lg font-semibold">Settings</span>
           </div>
         </div>
+
+        {/* Settings Pop-Up Menu */}
+        {showSettings && <SettingsPopup profile={profile} username={username} onClose={toggleSettings} />}
 
         <Card>
           <div className="profile-container">
@@ -100,7 +130,7 @@ const TouristProfile = () => {
                   </div>
                 </div>
 
-                {/* Tourist-Specific Information */}
+                {/* Preferences and Favorites */}
                 <div className="bg-gray-50 rounded-lg p-6 mb-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-semibold text-indigo-500 border-b border-indigo-100 pb-2">
@@ -112,7 +142,6 @@ const TouristProfile = () => {
                     </button>
                   </div>
 
-                  {/* Assuming `profile.preferences` is an array of preferences */}
                   <div className="space-y-4">
                     {profile.preferences && profile.preferences.length > 0 ? (
                       profile.preferences.map((preference, index) => (
@@ -168,5 +197,107 @@ const StatCard = ({ icon, title, value }) => (
     <p className="text-2xl font-bold text-indigo-600">{value}</p>
   </div>
 );
+
+
+const SettingsPopup = ({ profile, username, onClose }) => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showChangePasswordFields, setShowChangePasswordFields] = useState(false);
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+
+  const handleChangePassword = () => {
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New passwords do not match");
+      return;
+    }
+    if (newPassword === oldPassword) {
+      setPasswordError("Old password and new password cannot be identical");
+      return;
+    }
+    // Call the backend API to update the password
+    // Example: axios.post('/updatePassword', { oldPassword, newPassword })
+
+    // Assuming successful password update, reset fields
+    setPasswordError('');
+    setShowChangePasswordFields(false);
+    setOldPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+  };
+
+  return (
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-1/3">
+        <button onClick={onClose} className="text-red-500 font-semibold mb-4">Close</button>
+        <h2 className="text-xl font-semibold text-indigo-600 mb-4">Settings</h2>
+        
+        {/* Account Details */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-indigo-500">Account Details</h3>
+          <p><strong>Username:</strong> {profile.username}</p>
+          <p><strong>Email:</strong> {profile.email}</p>
+          <p><strong>Mobile Number:</strong> {profile.mobileNumber || "N/A"}</p>
+        </div>
+
+        {/* Password Section */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-indigo-500">Password</h3>
+          {showChangePasswordFields ? (
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="oldPassword" className="block text-gray-700">Old Password</label>
+                <input
+                  type="password"
+                  id="oldPassword"
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              <div>
+                <label htmlFor="newPassword" className="block text-gray-700">New Password</label>
+                <input
+                  type="password"
+                  id="newPassword"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              <div>
+                <label htmlFor="confirmPassword" className="block text-gray-700">Confirm Password</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
+              <button onClick={handleChangePassword} className="w-full bg-indigo-600 text-white p-2 rounded-md mt-4">Update Password</button>
+            </div>
+          ) : (
+            <div>
+              <p><strong>Password:</strong> {showPassword ? profile.password : '**********'}</p>
+              <button onClick={() => setShowChangePasswordFields(true)} className="text-indigo-600 mt-2">
+                Change Password
+              </button>
+              <button onClick={togglePasswordVisibility} className="text-indigo-600 ml-4">
+                {showPassword ? 'Hide' : 'Show'} Password
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 
 export default TouristProfile;
