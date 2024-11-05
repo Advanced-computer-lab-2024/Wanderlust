@@ -180,9 +180,45 @@ const getLoggedInUser = async (req, res) => {
     }
 }
 
+const getLoggedInUsername = async (req, res) => {
+    try {
+        const authHeader = req.header('Authorization');
+        if (!authHeader) {
+            return res.status(401).json({ message: 'Authorization header missing' });
+        }
+        const token = authHeader.replace('Bearer ', '');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userCollections = {
+            tourismGovernor: tourismGovernorModel,
+            tourguide: tourguideModel,
+            tourist: touristModel,
+            advertiser: advertiserModel,
+            seller: sellerModel,
+        };
+
+        const userModel = userCollections[decoded.role];
+        if (!userModel) {
+            return res.status(400).json({ message: 'Invalid role' });
+        }
+
+        const user = await userModel.findOne({ _id : decoded.id });
+        if (!user) {
+            console.log('User not found');
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const actualUser = await actualUserModel.findOne({ _id : user.userId });
+        res.status(200).json(actualUser.username);
+    }
+    catch (error) {
+        console.error('Error getting user:', error); 
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+}
+
 module.exports = {
     login,
     updatePassword,
     authenticateUser,
-    getLoggedInUser
+    getLoggedInUser,
+    getLoggedInUsername
 };
