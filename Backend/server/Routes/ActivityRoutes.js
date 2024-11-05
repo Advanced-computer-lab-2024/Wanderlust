@@ -12,7 +12,9 @@ const {
   getActivitiesByCategoryName,
   generateShareableLink,
   sendActivityLinkViaEmail,
-  rateActivity
+  rateActivity,
+  bookActivity,
+  cancelActivityBooking
 } = require("../Controllers/activityController");
 
 router.post("/createActivity", createActivity);
@@ -27,5 +29,7 @@ router.get('/activities', getActivitiesByCategoryName);
 router.get('/share/:activityId', generateShareableLink);
 router.post('/shareMail/:activityId/email', sendActivityLinkViaEmail);
 router.post('/rate/:activityId', rateActivity);
+router.post("/bookActivity", bookActivity);
+router.delete("/cancelActivityBooking/:bookingId", cancelActivityBooking);
 
 module.exports = router;

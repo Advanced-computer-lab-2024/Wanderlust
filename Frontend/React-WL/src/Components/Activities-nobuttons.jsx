@@ -27,6 +27,7 @@ const Activities = ({ showCreateButton = true, showUpdateButton = true, showDele
     set_minValue(e.minValue);
     set_maxValue(e.maxValue);
   };
+  
   if (loading) {
     return <div>Loading...</div>;
   }

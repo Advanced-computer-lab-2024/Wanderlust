@@ -249,6 +249,104 @@ const filterItinerariesByPref = async (req, res) => {
   }
 }
 
+
+const bookItinerary = async (req, res) => {
+  try {
+      const { itineraryId, userId } = req.body;
+
+      // Create a new booking
+      const newBooking = new Booking({
+          itineraryId,
+          userId,
+      });
+
+      await newBooking.save(); // Save to the database
+
+      res.status(201).json({ message: 'Booking successful!' });
+  } catch (error) {
+      console.error('Error booking itinerary:', error);
+      res.status(500).json({ message: 'Error booking itinerary' });
+  }
+};
+const cancelItineraryBooking = async (req, res) => {
+  const { bookingId } = req.params; // Get the booking ID from the request params
+
+  try {
+      const booking = await ItineraryBooking.findById(bookingId);
+
+      if (!booking) {
+          return res.status(404).json({ message: "Booking not found" });
+      }
+
+      // Check if the itinerary start time is more than 48 hours away
+      const currentTime = new Date();
+      const itineraryTime = new Date(booking.itineraryStartTime); // Assume you have an itineraryStartTime field
+
+      const timeDifference = itineraryTime - currentTime; // in milliseconds
+      const hoursDifference = timeDifference / (1000 * 60 * 60); // convert to hours
+
+      if (hoursDifference < 48) {
+          return res.status(400).json({ message: "Cannot cancel booking less than 48 hours before the itinerary" });
+      }
+
+      // If it's more than 48 hours, proceed to cancel the booking
+      await ItineraryBooking.deleteOne({ _id: bookingId });
+      return res.status(200).json({ message: "Booking cancelled successfully" });
+  } catch (error) {
+      return res.status(500).json({ message: "Error cancelling booking" });
+  }
+};
+
+const addComment = async (req, res) => {
+  const { itineraryId } = req.params; // Get itinerary ID from URL parameters
+  const { userId, comment } = req.body; // Get user ID and comment from request body
+
+  try {
+      const itinerary = await Itinerary.findById(itineraryId);
+      if (!itinerary) {
+          return res.status(404).json({ message: "Itinerary not found" });
+      }
+
+      itinerary.comments.push({ userId, comment });
+      await itinerary.save();
+
+      res.status(200).json({ message: "Comment added successfully!", itinerary });
+  } catch (error) {
+      res.status(500).json({ message: "Error adding comment", error });
+  }
+};
+
+const activateDeactivateItinerary = async (req, res) => {
+  const { id } = req.params; // Get itinerary ID from request parameters
+
+  try {
+      // Find the itinerary by ID
+      const itinerary = await Itinerary.findById(id);
+      
+      // If itinerary not found, return error
+      if (!itinerary) {
+          return res.status(404).json({ message: 'Itinerary not found.' });
+      }
+
+      // Check if there are bookings associated with this itinerary
+      const hasBookings = itinerary.bookings && itinerary.bookings.length > 0;
+
+      // If there are bookings, toggle the active status
+      if (hasBookings) {
+          itinerary.isActive = !itinerary.isActive; // Toggle active status
+          await itinerary.save(); // Save the updated itinerary
+          return res.status(200).json({ message: `Itinerary has been ${itinerary.isActive ? 'activated' : 'deactivated'}.` });
+      } else {
+          // If there are no bookings, return an error
+          return res.status(400).json({ message: 'Itinerary cannot be deactivated because it has no bookings.' });
+      }
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Error updating itinerary.' });
+  }
+};
+
+
 module.exports = {
   createItinerary,
   getItinerary,
@@ -258,5 +356,9 @@ module.exports = {
   searchItinerary,
   filterItinerairies,
   filterItinerariesByPref,
-  getExchangeRates
+  getExchangeRates,
+  bookItinerary,
+  cancelItineraryBooking,
+  addComment,
+  activateDeactivateItinerary
 };

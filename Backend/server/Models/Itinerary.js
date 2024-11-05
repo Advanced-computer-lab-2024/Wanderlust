@@ -2,6 +2,24 @@ const { date } = require('joi');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+
+const CommentSchema = new Schema({
+  userId: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: 'User', // Assuming you have a User model
+      required: true 
+  },
+  comment: { 
+      type: String, 
+      required: true 
+  },
+  createdAt: { 
+      type: Date, 
+      default: Date.now 
+  }
+});
+
+
 const itinerarySchema = new mongoose.Schema({
     title: { 
           type: String,
@@ -39,6 +57,10 @@ const itinerarySchema = new mongoose.Schema({
       type: String,
        required: true }, 
     dropoffLocation: { type: String, required: true }, 
+    isActive: { 
+      type: Boolean,
+      default: true 
+    }
 }, 
 { timestamps: true }); 
 

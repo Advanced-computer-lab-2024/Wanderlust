@@ -9,7 +9,11 @@ const {
     searchItinerary,
     filterItinerairies,
     filterItinerariesByPref,
-    getExchangeRates
+    getExchangeRates,
+    bookItinerary,
+    cancelItineraryBooking,
+    addComment,
+    activateDeactivateItinerary
   } = require("../Controllers/ItineraryController");
 
   router.post("/createItinerary", createItinerary);
@@ -21,6 +25,9 @@ const {
   router.get("/filterItineraries", filterItinerairies);
   router.get("/filterItinerariesByPref", filterItinerariesByPref);
   router.get('/exchangeRates', getExchangeRates);
-
+  router.post('/bookItinerary',bookItinerary);
+  router.delete("/cancelItineraryBooking/:bookingId", cancelItineraryBooking);
+  router.post('/:itineraryId/comments', addComment);
+  router.put('/:id/activateDeactivate', activateDeactivateItinerary);
 
   module.exports = router;

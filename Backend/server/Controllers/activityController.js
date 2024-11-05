@@ -320,6 +320,46 @@ const rateActivity = async (req, res) => {
   }
 };
 
+const bookActivity = (req, res) => {
+  const { activityId, userId } = req.body;
+
+  if (!activityId || !userId) {
+      return res.status(400).json({ error: 'Activity ID and User ID are required.' });
+  }
+
+  // Placeholder for booking logic (replace with actual booking logic)
+  console.log(`Booking requested for activity: ${activityId}, by user: ${userId}`);
+  res.status(200).json({ message: 'Booking successful!' });
+};
+const cancelActivityBooking = async (req, res) => {
+  const { bookingId } = req.params.bookingId; // Get the booking ID from the request params
+
+  try {
+      const booking = await ActivityBooking.findById(bookingId);
+
+      if (!booking) {
+          return res.status(404).json({ message: "Booking not found" });
+      }
+
+      // Check if the event start time is more than 48 hours away
+      const currentTime = new Date();
+      const eventTime = new Date(booking.eventStartTime); // Assume you have an eventStartTime field
+
+      const timeDifference = eventTime - currentTime; // in milliseconds
+      const hoursDifference = timeDifference / (1000 * 60 * 60); // convert to hours
+
+      if (hoursDifference < 48) {
+          return res.status(400).json({ message: "Cannot cancel booking less than 48 hours before the event" });
+      }
+
+      // If it's more than 48 hours, proceed to cancel the booking
+      await ActivityBooking.deleteOne({ _id: bookingId });
+      return res.status(200).json({ message: "Booking cancelled successfully" });
+  } catch (error) {
+      return res.status(500).json({ message: "Error cancelling booking" });
+  }
+};
+
 module.exports = {
   createActivity,
   getActivity,
@@ -332,5 +372,7 @@ module.exports = {
   getActivitiesByCategoryName,
   generateShareableLink,
   sendActivityLinkViaEmail,
-  rateActivity
+  rateActivity,
+  bookActivity,
+  cancelActivityBooking
 };
