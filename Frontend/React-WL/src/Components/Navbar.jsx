@@ -1,9 +1,17 @@
-import React from 'react';
+import React , { useEffect , useState} from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import logo from '../assets/Images/Wl-Logog.png';
 
 const Navbar = ({t1, t2, t3, t4, t5, t6, p1, p2, p3, p4, p5, p6}) => {
   const location = useLocation();
+  const [flag, setFlag] = useState(false);
+
+  useEffect(() => {
+    // Check if p1 matches the "/TouristProfile" route
+    if (p1 === "/TouristProfile") {
+      setFlag(true);
+    }
+  }, [p1]);
 
   const getLinkClass = (path) => {
     if (location.pathname === path) {
@@ -12,6 +20,7 @@ const Navbar = ({t1, t2, t3, t4, t5, t6, p1, p2, p3, p4, p5, p6}) => {
       return 'text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2';
     }
   };
+
 
   return (
     <>
@@ -42,11 +51,27 @@ const Navbar = ({t1, t2, t3, t4, t5, t6, p1, p2, p3, p4, p5, p6}) => {
                   {t4 && p4 && (
                     <Link to={p4} className={getLinkClass(p4)}>{t4}</Link>
                   )}
-
+                  
                   {t5 && p5 && (
-                    <Link to={p5} className={getLinkClass(p5)}>{t5}</Link>
+                    flag ? (
+                      <div className="relative group mt-1.5">
+                        <Link to={p5} className={getLinkClass(p5)}>
+                          {t5}
+                        </Link>
+                        <div className="absolute hidden group-hover:block mt-2 bg-black shadow-lg rounded-md w-48">
+                          <Link to={'/BookingsTourist'} className="block px-4 py-2 text-white hover:bg-gray-700">
+                            My Bookings
+                          </Link>
+                          <Link to={'/ComplaintsTourist'} className="block px-4 py-2 text-white hover:bg-gray-700">
+                            My Complaints
+                          </Link>
+                        </div>
+                      </div>
+                    ) : (
+                      <Link to={p5} className={getLinkClass(p5)}>{t5}</Link>
+                    )
                   )}
-
+                  
                   {t6 && p6 && (
                     <Link to={p6} className={"border " + getLinkClass(p6)}>{t6}</Link>
                   )}

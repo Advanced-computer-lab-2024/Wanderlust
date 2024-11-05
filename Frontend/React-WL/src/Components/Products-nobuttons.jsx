@@ -103,7 +103,7 @@ const Products = () => {
                             <span>Quantity: {product.quantity}</span><br />
                             <span>Rating: {product.rating}</span><br />
                             <span>Reviews: {product.reviews}</span><br />
-                            <span>Seller: {product.seller.name}</span><br />
+                            {/* <span>Seller: {product.seller.name}</span><br /> */}
                             <img src={product.picture} alt={product.name} style={{ maxWidth: '100px', maxHeight: '100px' }} /><br />
                         </div>
                     ))}
