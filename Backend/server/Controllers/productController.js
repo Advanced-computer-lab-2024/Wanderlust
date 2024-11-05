@@ -234,6 +234,53 @@ const unarchiveProduct = async (req, res) => {
   }
 };
 
+// View available quantity and sales of a product (admin and seller only)
+const viewProductDetails = async (req, res) => {
+  try {
+      const { productId } = req.params;
+      const product = await Product.findById(productId).populate('sales.userId', 'username');
+      if (!product) {
+          return res.status(404).json({ message: 'Product not found' });
+      }
+      res.status(200).json({ quantity: product.quantity, sales: product.sales });
+  } catch (error) {
+      console.error('Error fetching product details:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Add a sale to a product
+const addSale = async (req, res) => {
+  try {
+      const { productId, quantity } = req.body;
+      if (!productId || !quantity) {
+          return res.status(400).json({ message: 'Product ID and quantity are required' });
+      }
+
+      const token = req.headers.authorization.split(' ')[1];
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+      const userId = decodedToken.id;
+
+      const product = await Product.findById(productId);
+      if (!product) {
+          return res.status(404).json({ message: 'Product not found' });
+      }
+
+      if (product.quantity < quantity) {
+          return res.status(400).json({ message: 'Insufficient product quantity' });
+      }
+
+      product.sales.push({ userId, quantity });
+      product.quantity -= quantity;
+
+      await product.save();
+      res.status(200).json({ message: 'Sale added successfully', product });
+  } catch (error) {
+      console.error('Error adding sale:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 module.exports = {
   addProduct,
   updateProductByName,
@@ -246,4 +293,6 @@ module.exports = {
   archiveProduct,
   unarchiveProduct,
   rateProduct,
+  viewProductDetails,
+  addSale,
 };
