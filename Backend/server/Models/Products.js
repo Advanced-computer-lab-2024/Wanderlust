@@ -42,6 +42,23 @@ const ProductSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Seller",
   },
+  sales: [
+    {
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+      },
+      quantity: {
+        type: Number,
+        required: true
+      },
+      date: {
+        type: Date,
+        default: Date.now
+      }
+    }
+  ],
   picture: {
     type: String,
   },
