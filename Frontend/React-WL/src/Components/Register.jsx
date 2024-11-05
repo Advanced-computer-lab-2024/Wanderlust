@@ -16,6 +16,12 @@ const Register = () => {
         job: "", // Tourist
         YOE : "", // Tour Guide
         previousWork : "", // Tour Guide
+        idTourguideDocument : "", // Tour Guide
+        CertificateTourguideDocument : "", // Tour Guide
+        idSellerDocument : "", // Seller
+        taxationRegistryCardSellerDocument : "", // Seller
+        idAdvertiserDocument : "", // Advertiser
+        taxationRegistryCardAdvertiserDocument: "", // Advertiser
     });
 
     //lesa tourguide m4 sha8ala w lesa seller w advertiser
@@ -55,57 +61,30 @@ const Register = () => {
             alert("Passwords do not match");
             return;
         }
+        const data = {
+            username : formData.username,
+            email : formData.email,
+            password : formData.password1,
+            mobileNumber : formData.mobileNumber,
+            role : role,
+        }
+        const responseUser = await axios.post(`http://localhost:8000/signup`, data);
+        const userId = responseUser.data._id;
          if (role === "tourist") {
             const data = {
-                username: formData.username,
-                email: formData.email,
-                password: formData.password1,
-                mobileNumber: formData.mobileNumber,
                 nationality: formData.nationality,
-                dateOfBirth: formData.dateOfBirth,
-                job: formData.job,
+                DOB: formData.dateOfBirth,
+                jobOrStudent: formData.job,
             };
             // console.log(data);
-            const response = await axios.post("http://localhost:8000/api/tourist/createTourist", data);
+            const response = await axios.post(`http://localhost:8000/api/tourist/createTourist/${userId}`, data);
             console.log(response.data);
         } else if (role === "tour_guide") {
-            const dataUser = {
-                username: formData.username,
-                email: formData.email,
-                password: formData.password1,
-                role: "tour_guide",
-            }
-            const responseUser = await axios.post(
-                "http://localhost:8000/createUser",
-                dataUser
-            );
-            console.log(responseUser);
+            //create tour guide
         } else if (role === "seller") {
-            const data = {
-                username: formData.username,
-                email: formData.email,
-                password: formData.password1,
-                role : 'seller',
-            }
-
-            const response = await axios.post(
-                "http://localhost:8000/createUser",
-                data
-            );
-            console.log(response.data);
+            // create seller
         } else if (role === "advertiser") {
-            const data = {
-                username: formData.username,
-                email: formData.email,
-                password: formData.password1,
-                role : 'advertiser',
-            }
-
-            const response = await axios.post(
-                "http://localhost:8000/createUser",
-                data
-            );
-            console.log(response.data);
+            // create advertiser
         }
     };
 
@@ -223,9 +202,104 @@ const Register = () => {
                                 />
                             </div>
                         </>
-                    )}
+                    )
+                    }
+                    {role === "tour_guide" && (
+                        <>
+                            <div className="mb-6">
+                                <label className="block text-gray-800 font-semibold">Years of Experience <span className="text-red-500"> *</span></label>
+                                <input
+                                    type="number"
+                                    name="YOE"
+                                    value={formData.YOE}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter your years of experience"
+                                    className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                                />
+                            </div>
+                            <div className="mb-6">
+                                <label className="block text-gray-800 font-semibold">Previous Work <span className="text-red-500"> *</span></label>
+                                <input
+                                    type="text"
+                                    name="previousWork"
+                                    value={formData.previousWork}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter your previous work"
+                                    className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                                />
+                            </div>
+                            <div className="mb-6">
+                                <label className="block text-gray-800 font-semibold">ID Document <span className="text-red-500"> *</span></label>
+                                <input
+                                    type="file"
+                                    name="idTourguideDocument"
+                                    onChange={handleInputChange}
+                                    className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                                />
+                            </div>
+                            <div className="mb-6">
+                                <label className="block text-gray-800 font-semibold">Certificate Document <span className="text-red-500"> *</span></label>
+                                <input
+                                    type="file"
+                                    name="CertificateTourguideDocument"
+                                    onChange={handleInputChange}
+                                    className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                                />
+                            </div>
 
+                        </>
+                    )
+                    }
+                    {role === "seller" && (
+                        <>
 
+                            <div className="mb-6">
+                                <label className="block text-gray-800 font-semibold">ID Document <span className="text-red-500"> *</span></label>
+                                <input
+                                    type="file"
+                                    name="idSellerDocument"
+                                    onChange={handleInputChange}
+                                    className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                                />
+                            </div>
+                            <div className="mb-6">
+                                <label className="block text-gray-800 font-semibold">Taxation Registry Card Document <span className="text-red-500"> *</span></label>
+                                <input
+                                    type="file"
+                                    name="taxationRegistryCardSellerDocument"
+                                    onChange={handleInputChange}
+                                    className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                                />
+                            </div>
+
+                        </>
+                    )
+                    }
+                    {role === "advertiser" && (
+                        <>
+
+                            <div className="mb-6">
+                                <label className="block text-gray-800 font-semibold">ID Document <span className="text-red-500"> *</span></label>
+                                <input
+                                    type="file"
+                                    name="idAdvertiserDocument"
+                                    onChange={handleInputChange}
+                                    className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                                />
+                            </div>
+                            <div className="mb-6">
+                                <label className="block text-gray-800 font-semibold">Taxation Registry Card Document <span className="text-red-500"> *</span></label>
+                                <input
+                                    type="file"
+                                    name="taxationRegistryCardAdvertiserDocument"
+                                    onChange={handleInputChange}
+                                    className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                                />
+                            </div>
+
+                        </>
+                    )
+                    }
                     <button
                         onClick={handleSubmit}
                         type="submit"
