@@ -6,11 +6,12 @@ import Activities from '../Components/Activities'
 import ItineraryList from '../Components/ItineraryList'
 import TourGuideProfile from '../Components/TourGuideProfile'
 import Advertiser from './Advertiser'
+import GuestNavBar from '../Components/NavBars/GuestNavBar'
 
 const Home = () => {
   return (
   <>
-    <Navbar t1={"Tour guide"} p1={"/Tourguide"} t2={"Advertiser"} p2={"/advertiser"} t3={"Seller"} p3={"/seller"} t4={"Tourism Govener"} p4={"/TourismGovernor"} t5={"Tourist"} p5={"/tourist"} t6={"Login"} p6={"/Login"} />
+      <GuestNavBar />
       <Hero />
       <Activities showCreateButton={false}
           showUpdateButton={false}

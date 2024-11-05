@@ -2,15 +2,14 @@ import React from 'react'
 import Navbar from '../Components/Navbar'
 import Activities from '../Components/Activities'
 import GuestNavbar from '../Components/NavBars/GuestNavBar'
-
-const Advertiser = () => {
+import LocationList from '../Components/LocationList'
+const LocationsPage = () => {
   return (
     <>
-      <GuestNavbar />
-    <Activities />
-
+    <GuestNavbar />
+    <LocationList />
     </>
-  )
+  );
 }
 
-export default Advertiser
+export default LocationsPage;

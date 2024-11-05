@@ -28,17 +28,15 @@ import Complaint from './Components/Admin/Complaint';
 import ComplaintsTouristPage from './Pages/ComplaintsTouristPage';
 
 import  TouristProfilePage  from './Pages/TouristProfilePage';
-
+import LocationsPage from './Pages/LocationsPage';
 const App = () => {
   return (
     <Router>
       
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/tourguide" element={<Tourguide />} />
-        <Route path="/itinerary" element={<Itinerary />} />
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/addadmin" element={<AddAdminPage />} />
         <Route path="/addtourismgovernor" element={<AddTourismGovernorPage />} />
@@ -48,7 +46,6 @@ const App = () => {
         <Route path="/managepreferencetags" element={<AdminManagePreferenceTagsPage />} />
         <Route path="/managecomplaints" element={<AdminManageComplaintsPage />} />
         <Route path="/advertiser" element={<Advertiser />} />
-        <Route path="/activitiesPage" element={<ActivitiesPage />} />
         <Route path="/seller" element={<SellerPage/>} />
         <Route path="/TourismGovernor" element={<TourismGovernor />} />
         <Route path="/complaint" element={<Complaint />} />
@@ -56,15 +53,20 @@ const App = () => {
 
 
 
-      {/* //tourist routes */}
+        {/* //tourist routes */}
         {/* <Route path="/tourist" element={<Tourist />} /> */}
         <Route path="/ItineraryTourist" element={<ItineraryTourist />} />
         <Route path="/LocationTourist" element={<LocationTourist />} />
         <Route path="/ActivityTourist" element={<ActivityTourist />} />
         <Route path="/ProductTourist" element={<ProductTourist />} />
         <Route path="/ComplaintsTourist" element={<ComplaintsTouristPage />} />
-
         <Route path="/TouristProfile" element={<TouristProfilePage />} />
+
+        {/* Guest Routes */}
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/LocationPage" element={<LocationsPage />} />
+        <Route path="/activitiesPage" element={<ActivitiesPage />} />
+        <Route path="/itinerary" element={<Itinerary />} />
 
 
         
