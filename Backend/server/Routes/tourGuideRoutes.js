@@ -8,7 +8,7 @@ const {
   createTourGuideProfile,
   saveTourGuideIdUrl,
   rateTourGuide
-} = require("../Controllers/tourGuideProfileController");
+} = require("../Controllers/tourGuideController");
 
 //router.put("/create/:userId", createTourGuide);
 router.put("/createtgprofile/:userId", createTourGuideProfile);
