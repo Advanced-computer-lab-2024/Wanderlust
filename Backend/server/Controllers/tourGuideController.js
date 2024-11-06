@@ -4,7 +4,7 @@ const User = require("../Models/user");
 
 const createTourGuideProfile = async (req, res) => {
   const { userId } = req.params;
-  const { YOE, previousWork, IdURL, certificatesURL } = req.body;
+  const { YOE, previousWork } = req.body;
   try {
     const user = await User.findById(userId);
     if (!user) {
@@ -14,28 +14,18 @@ const createTourGuideProfile = async (req, res) => {
       userId: user._id,
       YOE,
       previousWork,
-      IdURL,
-      certificatesURL,
     });
-    user.role = "tour guide";
+    user.role = "tourguide";
     user.roleApplicationStatus = "pending";
     await tourGuide.save();
     await user.save();
     res.status(200).json({
       user,
-      tourGuide: {
-        _id: tourGuide._id,
-        YOE: tourGuide.YOE,
-        previousWork: tourGuide.previousWork,
-        IdURL: tourGuide.IdURL,
-        certificatesURL: tourGuide.certificatesURL,
-        createdAt: tourGuide.createdAt,
-        updatedAt: tourGuide.updatedAt,
-        __v: tourGuide.__v,
-      },
+      tourGuide,
     });
   } catch (error) {
     res.status(400).json({ error: error.message });
+    console.log(error.message);
   }
 };
 

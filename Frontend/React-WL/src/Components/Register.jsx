@@ -18,8 +18,13 @@ const Register = () => {
         previousWork : "", // Tour Guide
         idTourguideDocument : "", // Tour Guide
         CertificateTourguideDocument : "", // Tour Guide
+        description : "", // Seller
+        sellerType : "", // Seller
         idSellerDocument : "", // Seller
         taxationRegistryCardSellerDocument : "", // Seller
+        website : "", // Advertiser
+        hotline : "", // Advertiser
+        companyProfile : "", // Advertiser
         idAdvertiserDocument : "", // Advertiser
         taxationRegistryCardAdvertiserDocument: "", // Advertiser
     });
@@ -79,12 +84,63 @@ const Register = () => {
             // console.log(data);
             const response = await axios.post(`http://localhost:8000/api/tourist/createTourist/${userId}`, data);
             console.log(response.data);
-        } else if (role === "tour_guide") {
+        } else if (role === "tourguide") {
+
+            const data = {
+                YOE: formData.YOE,
+                previousWork: formData.previousWork,
+            }
+            console.log(data);
+            const response = await axios.put(`http://localhost:8000/api/tourGuide/createtgprofile/${userId}`, data);
+            console.log(response.data);
+            // const body = {
+            //     userId : userId
+            // }
+            // const userType = "TourGuide";
+            // var documentType = "id";
+            // const responseDocId = await axios.post(`http://localhost:8000/api/documents/uploadDocument/${userType}/${documentType}`,body);
+            // documentType = "certificate";
+            // const responseDocCert = await axios.post(`http://localhost:8000/api/documents/uploadDocument/${userType}/${documentType}`,body);
+            // //upload documents
+
+
             //create tour guide
         } else if (role === "seller") {
+            //upload documents
+
+            const data = {
+                type: formData.sellerType,
+                description: formData.description,
+            }
+            const response = await axios.put(`http://localhost:8000/api/seller/createSeller/${userId}`, data);
+            console.log(response.data);
+            // const body = {
+            //     userId : userId
+            // }
+            // var documentType = "id";
+            // const userType = "Seller";
+            // const responseDocId = await axios.post(`http://localhost:8000/api/documents/uploadDocument/${userType}/${documentType}`,body);
+            // documentType = "taxation";
+            // const responseDocTax = await axios.post(`http://localhost:8000/api/documents/uploadDocument/${userType}/${documentType}`,body);
+
             // create seller
         } else if (role === "advertiser") {
-            // create advertiser
+
+            const data = {
+                website: formData.website,
+                hotline: formData.hotline,
+                companyProfile: formData.companyProfile,
+            }
+            const response = await axios.put(`http://localhost:8000/api/advertiser/createAdvertiserProfile/${userId}`, data);
+            console.log(response.data);
+            // const body = {
+            //     userId : userId
+            // }
+            // var documentType = "id";
+            // const userType = "Advertiser";
+            // const responseDocId = await axios.post(`http://localhost:8000/api/documents/uploadDocument/${userType}/${documentType}`,body);
+            // documentType = "taxation";
+            // const responseDocTax = await axios.post(`http://localhost:8000/api/documents/uploadDocument/${userType}/${documentType}`,body);
         }
     };
 
@@ -96,7 +152,7 @@ const Register = () => {
                     <select id="role" value={role} onChange={handleRoleChange}>
                         <option value="">Choose a role</option>
                         <option value="tourist">Tourist</option>
-                        <option value="tour_guide">Tour Guide</option>
+                        <option value="tourguide">Tour Guide</option>
                         <option value="seller">Seller</option>
                         <option value="advertiser">Advertiser</option>
                     </select>
@@ -152,10 +208,7 @@ const Register = () => {
                             className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
                         />
                     </div>
-
-                    {role === "tourist" && (
-                        <>
-                            <div className="mb-6">
+                    <div className="mb-6">
                                 <label className="block text-gray-800 font-semibold">Mobile Number<span className="text-red-500"> *</span></label>
                                 <input
                                     type="number"
@@ -166,6 +219,10 @@ const Register = () => {
                                     className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
                                 />
                             </div>
+
+                    {role === "tourist" && (
+                        <>
+
                             <div className="mb-6">
                                 <label className="block text-gray-800 font-semibold">Nationality <span className="text-red-500"> *</span></label>
                                 <select
@@ -204,7 +261,7 @@ const Register = () => {
                         </>
                     )
                     }
-                    {role === "tour_guide" && (
+                    {role === "tourguide" && (
                         <>
                             <div className="mb-6">
                                 <label className="block text-gray-800 font-semibold">Years of Experience <span className="text-red-500"> *</span></label>
@@ -252,6 +309,30 @@ const Register = () => {
                     }
                     {role === "seller" && (
                         <>
+                        <div className="mb-6">
+                            <label className="block text-gray-800 font-semibold">Description <span className="text-red-500"> *</span></label>
+                            <input
+                                type="text"
+                                name="description"
+                                value={formData.description}
+                                onChange={handleInputChange}
+                                placeholder="Enter a description"
+                                className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                            />
+                        </div>
+                        <div className="mb-6">
+                            <label className="block text-gray-800 font-semibold">Seller Type <span className="text-red-500"> *</span></label>
+                            <select
+                                name="sellerType"
+                                value={formData.sellerType}
+                                onChange={handleInputChange}
+                                className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                            >
+                                <option value="">Select seller type</option>
+                                <option value="VTP">VTP</option>
+                                <option value="external">External</option>
+                            </select>
+                        </div>
 
                             <div className="mb-6">
                                 <label className="block text-gray-800 font-semibold">ID Document <span className="text-red-500"> *</span></label>
@@ -277,7 +358,39 @@ const Register = () => {
                     }
                     {role === "advertiser" && (
                         <>
-
+                            <div className="mb-6">
+                                <label className="block text-gray-800 font-semibold">Website <span className="text-red-500"> *</span></label>
+                                <input
+                                    type="text"
+                                    name="website"
+                                    value={formData.website}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter your website"
+                                    className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                                />
+                            </div>
+                            <div className="mb-6">
+                                <label className="block text-gray-800 font-semibold">Hotline <span className="text-red-500"> *</span></label>
+                                <input
+                                    type="text"
+                                    name="hotline"
+                                    value={formData.hotline}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter your hotline"
+                                    className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                                />
+                            </div>
+                            <div className="mb-6">
+                                <label className="block text-gray-800 font-semibold">Company Profile <span className="text-red-500"> *</span></label>
+                                <input
+                                    type="text"
+                                    name="companyProfile"
+                                    value={formData.companyProfile}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter your company profile"
+                                    className="w-full border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                                />
+                            </div>
                             <div className="mb-6">
                                 <label className="block text-gray-800 font-semibold">ID Document <span className="text-red-500"> *</span></label>
                                 <input

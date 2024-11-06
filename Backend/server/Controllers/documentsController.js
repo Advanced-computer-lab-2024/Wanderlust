@@ -22,14 +22,12 @@ const uploadDocument = async (req, res) => {
         )
         .end(req.file.buffer);
     });
-
     // Determine model and update field
     let Model;
     if (userType === "TourGuide") Model = TourGuide;
     else if (userType === "Advertiser") Model = Advertiser;
     else if (userType === "Seller") Model = Seller;
     else return res.status(400).send("Invalid user type");
-
     const updateField = {};
     if (documentType === "id") updateField.IdURL = result.secure_url;
     else if (documentType === "certificate" && userType === "TourGuide")
