@@ -7,7 +7,7 @@ const User = require("../Models/user");
 //http://localhost:8000/api/seller/createSeller/userId
 const createSeller = async (req, res) => {
     const { userId } = req.params;
-    const { description, productName } = req.body;
+    const { description , type } = req.body;
     try {
         const user = await User.findById(userId);
         if (!user) {
@@ -16,7 +16,7 @@ const createSeller = async (req, res) => {
         const seller = new SellerModel({
           userId: user._id,
           description,
-          productName,
+          type,
         });
         user.role = "seller";
         user.roleApplicationStatus = "pending";

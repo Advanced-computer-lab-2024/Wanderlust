@@ -11,9 +11,9 @@ const sellerSchema = new Schema({
     type: String,
     required: true,
   },
-  productName: {
+  type: {
     type: String,
-    required: true,
+    enum :["VTP" , "External"] ,
   },
   roleApplicationStatus: {
     type: String,
