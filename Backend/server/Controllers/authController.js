@@ -6,6 +6,10 @@ const touristModel = require('../Models/Tourist.js');
 const advertiserModel = require('../Models/Advertiser'); 
 const sellerModel = require('../Models/Seller.js');
 const actualUserModel = require('../Models/user.js');
+const userSchema = require('../Models/user.js');
+
+const axios = require('axios');
+
 //routings in admin routing file
 //if you wanna test in postman 1)login 2)copy given token 3)header add key=Authorization value= Bearer copied_token 4)write normal json
 
@@ -118,13 +122,19 @@ const updatePassword = async (req, res) => {
             { model: sellerModel, role: 'seller' },
         ];
 
-        let user = null;
+        const token = req.headers.authorization;
 
-        for (const collection of userCollections) {
-            user = await collection.model.findById(req.user.id);
-            if (user) {
-                break;
-            }
+        // Call the getLoggedInInfo API to retrieve the logged-in user's information
+        const response = await axios.get('http://localhost:8000/api/admin/getLoggedInInfo', {
+            headers: { Authorization: token }
+        });
+
+        const user = response.data;
+        console.log("userPass:" +user.password,"oldPass: "+ oldPassword);
+
+        // If user is not found, return an error
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
 
         if (!user) {
@@ -136,8 +146,15 @@ const updatePassword = async (req, res) => {
         if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(newPassword)) {
             return res.status(400).json({ message: 'New password must be at least 6 characters long and contain both letters and numbers.' });
         }
-        user.password = newPassword;
-        await user.save();
+        // Now get the actual user model
+        const actualUser = await actualUserModel.findById(user._id); // Assuming `user._id` is the actual user's ID
+        if (!actualUser) {
+            return res.status(404).json({ message: 'Actual user not found' });
+        }
+
+        // Update the password for the actual user
+        actualUser.password = newPassword;
+        await actualUser.save();
         res.status(200).json({ message: 'Password updated successfully' });
     } catch (error) {
         console.error('Error updating password:', error); 
