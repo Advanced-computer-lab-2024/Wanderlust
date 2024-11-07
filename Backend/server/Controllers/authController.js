@@ -77,7 +77,6 @@ const login = async (req, res) => {
                 return res.status(400).json({ message: 'Invalid credentials' });
             }
             const userCollections = {
-                tourismGovernor: tourismGovernorModel,
                 tourguide: tourguideModel,
                 tourist: touristModel,
                 advertiser: advertiserModel,
@@ -121,49 +120,71 @@ const updatePassword = async (req, res) => {
             return res.status(400).json({ message: 'New passwords do not match' });
         }
         console.log('Old Password:', oldPassword); 
-        const userCollections = [
-            { model: adminModel, role: 'admin' },
-            { model: tourismGovernorModel, role: 'tourismGovernor' },
-            { model: tourguideModel, role: 'tourguide' },
-            { model: touristModel, role: 'tourist' },
-            { model: advertiserModel, role: 'advertiser' },
-            { model: sellerModel, role: 'seller' },
-        ];
+        const userCollections = {
+            admin : adminModel,
+            tourismGovernor : tourismGovernorModel,
+        };
+        const token = req.headers.authorization.split(' ')[1];
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decodedToken.id;
+        const role = decodedToken.role;
+        console.log(   role );
 
-        const token = req.headers.authorization;
+        if (role === 'admin' || role === 'tourismGovernor') {
+            const userModel = userCollections[role];
+            const user = await userModel.findById(userId);
+            if (!userModel) {
+                return res.status(400).json({ message: 'Invalid role' });
+            }
 
-        // Call the getLoggedInInfo API to retrieve the logged-in user's information
-        const response = await axios.get('http://localhost:8000/api/admin/getLoggedInInfo', {
-            headers: { Authorization: token }
-        });
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+            if (oldPassword !== user.password) {
+                return res.status(400).json({ message: 'Old password is incorrect' });
+            }
+            if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(newPassword)) {
+                return res.status(400).json({ message: 'New password must be at least 6 characters long and contain both letters and numbers.' });
+            }
+            user.password = newPassword;
+            await user.save();
+            res.status(200).json({ message: 'Password updated successfully' });
+        }else{
+            const token = req.headers.authorization;
 
-        const user = response.data;
-        console.log("userPass:" +user.password,"oldPass: "+ oldPassword);
+            // Call the getLoggedInInfo API to retrieve the logged-in user's information
+            const response = await axios.get('http://localhost:8000/api/admin/getLoggedInInfo', {
+                headers: { Authorization: token }
+            });
 
-        // If user is not found, return an error
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+            const user = response.data;
+            console.log("userPass:" +user.password,"oldPass: "+ oldPassword);
 
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        if (oldPassword !== user.password) {
-            return res.status(400).json({ message: 'Old password is incorrect' });
-        }
-        if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(newPassword)) {
-            return res.status(400).json({ message: 'New password must be at least 6 characters long and contain both letters and numbers.' });
-        }
-        // Now get the actual user model
-        const actualUser = await actualUserModel.findById(user._id); // Assuming `user._id` is the actual user's ID
-        if (!actualUser) {
-            return res.status(404).json({ message: 'Actual user not found' });
-        }
+            // If user is not found, return an error
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
 
-        // Update the password for the actual user
-        actualUser.password = newPassword;
-        await actualUser.save();
-        res.status(200).json({ message: 'Password updated successfully' });
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+            if (oldPassword !== user.password) {
+                return res.status(400).json({ message: 'Old password is incorrect' });
+            }
+            if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(newPassword)) {
+                return res.status(400).json({ message: 'New password must be at least 6 characters long and contain both letters and numbers.' });
+            }
+            // Now get the actual user model
+            const actualUser = await actualUserModel.findById(user._id); // Assuming `user._id` is the actual user's ID
+            if (!actualUser) {
+                return res.status(404).json({ message: 'Actual user not found' });
+            }
+
+            // Update the password for the actual user
+            actualUser.password = newPassword;
+            await actualUser.save();
+            res.status(200).json({ message: 'Password updated successfully' });
+     }
     } catch (error) {
         console.error('Error updating password:', error); 
         res.status(500).json({ message: 'Server error', error: error.message });
