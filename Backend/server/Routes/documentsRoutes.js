@@ -4,25 +4,30 @@ const upload = multer({ storage: multer.memoryStorage() });
 const {
   uploadDocument,
   uploadImage,
+  uploadProductImage,
   getDocuments,
-  deleteDocument,
 } = require("../Controllers/documentsController");
 const router = express.Router();
 
-router.post(
+router.put(
   "/uploadDocument/:userType/:documentType",
   upload.single("file"),
   uploadDocument
 );
-router.post(
+router.put(
   "/uploadImage/:userType/:documentType",
   upload.single("file"),
   uploadImage
 );
-router.get("/getDocuments/:userType/:userId", getDocuments);
-router.delete(
-  "/deleteDocument/:userType/:documentType/:userId",
-  deleteDocument
+router.put(
+  "/uploadProductImage/:productId",
+  upload.single("file"),
+  uploadProductImage
 );
+router.get("/getDocuments/:userType/:userId", getDocuments);
+// router.delete(
+//   "/deleteDocument/:userType/:documentType/:userId",
+//   deleteDocument
+// );
 
 module.exports = router;
