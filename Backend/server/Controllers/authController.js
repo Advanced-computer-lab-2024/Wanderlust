@@ -38,8 +38,16 @@ const login = async (req, res) => {
         if (!username || !password || !role) {
             return res.status(400).json({ message: 'Username, password, and role are required' });
         }
-        if(role === 'admin'){
-            const user = await adminModel.findOne({ username : username });
+        if(role === 'admin' || role === 'tourismGovernor'){
+            const userCollections = {
+                tourismGovernor: tourismGovernorModel,
+                admin: adminModel,
+            };
+            const userModel = userCollections[role];
+            if (!userModel) {
+                return res.status(400).json({ message: 'Invalid role' });
+            }
+            const user = await userModel.findOne({ username: username });
             if (!user) {
                 console.log('User not found');
                 return res.status(404).json({ message: 'User not found' });

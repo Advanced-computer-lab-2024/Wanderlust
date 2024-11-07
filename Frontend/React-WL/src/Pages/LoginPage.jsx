@@ -74,6 +74,7 @@ const Login = () => {
                             <option value="seller">Seller</option>
                             <option value="advertiser">Advertiser</option>
                             <option value="admin">Admin</option>
+                            <option value="tourismGovernor">Tourism Governor</option>
                         </select>
                     </div>
                     <div className="mb-6">
