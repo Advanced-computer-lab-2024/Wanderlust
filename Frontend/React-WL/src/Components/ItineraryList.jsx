@@ -389,7 +389,7 @@ const ItineraryItem = ({ item, onUpdate, onDelete,deleteConfirmId,setDeleteConfi
           <h2 className="text-2xl font-semibold mb-2 text-indigo-600">{item.title}</h2>
           <p className="text-gray-600 text-sm flex items-center">
             <Calendar className="mr-2" size={16} />
-            {item.timeline.start} - {item.timeline.end}
+            {new Date(item.timeline.start).toISOString().split("T")[0]} - {new Date(item.timeline.end).toISOString().split("T")[0]}
           </p>
         </div>
         <div>
