@@ -237,34 +237,86 @@ const SettingsPopup = ({
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="absolute inset-0 bg-black opacity-50" onClick={onClose}></div>
       <div className="bg-white rounded-lg shadow-lg p-6 z-10">
-        <h3 className="text-xl font-semibold text-indigo-600 mb-4">Add Preferences</h3>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {preferenceTagOptions.map((tag) => (
+        <h3 className="text-xl font-semibold text-indigo-600 mb-4">Settings</h3>
+        <div className="mb-4">
+          <h4 className="text-lg font-semibold text-indigo-600 mb-2">Account Details</h4>
+          <div className="mb-2">
+            <label className="block text-gray-600">Username</label>
+            <p className="text-gray-800">{profile.username}</p>
+          </div>
+          <div className="mb-2">
+            <label className="block text-gray-600">Email</label>
+            <p className="text-gray-800">{profile.email}</p>
+          </div>
+          <div className="mb-2">
+            <label className="block text-gray-600">Password</label>
+            <div className="flex items-center">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={profile.password || ""}
+                readOnly
+                className="bg-gray-200 text-gray-800 rounded p-2 mr-2 w-40"
+              />
+              <button onClick={togglePasswordVisibility}>
+                {showPassword ? <EyeOff className="w-5 h-5 text-gray-600" /> : <Eye className="w-5 h-5 text-gray-600" />}
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-4 mb-4">
             <button
-              key={tag}
-              onClick={() => handlePreferenceTagSelect(tag)}
-              className={`rounded-full py-1 px-3 ${
-                selectedPreferenceTags.includes(tag)
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              {tag}
+              onClick={() => setShowChangePasswordFields(!showChangePasswordFields)}
+              className="bg-indigo-600 text-white py-2 px-4 rounded-md">
+              Change Password
             </button>
-          ))}
+          </div>
+
+          {showChangePasswordFields && (
+            <div>
+              <div className="mb-2">
+                <label className="block text-gray-600">Old Password</label>
+                <input
+                  type="password"
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  className="bg-gray-200 text-gray-800 rounded p-2 w-full"
+                />
+              </div>
+              <div className="mb-2">
+                <label className="block text-gray-600">New Password</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="bg-gray-200 text-gray-800 rounded p-2 w-full"
+                />
+              </div>
+              <div className="mb-2">
+                <label className="block text-gray-600">Confirm Password</label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="bg-gray-200 text-gray-800 rounded p-2 w-full"
+                />
+              </div>
+              {passwordError && (
+                <div className="text-red-500 text-sm mb-4">{passwordError}</div>
+              )}
+              <button
+                onClick={handleChangePassword}
+                className="bg-indigo-600 text-white py-2 px-4 rounded-md">
+                Update Password
+              </button>
+            </div>
+          )}
         </div>
+
         <div className="mt-4 text-center">
           <button
-            onClick={onSave}
-            className="bg-indigo-600 text-white py-2 px-4 rounded-md mr-2"
-          >
-            Save Preferences
-          </button>
-          <button
             onClick={onClose}
-            className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md"
-          >
-            Cancel
+            className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md">
+            Close
           </button>
         </div>
       </div>
