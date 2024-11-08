@@ -40,7 +40,7 @@ const Login = () => {
             navigate("/TouristProfile");
         } 
         if(data.role === "advertiser") {
-            navigate("/advertiser");
+            navigate("/AdvertiserProfile");
         } 
         if(data.role === "tourguide") {
             navigate("/tgprofile");
@@ -48,6 +48,7 @@ const Login = () => {
         if(data.role === "seller") {
             navigate("/SellerProfile");
         }
+
         // const response2 = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
         //     headers: {
         //         Authorization: `Bearer ${localStorage.getItem("jwtToken")}`

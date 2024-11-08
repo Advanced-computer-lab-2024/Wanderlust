@@ -14,13 +14,11 @@ import AdminManageProductsPage from './Pages/AdminManageProductsPage';
 import AdminManageActivitiesPage from './Pages/AdminManageActivitiesPage';
 import AdminManagePreferenceTagsPage from './Pages/AdminManagePreferenceTagsPage';
 import AdminManageComplaintsPage from './Pages/AdminManageComplaintsPage';
-import Advertiser from './Pages/Advertiser';
 import ActivitiesPage from './Pages/Guest/ActivitiesPage';
 // import Tourist from './Pages/Tourist';
 import ItineraryTourist from './Pages/Tourist/ItineraryTourist';
 import LocationTourist from './Pages/Tourist/LocationTourist';
 import ActivityTourist from './Pages/Tourist/ActivityTourist';
-import SellerPage from './Pages/SellerPage';
 import ProductTourist from './Pages/Tourist/ProductTourist';
 import TourismGovernor from './Pages/TourismGovernor';
 import TgProfile from './Pages/Tourguide/Tgprofile';
@@ -33,6 +31,8 @@ import ItineraryTourguidePage from './Pages/Tourguide/ItineraryTourguidePage';
 import ActivityTourguidePage from './Pages/Tourguide/ActivityTourGuidePage';
 import SellerProductsPage from './Pages/Seller/SellerProductsPage';
 import SellerProfilePage from './Pages/Seller/SellerProfilePage';
+import AdvertiserProfilePage from './Pages/Advertiser/AdvertiserProfilePage';
+import AdvertiserActivitiesPage from './Pages/Advertiser/AdvertiserActivitiesPage';
 const App = () => {
   return (
     <Router>
@@ -49,8 +49,6 @@ const App = () => {
         <Route path="/manageactivities" element={<AdminManageActivitiesPage />} />
         <Route path="/managepreferencetags" element={<AdminManagePreferenceTagsPage />} />
         <Route path="/managecomplaints" element={<AdminManageComplaintsPage />} />
-        <Route path="/advertiser" element={<Advertiser />} />
-        <Route path="/seller" element={<SellerPage/>} />
         <Route path="/TourismGovernor" element={<TourismGovernor />} />
         <Route path="/complaint" element={<Complaint />} />
 
@@ -82,6 +80,9 @@ const App = () => {
         <Route path="/SellerProfile" element={<SellerProfilePage />} />
         <Route path="/SellerProducts" element={<SellerProductsPage />} />
 
+        {/* Advertiser Routes */}
+        <Route path="/AdvertiserProfile" element={<AdvertiserProfilePage />} />
+        <Route path="/AdvertiserActivities" element={<AdvertiserActivitiesPage />} />
         {/* <Route path="/advertiser" element={<Advertiser />} />
         <Route path="/seller" element={<Seller />} />
         <Route path="/tourism-governor" element={<TourismGovernor />} />
