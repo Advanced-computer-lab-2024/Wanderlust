@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import Activity from './Activity';
 import MultiRangeSlider from "multi-range-slider-react";
 import axios from 'axios';
+import CreateActivityForm from './CreateActivityForm';
 const Activities = ({ showCreateButton = true, showUpdateButton = true, showDeleteButton = true, onCreate }) => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [minValue, set_minValue] = useState(1);
   const [maxValue, set_maxValue] = useState(1000);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -106,6 +108,20 @@ const Activities = ({ showCreateButton = true, showUpdateButton = true, showDele
       setLoading(false);
     }
   }
+
+  const handleCreateActivity = () => {
+    setIsCreateModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsCreateModalOpen(false);
+  };
+
+  const handleCreateSuccess = () => {
+    // Refresh the activities list
+    fetchActivities();
+    handleCloseModal();
+  };
 
   return (
     <section className="bg-blue-50 px-4 py-10">
@@ -210,15 +226,15 @@ const Activities = ({ showCreateButton = true, showUpdateButton = true, showDele
 
           {/* Create Activity Button */}
           {showCreateButton && (
-            <div className="flex justify-center mb-6">
-              <button
-                onClick={onCreate}
-                className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
-              >
-                Create Activity
-              </button>
-            </div>
-          )}
+  <div className="flex justify-center mb-6">
+    <button
+      onClick={handleCreateActivity}
+      className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+    >
+      Create Activity
+    </button>
+  </div>
+)}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {activities.length > 0 ? (
@@ -238,6 +254,14 @@ const Activities = ({ showCreateButton = true, showUpdateButton = true, showDele
           </div>
         </div>
       </div>
+      {isCreateModalOpen && (
+      <CreateActivityForm
+        onClose={handleCloseModal}
+        onSubmit={handleCreateSuccess}
+      />
+    )}
+
+
     </section>
   );
 };
