@@ -20,7 +20,6 @@ import ItineraryTourist from './Pages/Tourist/ItineraryTourist';
 import LocationTourist from './Pages/Tourist/LocationTourist';
 import ActivityTourist from './Pages/Tourist/ActivityTourist';
 import ProductTourist from './Pages/Tourist/ProductTourist';
-import TourismGovernor from './Pages/TourismGovernorLocations';
 import TgProfile from './Pages/Tourguide/Tgprofile';
 import Complaint from './Components/Admin/Complaint';
 import ComplaintsTouristPage from './Pages/Tourist/ComplaintsTouristPage';
@@ -51,7 +50,6 @@ const App = () => {
         <Route path="/manageactivities" element={<AdminManageActivitiesPage />} />
         <Route path="/managepreferencetags" element={<AdminManagePreferenceTagsPage />} />
         <Route path="/managecomplaints" element={<AdminManageComplaintsPage />} />
-        <Route path="/TourismGovernor" element={<TourismGovernor />} />
         <Route path="/complaint" element={<Complaint />} />
 
 
