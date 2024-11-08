@@ -207,7 +207,7 @@ const SettingsPopup = ({ profile, username, onClose }) => {
         alert('Password updated successfully');
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'An error occurred. Please try again.';
+      const message = error.response?.data?.message || 'An error has occurred. Please try again.';
       alert(`Error: ${message}`);
     }
   };
