@@ -45,6 +45,9 @@ const Login = () => {
         if(data.role === "tourguide") {
             navigate("/tgprofile");
         }
+        if(data.role === "seller") {
+            navigate("/SellerProfile");
+        }
         // const response2 = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
         //     headers: {
         //         Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
