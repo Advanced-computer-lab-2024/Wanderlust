@@ -7,25 +7,12 @@ const TouristProfile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [preferenceTagOptions, setPreferenceTagOptions] = useState([]);
-  const [selectedPreferenceTags, setSelectedPreferenceTags] = useState([]);
   const [username, setUsername] = useState("");
-  const [showPreference, setShowpreference] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  
 
   useEffect(() => {
     fetchProfile();
-    fetchPreferenceTags();
   }, []);
-
-  const handlePreferenceTagSelect = (tag) => {
-    if (selectedPreferenceTags.includes(tag)) {
-      setSelectedPreferenceTags(selectedPreferenceTags.filter((t) => t !== tag));
-    } else {
-      setSelectedPreferenceTags([...selectedPreferenceTags, tag]);
-    }
-  };
 
   const fetchProfile = async () => {
     try {
@@ -35,8 +22,7 @@ const TouristProfile = () => {
         }),
         axios.get("http://localhost:8000/api/admin/getLoggedInUser", {
           headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
-        }),
-        
+        })
       ]);
 
       const combinedData = {
@@ -45,6 +31,7 @@ const TouristProfile = () => {
       };
 
       setProfile(combinedData);
+      console.log("Profile data:", combinedData);
     } catch (error) {
       console.error("Error fetching profile:", error);
       setError(error);
@@ -53,48 +40,13 @@ const TouristProfile = () => {
     }
   };
 
-  const fetchPreferenceTags = async () => {
-    try {
-      const response = await axios.get("http://localhost:8000/api/preferenceTag/getpreferenceTags");
-      setPreferenceTagOptions(response.data.map((tag) => tag.name));
-    } catch (error) {
-      console.error("Error fetching preference tags:", error);
-      setError(error);
-    }
-  };
-
   const handleAddPreference = () => {
-    setShowpreference(true);
-  };
-
-  const handleSavePreferences = async () => {
-    try {
-      await axios.put(`http://localhost:8000/api/preferenceTag/updateTouristPref/${profile._id}`, {
-        preferences: selectedPreferenceTags
-      }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
-      });
-      console.log(profile.id);
-      setProfile((prevProfile) => ({
-        ...prevProfile,
-        preferences: selectedPreferenceTags
-      }));
-      setShowpreference(false);
-    } catch (error) {
-      console.error("Error saving preferences:", error);
-      setError(error);
-    }
+    console.log("Add Preference clicked");
   };
 
   const toggleSettings = () => {
     setShowSettings(!showSettings);
   };
-
-  const togglePreference = () => {
-    setShowpreference(!showPreference);
-  };
-
-
 
   if (loading) return (
     <div className="flex justify-center items-center h-64">
@@ -136,17 +88,7 @@ const TouristProfile = () => {
           </div>
         </div>
 
-        {showPreference && (
-      <PreferencePopup
-        onClose={togglePreference}
-        onSave={handleSavePreferences}
-        preferenceTagOptions={preferenceTagOptions}
-        selectedPreferenceTags={selectedPreferenceTags}
-        handlePreferenceTagSelect={handlePreferenceTagSelect}
-      />
-    )}
-
-{showSettings && <SettingsPopup profile={profile} username={username} onClose={toggleSettings} />}
+        {showSettings && <SettingsPopup profile={profile} username={username} onClose={toggleSettings} />}
 
         <Card>
           <div className="profile-container">
@@ -234,52 +176,6 @@ const StatCard = ({ icon, title, value }) => (
     <p className="text-2xl font-bold text-indigo-600">{value}</p>
   </div>
 );
-
-const PreferencePopup = ({
-  onClose,
-  onSave,
-  preferenceTagOptions,
-  selectedPreferenceTags,
-  handlePreferenceTagSelect,
-}) => {
-  return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="absolute inset-0 bg-black opacity-50" onClick={onClose}></div>
-      <div className="bg-white rounded-lg shadow-lg p-6 z-10">
-        <h3 className="text-xl font-semibold text-indigo-600 mb-4">Add Preferences</h3>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {preferenceTagOptions.map((tag) => (
-            <button
-              key={tag}
-              onClick={() => handlePreferenceTagSelect(tag)}
-              className={`rounded-full py-1 px-3 ${
-                selectedPreferenceTags.includes(tag)
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              {tag}
-            </button>
-          ))}
-        </div>
-        <div className="mt-4 text-center">
-          <button
-            onClick={onSave}
-            className="bg-indigo-600 text-white py-2 px-4 rounded-md mr-2"
-          >
-            Save Preferences
-          </button>
-          <button
-            onClick={onClose}
-            className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const SettingsPopup = ({ profile, username, onClose }) => {
   const [showPassword, setShowPassword] = useState(false);
