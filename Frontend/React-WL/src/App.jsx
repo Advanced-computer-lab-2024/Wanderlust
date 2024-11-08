@@ -20,7 +20,6 @@ import ItineraryTourist from './Pages/Tourist/ItineraryTourist';
 import LocationTourist from './Pages/Tourist/LocationTourist';
 import ActivityTourist from './Pages/Tourist/ActivityTourist';
 import ProductTourist from './Pages/Tourist/ProductTourist';
-import TourismGovernor from './Pages/TourismGovernor';
 import TgProfile from './Pages/Tourguide/Tgprofile';
 import Complaint from './Components/Admin/Complaint';
 import ComplaintsTouristPage from './Pages/Tourist/ComplaintsTouristPage';
@@ -33,6 +32,8 @@ import SellerProductsPage from './Pages/Seller/SellerProductsPage';
 import SellerProfilePage from './Pages/Seller/SellerProfilePage';
 import AdvertiserProfilePage from './Pages/Advertiser/AdvertiserProfilePage';
 import AdvertiserActivitiesPage from './Pages/Advertiser/AdvertiserActivitiesPage';
+import TourismGovernorLocationsPage from './Pages/TourismGovernor/TourismGovrernorLocationsPage';
+import TourismGovernorProfilePage from './Pages/TourismGovernor/TourismGovrernorProfilePage';
 const App = () => {
   return (
     <Router>
@@ -49,7 +50,6 @@ const App = () => {
         <Route path="/manageactivities" element={<AdminManageActivitiesPage />} />
         <Route path="/managepreferencetags" element={<AdminManagePreferenceTagsPage />} />
         <Route path="/managecomplaints" element={<AdminManageComplaintsPage />} />
-        <Route path="/TourismGovernor" element={<TourismGovernor />} />
         <Route path="/complaint" element={<Complaint />} />
 
 
@@ -83,11 +83,11 @@ const App = () => {
         {/* Advertiser Routes */}
         <Route path="/AdvertiserProfile" element={<AdvertiserProfilePage />} />
         <Route path="/AdvertiserActivities" element={<AdvertiserActivitiesPage />} />
-        {/* <Route path="/advertiser" element={<Advertiser />} />
-        <Route path="/seller" element={<Seller />} />
-        <Route path="/tourism-governor" element={<TourismGovernor />} />
-        <Route path="/tourist" element={<Tourist />} />
-        <Route path="/register" element={<Register />} />*/}
+
+        {/* Tourism Governor Routes */}
+        <Route path="/TourismGovernorProfile" element={<TourismGovernorProfilePage />} />
+        <Route path="/TourismGovernorLocations" element={<TourismGovernorLocationsPage />} />
+
       </Routes> 
     </Router>
   );
