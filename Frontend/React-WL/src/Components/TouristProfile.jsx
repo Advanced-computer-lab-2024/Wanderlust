@@ -188,33 +188,29 @@ const SettingsPopup = ({ profile, username, onClose }) => {
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   const handleChangePassword = async () => {
-    console.log(oldPassword);
     try {
-        const response = await axios.post(
-            'http://localhost:8000/api/admin/updatePassword',
-            {
-                oldPassword: oldPassword,
-                newPassword: newPassword,
-                confirmPassword: confirmPassword
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
-                }
-            }
-        );
+      const response = await axios.post(
+        'http://localhost:8000/api/admin/updatePassword',
+        {
+          oldPassword,
+          newPassword,
+          confirmPassword
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
+          }
+        }
+      );
 
-        if (response.status === 200) {
-            alert('Password updated successfully');
-        }
+      if (response.status === 200) {
+        alert('Password updated successfully');
+      }
     } catch (error) {
-        if (error.response && error.response.data && error.response.data.message) {
-            alert(`Error: ${error.response.data.message}`);
-        } else {
-            alert('An error occurred. Please try again.');
-        }
+      const message = error.response?.data?.message || 'An error occurred. Please try again.';
+      alert(`Error: ${message}`);
     }
-};
+  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -224,84 +220,85 @@ const SettingsPopup = ({ profile, username, onClose }) => {
         <div className="mb-4">
           <h4 className="text-lg font-semibold text-indigo-600 mb-2">Account Details</h4>
           <div className="mb-2">
-            <label className="block text-gray-600">Username</label>
-            <p className="text-gray-800">{profile.username}</p>
+            <label className="text-gray-700 font-semibold">Username</label>
+            <p>{profile.username}</p>
           </div>
           <div className="mb-2">
-            <label className="block text-gray-600">Email</label>
-            <p className="text-gray-800">{profile.email}</p>
+            <label className="text-gray-700 font-semibold">Email</label>
+            <p>{profile.email}</p>
           </div>
           <div className="mb-2">
-            <label className="block text-gray-600">Password</label>
+            <label className="text-gray-700 font-semibold">Password</label>
             <div className="flex items-center">
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 value={profile.password || ""}
-                readOnly
-                className="bg-gray-200 text-gray-800 rounded p-2 mr-2 w-40"
+                disabled
+                className="border rounded px-2 py-1 w-full"
               />
-              <button onClick={togglePasswordVisibility}>
-                {showPassword ? <EyeOff className="w-5 h-5 text-gray-600" /> : <Eye className="w-5 h-5 text-gray-600" />}
+              <button onClick={togglePasswordVisibility} className="ml-2">
+                {showPassword ? <EyeOff /> : <Eye />}
               </button>
             </div>
           </div>
-
-          <div className="mt-4 mb-4">
-            <button
-              onClick={() => setShowChangePasswordFields(!showChangePasswordFields)}
-              className="bg-indigo-600 text-white py-2 px-4 rounded-md">
-              Change Password
-            </button>
-          </div>
+          <button
+            onClick={() => setShowChangePasswordFields(true)}
+            className="text-indigo-600 font-semibold"
+          >
+            Change Password
+          </button>
 
           {showChangePasswordFields && (
-            <div>
+            <div className="mt-4">
               <div className="mb-2">
-                <label className="block text-gray-600">Old Password</label>
+                <label className="text-gray-700 font-semibold">Old Password</label>
                 <input
                   type="password"
                   value={oldPassword}
                   onChange={(e) => setOldPassword(e.target.value)}
-                  className="bg-gray-200 text-gray-800 rounded p-2 w-full"
+                  className="border rounded px-2 py-1 w-full"
                 />
               </div>
               <div className="mb-2">
-                <label className="block text-gray-600">New Password</label>
+                <label className="text-gray-700 font-semibold">New Password</label>
                 <input
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="bg-gray-200 text-gray-800 rounded p-2 w-full"
+                  className="border rounded px-2 py-1 w-full"
                 />
               </div>
               <div className="mb-2">
-                <label className="block text-gray-600">Confirm Password</label>
+                <label className="text-gray-700 font-semibold">Confirm Password</label>
                 <input
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="bg-gray-200 text-gray-800 rounded p-2 w-full"
+                  className="border rounded px-2 py-1 w-full"
                 />
               </div>
-              {passwordError && (
-                <div className="text-red-500 text-sm mb-4">{passwordError}</div>
-              )}
+              {passwordError && <p className="text-red-600">{passwordError}</p>}
               <button
                 onClick={handleChangePassword}
-                className="bg-indigo-600 text-white py-2 px-4 rounded-md">
+                className="bg-indigo-600 text-white rounded px-4 py-2 mt-2"
+              >
                 Update Password
               </button>
             </div>
           )}
         </div>
 
-        <div className="mt-4 text-center">
-          <button
-            onClick={onClose}
-            className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md">
-            Close
-          </button>
+        <div className="mt-6">
+          <h4 className="text-lg font-semibold text-indigo-600 mb-2">Complaints</h4>
+          <p className="text-gray-500">No complaints found</p>
         </div>
+
+        <button
+          onClick={onClose}
+          className="mt-4 bg-red-600 text-white rounded px-4 py-2"
+        >
+          Close
+        </button>
       </div>
     </div>
   );
