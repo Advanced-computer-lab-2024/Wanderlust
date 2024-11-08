@@ -118,7 +118,7 @@ const Register = () => {
       formD1.append("file", documents.idTourGuideDocument);
       const userType = "TourGuide";
       var documentType = "id";
-      const responseDocId = await axios.post(
+      const responseDocId = await axios.put(
         `http://localhost:8000/api/documents/uploadDocument/${userType}/${documentType}`,
         formD1,
         {
@@ -128,7 +128,7 @@ const Register = () => {
       formD1.delete("file");
       formD1.append("file", documents.certificateTourGuideDocument);
       documentType = "certificate";
-      const responseDocCert = await axios.post(
+      const responseDocCert = await axios.put(
         `http://localhost:8000/api/documents/uploadDocument/${userType}/${documentType}`,
         formD1,
         {
@@ -152,7 +152,7 @@ const Register = () => {
       formD1.append("file", documents.idSellerDocument);
       var documentType = "id";
       const userType = "Seller";
-      const responseDocId = await axios.post(
+      const responseDocId = await axios.put(
         `http://localhost:8000/api/documents/uploadDocument/${userType}/${documentType}`,
         formD1,
         {
@@ -162,7 +162,7 @@ const Register = () => {
       formD1.delete("file");
       formD1.append("file", documents.taxationRegistryCardSellerDocument);
       documentType = "taxation";
-      const responseDocTax = await axios.post(
+      const responseDocTax = await axios.put(
         `http://localhost:8000/api/documents/uploadDocument/${userType}/${documentType}`,
         formD1,
         {
@@ -186,7 +186,7 @@ const Register = () => {
       formD1.append("file", documents.idAdvertiserDocument);
       var documentType = "id";
       const userType = "Advertiser";
-      const responseDocId = await axios.post(
+      const responseDocId = await axios.put(
         `http://localhost:8000/api/documents/uploadDocument/${userType}/${documentType}`,
         formD1,
         {
@@ -196,7 +196,7 @@ const Register = () => {
       formD1.delete("file");
       formD1.append("file", documents.taxationRegistryCardAdvertiserDocument);
       documentType = "taxation";
-      const responseDocTax = await axios.post(
+      const responseDocTax = await axios.put(
         `http://localhost:8000/api/documents/uploadDocument/${userType}/${documentType}`,
         formD1,
         {
