@@ -9,7 +9,6 @@ const {
     searchItinerary,
     filterItinerairies,
     filterItinerariesByPref,
-    getExchangeRates,
     bookItinerary,
     cancelItineraryBooking,
     addComment,
@@ -24,7 +23,6 @@ const {
   router.get("/searchItinerary", searchItinerary);
   router.get("/filterItineraries", filterItinerairies);
   router.get("/filterItinerariesByPref", filterItinerariesByPref);
-  router.get('/exchangeRates', getExchangeRates);
   router.post('/bookItinerary',bookItinerary);
   router.delete("/cancelItineraryBooking/:bookingId", cancelItineraryBooking);
   router.post('/:itineraryId/comments', addComment);

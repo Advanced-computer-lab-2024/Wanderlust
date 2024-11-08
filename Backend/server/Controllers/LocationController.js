@@ -1,6 +1,7 @@
 const locationModel = require("../Models/Locations.js");
 const preferenceTagModel = require("../Models/PreferenceTag.js");
 const { default: mongoose } = require("mongoose");
+const { convertCurrency } = require('./currencyConverter');
 
 // Create a new location
 const createLocation = async (req, res) => {
@@ -38,11 +39,24 @@ const createLocation = async (req, res) => {
 
 // Get all locations
 const getLocations = async (req, res) => {
+  const { currency } = req.query; // Get the selected currency from query parameters
   try {
-    const locations = await locationModel.find().populate("tags"); // Retrieve all locations from the database
-    res.status(200).json(locations); // Send the locations as a response
+    const locations = await locationModel.find().populate('tags');
+
+    if (currency) {
+      const convertedLocations = await Promise.all(
+        locations.map(async (item) => {
+          const convertedItem = item.toObject(); // Convert Mongoose document to plain JavaScript object
+          convertedItem.ticketPrices = await convertCurrency(convertedItem.ticketPrices, currency); // Convert ticket price to selected currency
+          return convertedItem;
+        })
+      );
+      return res.status(200).json(convertedLocations);
+    }
+
+    res.status(200).json(locations);
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving locations", error });
+    res.status(500).json({ message: "Error fetching locations", error: error.message });
   }
 };
 

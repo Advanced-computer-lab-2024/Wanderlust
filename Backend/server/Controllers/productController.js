@@ -1,5 +1,6 @@
 const Product = require("../Models/Products.js");
 const jwt = require('jsonwebtoken');
+const { convertCurrency } = require('./currencyConverter');
 
 // Add a new product
 const addProduct = async (req, res) => {
@@ -97,6 +98,7 @@ const searchProductByName = async (req, res) => {
 };
 // Filter products by price
 const filterProductsByPrice = async (req, res) => {
+  const { currency } = req.query; // Get the selected currency from query parameters
   try {
     const { minPrice, maxPrice } = req.query;
     if (!minPrice && !maxPrice) {
@@ -104,19 +106,26 @@ const filterProductsByPrice = async (req, res) => {
         .status(400)
         .json({ message: "At least one of minPrice or maxPrice is required" });
     }
-
     const query = {};
     if (minPrice) query.price = { $gte: Number(minPrice) };
     if (maxPrice) query.price = { ...query.price, $lte: Number(maxPrice) };
 
     const products = await Product.find(query).populate("seller");
-    if (products.length === 0) {
-      return res.status(404).json({ message: "No products found" });
+
+    if (currency) {
+      const convertedProducts = await Promise.all(
+        products.map(async (item) => {
+          const convertedItem = item.toObject(); 
+          convertedItem.price = await convertCurrency(convertedItem.price, currency); 
+          return convertedItem;
+        })
+      );
+      return res.status(200).json({ products: convertedProducts });
     }
 
     res.status(200).json({ products });
   } catch (error) {
-    console.error("Error filtering products:", error);
+    console.error("Error filtering products by price:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
