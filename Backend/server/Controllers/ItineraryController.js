@@ -2,6 +2,7 @@ const axios = require('axios');
 const Itinerary = require("../Models/Itinerary");
 const Activity = require("../Models/Activity");
 const PreferenceTagModel = require("../Models/PreferenceTag");
+const { convertCurrency } = require('./currencyConverter');
 
 const createItinerary = async (req, res) => {
   const {
@@ -39,15 +40,6 @@ const createItinerary = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
-
-const getExchangeRates = async (req, res) => {
-  try {
-    const response = await axios.get('https://v6.exchangerate-api.com/v6/77676a6e9ec92dc31f556a19/latest/USD'); 
-    res.status(200).json(response.data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
 //u have to enter currency wanted in postman example
 //http://localhost:8000/api/itinerary/getItinerary?currency=EUR
 const getItinerary = async (req, res) => {
@@ -55,28 +47,34 @@ const getItinerary = async (req, res) => {
   try {
     const itineraries = await Itinerary.find().populate({
       path: 'activities',
-      populate: { path: 'category tags' }, // Populate nested fields if needed
+      populate: { path: 'category tags' },
     });
+
     if (currency) {
-      const response = await axios.get('https://v6.exchangerate-api.com/v6/77676a6e9ec92dc31f556a19/latest/USD'); // Replace with your base currency
-      const rates = response.data.conversion_rates;
-      if (!rates[currency]) {
-        return res.status(400).json({ error: `Currency code ${currency} not found in exchange rates.` });
-      }
-      const conversionRate = rates[currency];
-      const convertedItineraries = itineraries.map((item) => {
-        const convertedItem = item.toObject(); // Convert Mongoose document to plain JavaScript object
-        convertedItem.price = (convertedItem.price * conversionRate).toFixed(2); // Convert price to selected currency
-        return convertedItem;
-      });
+      const convertedItineraries = await Promise.all(
+        itineraries.map(async (item) => {
+          const convertedItem = item.toObject(); // Convert Mongoose document to plain JavaScript object
+          convertedItem.price = await convertCurrency(convertedItem.price, currency); // Convert itinerary price to selected currency
+
+          // Convert prices of activities within the itinerary
+          convertedItem.activities = await Promise.all(
+            convertedItem.activities.map(async (activity) => {
+              activity.price = await convertCurrency(activity.price, currency);
+              return activity;
+            })
+          );
+
+          return convertedItem;
+        })
+      );
       return res.status(200).json(convertedItineraries);
     }
+
     res.status(200).json(itineraries);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
-
 const updateItinerary = async (req, res) => {
   const {
     id,
@@ -356,7 +354,6 @@ module.exports = {
   searchItinerary,
   filterItinerairies,
   filterItinerariesByPref,
-  getExchangeRates,
   bookItinerary,
   cancelItineraryBooking,
   addComment,

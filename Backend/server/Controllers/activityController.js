@@ -3,6 +3,7 @@ const { default: mongoose, get } = require("mongoose");
 const { findById } = require("../Models/tourGuide.js");
 const ActivityCatModel = require("../Models/ActivityCat.js");
 const User = require('../Models/user');
+const { convertCurrency } = require('./currencyConverter');
 
 const createActivity = async (req, res) => {
   const {
@@ -44,10 +45,23 @@ const createActivity = async (req, res) => {
 };
 
 const getActivity = async (req, res) => {
+  const { currency } = req.query; // Get the selected currency from query parameters
   try {
     const activities = await Activity.find()
-      .populate("category")
-      .populate("tags");
+      .populate('category')
+      .populate('tags');
+
+    if (currency) {
+      const convertedActivities = await Promise.all(
+        activities.map(async (item) => {
+          const convertedItem = item.toObject(); 
+          convertedItem.price = await convertCurrency(convertedItem.price, currency); 
+          return convertedItem;
+        })
+      );
+      return res.status(200).json(convertedActivities);
+    }
+
     res.status(200).json(activities);
   } catch (error) {
     res.status(400).json({ error: error.message });
