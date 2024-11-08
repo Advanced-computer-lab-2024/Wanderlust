@@ -26,6 +26,9 @@ const AdminDashboardComponent = () => {
     const handleManageComplaints = () => {
         navigate('/managecomplaints');
     }
+    const handleViewProducts = () => {
+        navigate('/adminviewproducts');
+    }
 
     return (
         <div className="p-4">
@@ -68,6 +71,11 @@ const AdminDashboardComponent = () => {
                     <p>View and manage all complaints.</p>
                     <button className="btn btn-primary" onClick={handleManageComplaints}>Manage Complaints</button>
                 </div>
+                {/* <div className="flex-fill border rounded p-4 shadow-sm" style={{ flex: '1 1 calc(33.333% - 20px)' }}>
+                    <h2 className='text-gray-800 font-semibold'>View Product Details</h2>
+                    <p>View the available quantity, and sales of each product.</p>
+                    <button className="btn btn-primary" onClick={handleViewProducts}>View Products</button>
+                </div> */}
             </div>
         </div>
     );
