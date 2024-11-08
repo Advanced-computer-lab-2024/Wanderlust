@@ -247,25 +247,26 @@ const filterItinerariesByPref = async (req, res) => {
   }
 }
 
-
 const bookItinerary = async (req, res) => {
   try {
-      const { itineraryId, userId } = req.body;
+    const { itineraryId, userId } = req.body;
 
-      // Create a new booking
-      const newBooking = new Booking({
-          itineraryId,
-          userId,
-      });
+    // Create a new booking
+    const newBooking = new Booking({
+      itineraryId,
+      userId,
+    });
 
-      await newBooking.save(); // Save to the database
+    await newBooking.save(); // Save to the database
 
-      res.status(201).json({ message: 'Booking successful!' });
+    res.status(201).json({ message: 'Booking successful!' });
   } catch (error) {
-      console.error('Error booking itinerary:', error);
-      res.status(500).json({ message: 'Error booking itinerary' });
+    console.error('Error booking itinerary:', error);
+    res.status(500).json({ message: 'Error booking itinerary' });
   }
 };
+
+
 const cancelItineraryBooking = async (req, res) => {
   const { bookingId } = req.params; // Get the booking ID from the request params
 
