@@ -296,23 +296,23 @@ const cancelItineraryBooking = async (req, res) => {
   const { bookingId } = req.params; // Get the booking ID from the request params
 
   try {
-    const booking = await ItineraryBooking.findById(bookingId);
+    const booking = await Booking.findById(bookingId);
 
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
     }
+    const itinerary = await Itinerary.findById(booking.itineraryId);
 
     // Check if the itinerary start time is more than 48 hours away
     const currentTime = new Date();
-    const itineraryTime = new Date(booking.itineraryStartTime); // Assume you have an itineraryStartTime field
+    const itineraryTime = new Date(itinerary.timeline.start); // Assume you have an itineraryStartTime field
 
     const timeDifference = itineraryTime - currentTime; // in milliseconds
     const hoursDifference = timeDifference / (1000 * 60 * 60); // convert to hours
 
     if (hoursDifference < 48) {
       return res.status(400).json({
-        message:
-          "Cannot cancel booking less than 48 hours before the itinerary",
+        message: `Cannot cancel booking less than 48 hours before the itinerary, hoursDifference=${hoursDifference}`,
       });
     }
 
@@ -320,7 +320,7 @@ const cancelItineraryBooking = async (req, res) => {
     await ItineraryBooking.deleteOne({ _id: bookingId });
     return res.status(200).json({ message: "Booking cancelled successfully" });
   } catch (error) {
-    return res.status(500).json({ message: "Error cancelling booking" });
+    return res.status(500).json({ message: error.message });
   }
 };
 
