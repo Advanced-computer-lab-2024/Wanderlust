@@ -423,7 +423,7 @@ const Register = () => {
                 >
                   <option value="">Select seller type</option>
                   <option value="VTP">VTP</option>
-                  <option value="external">External</option>
+                  <option value="External">External</option>
                 </select>
               </div>
 
