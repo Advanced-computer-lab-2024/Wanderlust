@@ -265,11 +265,46 @@ const getLoggedInInfo = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 }
+const acceptTerms = async (req, res) => {
+    try {
+        const authHeader = req.header('Authorization');
+        if (!authHeader) {
+            return res.status(401).json({ message: 'Authorization header missing' });
+        }
+        const token = authHeader.replace('Bearer ', '');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userCollections = {
+            tourguide: tourguideModel,
+            advertiser: advertiserModel,
+            seller: sellerModel,
+        };
+
+        const userModel = userCollections[decoded.role];
+        if (!userModel) {
+            return res.status(400).json({ message: 'Invalid role' });
+        }
+
+        const user = await userModel.findOne({ _id : decoded.id });
+        if (!user) {
+            console.log('User not found');
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const actualUser = await actualUserModel.findOne({ _id : user.userId });
+        actualUser.termsAccepted = true;
+        await actualUser.save();
+        res.status(200).json({ success: true });
+    }
+    catch (error) {
+        console.error('Error accepting terms:', error); 
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+}
 
 module.exports = {
     login,
     updatePassword,
     authenticateUser,
     getLoggedInUser,
-    getLoggedInInfo
+    getLoggedInInfo,
+    acceptTerms,
 };

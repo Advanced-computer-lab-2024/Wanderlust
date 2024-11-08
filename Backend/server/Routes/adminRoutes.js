@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../Controllers/adminController');
-const { login, updatePassword, authenticateUser, getLoggedInUser , getLoggedInInfo } = require('../Controllers/authController');
+const { login, updatePassword, authenticateUser, getLoggedInUser , getLoggedInInfo , acceptTerms} = require('../Controllers/authController');
 
 router.use(express.json())
 router.post("/addTourismGovernor",adminController.addTourismGovernor);
@@ -16,6 +16,7 @@ router.post('/login', login);
 router.post('/updatepassword', authenticateUser, updatePassword);
 router.get('/getLoggedInUser', getLoggedInUser);
 router.get('/getLoggedInInfo', getLoggedInInfo);
+router.post('/acceptTerms', acceptTerms);
 
 
 module.exports = router;

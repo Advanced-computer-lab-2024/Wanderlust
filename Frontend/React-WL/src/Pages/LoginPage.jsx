@@ -7,6 +7,7 @@ import GuestNavBar from "../Components/NavBars/GuestNavBar";
 const Login = () => {
     const [role, setRole] = useState("");
     const navigate = useNavigate();
+    const [showTerms, setShowTerms] = useState(false);
     const [formData, setFormData] = useState({
         username: "",
         password: "",
@@ -19,6 +20,23 @@ const Login = () => {
             [name]: value,
         }));
     };
+    const handleAcceptTerms = async () => {
+        const response = await axios.post("http://localhost:8000/api/admin/acceptTerms", {}, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
+            }
+        });
+        if (response.data.success) {
+            setShowTerms(false);
+            if (role === "tourguide") {
+                navigate("/tgprofile");
+            } else if (role === "seller") {
+                navigate("/SellerProfile");
+            } else if (role === "advertiser") {
+                navigate("/AdvertiserProfile");
+            }
+        }
+    };
 
     const handleRoleChange = (e) => {
         setRole(e.target.value);
@@ -30,27 +48,47 @@ const Login = () => {
             password: formData.password,
             role: role,
         }
-            const response = await axios.post("http://localhost:8000/api/admin/login", data);
+        const response = await axios.post("http://localhost:8000/api/admin/login", data);
         console.log(response.data.token);
-            localStorage.setItem("jwtToken", response.data.token);
+        localStorage.setItem("jwtToken", response.data.token);
         if(data.role === "admin") {
             navigate("/admindashboard");
         } 
-        if(data.role === "tourist") {
+        else if(data.role === "tourist") {
             navigate("/TouristProfile");
         } 
-        if(data.role === "advertiser") {
-            navigate("/AdvertiserProfile");
-        } 
-        if(data.role === "tourguide") {
-            navigate("/tgprofile");
-        }
-        if(data.role === "seller") {
-            navigate("/SellerProfile");
-        }
-        if(data.role === "tourismGovernor") {
+        else if(data.role === "tourismGovernor") {
             navigate("/TourismGovernorProfile");
         }
+        if(data.role === "tourguide" || data.role === "seller" || data.role === "advertiser") {
+            const response2 = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
+                }
+            });
+            console.log(response2.data);
+            if(response2.data.termsAccepted == true){
+                if(data.role === "tourguide") {
+                    navigate("/tgprofile");
+                } else if(data.role === "seller") {
+                    navigate("/SellerProfile");
+                } else if(data.role === "advertiser") {
+                    navigate("/AdvertiserProfile");
+                }
+            } else {
+                setShowTerms(true);
+            }
+        }
+        // else if(data.role === "advertiser") {
+        //     navigate("/AdvertiserProfile");
+        // } 
+        // else if(data.role === "tourguide") {
+        //     navigate("/tgprofile");
+        // }
+        // else if(data.role === "seller") {
+        //     navigate("/SellerProfile");
+        // }
+
 
         // const response2 = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
         //     headers: {
@@ -121,7 +159,25 @@ const Login = () => {
                     </Link>
                 </div>
             </div>
+
+    {showTerms && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-8 rounded shadow-lg max-w-lg">
+                <h2 className="text-2xl font-bold mb-4">Terms and Conditions</h2>
+                <p className="mb-4">
+                    Please read and accept our terms and conditions to proceed.
+                </p>
+                <button
+                    onClick={handleAcceptTerms}
+                    className="bg-indigo-600 text-white p-2 rounded-md"
+                >
+                    Accept Terms
+                </button>
+            </div>
+        </div>
+    )}
         </>
+    
     );
 };
 
