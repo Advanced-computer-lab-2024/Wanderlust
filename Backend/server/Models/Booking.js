@@ -6,12 +6,10 @@ const BookingSchema = new mongoose.Schema({
   activityId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Activity", // Reference to the Activity model
-    required: true,
   },
-  itineraryId:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Itinerary",
-    required: true,
+  itineraryId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Itinerary",
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
