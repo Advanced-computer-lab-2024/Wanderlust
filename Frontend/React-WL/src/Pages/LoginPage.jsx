@@ -48,6 +48,9 @@ const Login = () => {
         if(data.role === "seller") {
             navigate("/SellerProfile");
         }
+        if(data.role === "tourismGovernor") {
+            navigate("/TourismGovernorProfile");
+        }
 
         // const response2 = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
         //     headers: {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../Components/Navbar';
 
-const TourismGovernor = () => {
+const TourismGovernorLocations = () => {
   const [locations, setLocations] = useState([]);
   const [tags, setTags] = useState([]);
   const [locationForm, setLocationForm] = useState({
@@ -166,13 +166,6 @@ const TourismGovernor = () => {
 
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#f4f4f4', padding: '20px' }}>
-      <Navbar 
-        t1={"Profile"} p1={"/tgProfile"} 
-        
-         
-        
-      />
-
       <h1 className="text-3xl font-bold text-indigo-500 mb-6 text-center">Manage Locations</h1>
       <button
         onClick={() => setLocationFormVisible(!isLocationFormVisible)}
@@ -280,4 +273,4 @@ const TourismGovernor = () => {
   );
 };
 
-export default TourismGovernor;
+export default TourismGovernorLocations;
