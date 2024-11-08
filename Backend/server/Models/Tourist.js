@@ -28,7 +28,7 @@ const touristSchema = new Schema({
     type: Number,
     default: 0,
   },
-  badge: { type: String, default: "None" },
+  badge: { type: String, default: "Bronze" },
   createdAt: {
     type: Date,
     default: Date.now,
