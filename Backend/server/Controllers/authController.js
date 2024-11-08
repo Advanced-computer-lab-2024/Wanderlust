@@ -76,6 +76,11 @@ const login = async (req, res) => {
                 console.log('Invalid credentials');
                 return res.status(400).json({ message: 'Invalid credentials' });
             }
+            if( user.roleApplicationStatus != "approved"){
+                console.log('Your application is still pending');
+                return res.status(400).json({ message: 'Your application is still pending' });
+
+            }
             const userCollections = {
                 tourguide: tourguideModel,
                 tourist: touristModel,

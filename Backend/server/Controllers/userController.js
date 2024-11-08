@@ -9,13 +9,14 @@ const signUp = async (req, res) => {
     let termsAccepted;
     if(role === "tourist"){
         termsAccepted = true;
+        roleApplicationStatus = "approved";
     }
     else{
         termsAccepted = false;
     }
-    console.log(username, email, password, mobileNumber, role, termsAccepted);
+    console.log(username, email, password, mobileNumber, role, termsAccepted , roleApplicationStatus);
     try {
-        const newUser = new userModel({ username, email, password,mobileNumber, role,termsAccepted});
+        const newUser = new userModel({ username, email, password,mobileNumber, role,termsAccepted , roleApplicationStatus });
         await newUser.save();
         res.status(201).json(newUser);
     } catch (error) {
