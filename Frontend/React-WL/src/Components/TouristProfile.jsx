@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Card from './Card';
-import { Phone, User, Mail, Clock, Briefcase, Award, Star, Wallet, BarChart2, PlusCircle, Settings, Eye, EyeOff } from 'lucide-react';
+import { Phone, User, Mail, Clock, Briefcase, Award, Star, Wallet, BarChart2, PlusCircle, Settings, Eye, EyeOff, Medal } from 'lucide-react';
 
 const TouristProfile = () => {
   const [profile, setProfile] = useState(null);
@@ -13,6 +13,16 @@ const TouristProfile = () => {
   const [showPreference, setShowpreference] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   
+  const getBadgeColor = (badge) => {
+    switch (badge) {
+      case 'Gold':
+        return 'text-yellow-500';
+      case 'Silver':
+        return 'text-gray-400';
+      default:
+        return 'text-yellow-800'; // Bronze or None
+    }
+  };
 
   useEffect(() => {
     fetchProfile();
@@ -94,6 +104,48 @@ const TouristProfile = () => {
     setShowpreference(!showPreference);
   };
 
+  const redeemPoints = async () => {
+    const username =profile.username;  
+    if(profile.points<10000){
+      alert("Insufficient Points");
+    }
+    else{
+      alert("Points Redeemed Successfully");
+
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8000/api/tourist/redeemPoints/${username}`, {
+        method: 'PUT', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to redeem points');
+      }
+
+      const data = await response.json();
+      console.log('Redeemed successfully:', data);
+      setProfile((prevProfile) => ({
+        ...prevProfile,
+        points: data.points, // Update points
+        wallet: data.wallet, // Update wallet
+      }));
+
+    
+    } catch (error) {
+      console.error('Error:', error);
+
+      // Show error notification
+      alert("Insufficient Points");
+
+
+    }
+  };
+  
+
 
 
   if (loading) return (
@@ -113,28 +165,41 @@ const TouristProfile = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex space-x-6">
-            <div className="flex items-center text-indigo-600">
-              <Star className="w-6 h-6 mr-1" />
-              <span className="text-lg font-semibold">Level: {profile.level}</span>
-            </div>
-            <div className="flex items-center text-indigo-600">
-              <BarChart2 className="w-6 h-6 mr-1" />
-              <span className="text-lg font-semibold">Points: {profile.points}</span>
-            </div>
-            <div className="flex items-center text-indigo-600">
-              <Wallet className="w-6 h-6 mr-1" />
-              <span className="text-lg font-semibold">Wallet: ${profile.wallet}</span>
-            </div>
-          </div>
+    <div className="max-w-6xl mx-auto px-4">
 
-          <div className="flex items-center text-indigo-600 cursor-pointer" onClick={toggleSettings}>
-            <Settings className="w-6 h-6 mr-1" />
-            <span className="text-lg font-semibold">Settings</span>
-          </div>
-        </div>
+  <div className="flex justify-between items-center mb-3">
+    {/* Left side with Rank, Points, Wallet */}
+    <div className="flex space-x-4 items-center">
+      <div className="flex items-center text-indigo-600 space-x-1">
+        <span className="text-lg font-semibold">Rank:</span>
+        <Award className={`w-6 h-6 ${getBadgeColor(profile.badge)}`} />
+      </div>
+      <div className="flex items-center text-indigo-600 space-x-1">
+        <BarChart2 className="w-6 h-6" />
+        <span className="text-lg font-semibold">Points: {profile.points}</span>
+      </div>
+      <div className="flex items-center text-indigo-600 space-x-1">
+        <Wallet className="w-6 h-6" />
+        <span className="text-lg font-semibold">Wallet: ${profile.wallet}</span>
+      </div>
+    </div>
+
+    {/* Right side with Settings */}
+    <div className="flex items-center text-indigo-600 cursor-pointer" onClick={toggleSettings}>
+      <Settings className="w-6 h-6 mr-1" />
+      <span className="text-lg font-semibold">Settings</span>
+    </div>
+  </div>
+
+  {/* Redeem Button Section Below Points */}
+  <div className="flex justify-start mb-4">
+    <button className="ml-20 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700" onClick={redeemPoints}>
+      Redeem 
+    </button>
+  </div>
+
+
+
 
         {showPreference && (
       <PreferencePopup
@@ -221,7 +286,9 @@ const TouristProfile = () => {
           </div>
         </Card>
       </div>
-    </div>
+      </div>
+
+    
   );
 };
 
@@ -310,7 +377,12 @@ const SettingsPopup = ({ profile, username, onClose }) => {
 
         if (response.status === 200) {
             alert('Password updated successfully');
+            setShowPassword((prevProfile) => ({
+              ...prevProfile,
+              password :profile.password, 
+            }));
         }
+       
     } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
             alert(`Error: ${error.response.data.message}`);
