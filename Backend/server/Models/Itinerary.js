@@ -38,7 +38,7 @@ const itinerarySchema = new mongoose.Schema({
     languageOfTour: { 
       type: String, 
       required: true 
-    }, 
+    },
     price: { 
       type: Number,
        required: true
@@ -60,7 +60,11 @@ const itinerarySchema = new mongoose.Schema({
     isActive: { 
       type: Boolean,
       default: true 
-    }
+    },
+    flagged: {
+      type: Boolean,
+      default: false
+  }
 }, 
 { timestamps: true }); 
 
