@@ -45,10 +45,11 @@ const createItinerary = async (req, res) => {
 };
 //u have to enter currency wanted in postman example
 //http://localhost:8000/api/itinerary/getItinerary?currency=EUR
+//edited
 const getItinerary = async (req, res) => {
   const { currency } = req.query; // Get the selected currency from query parameters
   try {
-    const itineraries = await Itinerary.find().populate({
+    const itineraries = await Itinerary.find({ flagged: false }).populate({
       path: "activities",
       populate: { path: "category tags" },
     });
@@ -379,6 +380,42 @@ const activateDeactivateItinerary = async (req, res) => {
   }
 };
 
+// Flag an itinerary as inappropriate (admin only)
+const flagItinerary = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const itinerary = await Itinerary.findById(id);
+      if (!itinerary) {
+          return res.status(404).json({ message: 'Itinerary not found' });
+      }
+
+      itinerary.flagged = true;
+      await itinerary.save();
+      res.status(200).json({ message: 'Itinerary flagged successfully', itinerary });
+  } catch (error) {
+      console.error('Error flagging itinerary:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Unflag an itinerary as inappropriate (admin only)
+const unflagItinerary = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const itinerary = await Itinerary.findById(id);
+      if (!itinerary) {
+          return res.status(404).json({ message: 'Itinerary not found' });
+      }
+
+      itinerary.flagged = false;
+      await itinerary.save();
+      res.status(200).json({ message: 'Itinerary unflagged successfully', itinerary });
+  } catch (error) {
+      console.error('Error unflagging itinerary:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 module.exports = {
   createItinerary,
   getItinerary,
@@ -392,4 +429,6 @@ module.exports = {
   cancelItineraryBooking,
   addComment,
   activateDeactivateItinerary,
+  flagItinerary,
+  unflagItinerary,
 };
