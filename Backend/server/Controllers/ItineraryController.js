@@ -4,6 +4,7 @@ const Activity = require("../Models/Activity");
 const PreferenceTagModel = require("../Models/PreferenceTag");
 const Booking = require("../Models/Booking");
 const User = require("../Models/user");
+const jwt = require('jsonwebtoken'); 
 
 const { convertCurrency } = require("./currencyConverter");
 
@@ -416,6 +417,39 @@ const unflagItinerary = async (req, res) => {
   }
 };
 
+// Tourist rate an itinerary they followed
+const rateItinerary = async (req, res) => {
+  try {
+      const { itineraryId, rating, review } = req.body;
+      if (!itineraryId || !rating) {
+          return res.status(400).json({ message: 'Itinerary ID and rating are required' });
+      }
+
+      const token = req.headers.authorization.split(' ')[1];
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+      const userId = decodedToken.id;
+
+      const itinerary = await Itinerary.findById(itineraryId);
+      if (!itinerary) {
+          return res.status(404).json({ message: 'Itinerary not found' });
+      }
+
+      const existingRating = itinerary.ratings.find(r => r.userId.toString() === userId);
+      if (existingRating) {
+          existingRating.rating = rating;
+          existingRating.review = review;
+      } else {
+          itinerary.ratings.push({ userId, rating, review });
+      }
+
+      await itinerary.save();
+      res.status(200).json({ message: 'Rating added successfully', itinerary });
+  } catch (error) {
+      console.error('Error rating itinerary:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 module.exports = {
   createItinerary,
   getItinerary,
@@ -431,4 +465,5 @@ module.exports = {
   activateDeactivateItinerary,
   flagItinerary,
   unflagItinerary,
+  rateItinerary,
 };
