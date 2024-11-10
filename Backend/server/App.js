@@ -70,12 +70,11 @@ const sellerRoutes = require("./Routes/sellerRoutes");
 const itineraryRoutes = require("./Routes/itineraryRoutes");
 const bookingRoutes = require("./Routes/BookingRoutes");
 
-const transportationRoutes = require("./Routes/TransportationRoutes");
+const transportationRoutes = require("./Routes/transportationRoutes");
 const ComplaintRoutes = require("./Routes/ComplaintRoutes");
 
 const documentRoutes = require("./Routes/documentsRoutes");
 const { login } = require("./Controllers/authController");
-const Booking = require('../Models/Booking'); 
 
 
 //Routes

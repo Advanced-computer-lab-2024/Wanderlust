@@ -1,43 +1,47 @@
-const Booking = require('../Models/Booking');  // Assuming the Booking model exists
-const Advertiser = require('../Models/Advertiser');  // Assuming the Advertiser model exists
-const Tourist = require('../Models/Tourist');  // Assuming the Tourist model exists
+const TransportationBookingModel = require('../Models/transportationBooking');  // Assuming the Booking model exists
+const AdvertiserModel = require('../Models/Advertiser');  // Assuming the Advertiser model exists
+const TouristModel = require('../Models/Tourist');  // Assuming the Tourist model exists
 
-class TransportationController {
+
   // Book transportation based only on advertiserId and touristId
-  async book(req, res) {
-    const { advertiserId, touristId } = req.body;  // Get advertiserId and touristId from request body
-    const userId = req.user.id;  // Assuming the user is authenticated, using req.user.id for tourist
-
+  const bookTransportation = async (req, res) => {
     try {
-      // Check if the advertiser and tourist exist
-      const advertiser = await Advertiser.findById(advertiserId);
-      const tourist = await Tourist.findById(touristId);
-
+      const { advertiserId, touristId } = req.body;
+      if (!advertiserId || !touristId) {
+        return res
+          .status(400)
+          .json({ message: "Please provide advertiser ID and tourist ID" });
+      }
+      const advertiser = await AdvertiserModel.findById(advertiserId);
       if (!advertiser) {
-        return res.status(404).json({ error: 'Advertiser not found' });
+        return res.status(404).json({ message: "advertiser not found" });
       }
-      
+      const tourist = await TouristModel.findById(touristId);
       if (!tourist) {
-        return res.status(404).json({ error: 'Tourist not found' });
+        return res.status(404).json({ message: "tourist not found" });
       }
-
-      // Create a new booking for the tourist and advertiser
-      const newBooking = await Booking.create({
-        advertiserId,    // The advertiser providing the transportation
-        touristId,       // The tourist making the booking
+      const transportationBooking = await TransportationBookingModel.findOne({ advertiserId, touristId });
+      if (transportationBooking) {
+        return res
+          .status(400)
+          .json({ message: "You have already booked this transportation" });
+      }
+      // Create a new booking
+      const newTransportationBooking = new TransportationBookingModel({
+        advertiserId,
+        touristId,
       });
-
-      // Return the successful booking response
-      res.status(200).json({
-        message: 'Booking successful',
-        booking: newBooking,
-      });
-
+  
+      await newTransportationBooking.save(); // Save to the database
+  
+      res
+        .status(201)
+        .json({ message: "Booking successful!", advertiserId, touristId });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      console.error("Error booking transportation:", error);
+      res.status(500).json({ message: error.message });
     }
-  }
-}
+  };
 
-module.exports = new TransportationController();
+module.exports = {bookTransportation};
 

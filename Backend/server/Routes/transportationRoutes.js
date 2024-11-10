@@ -1,10 +1,10 @@
-const express = require('express');
-const transportationController = require('../Controllers/transportationController');
-const authenticate = require('../middleware/authMiddleware');
-
-const router = express.Router();
+const express = require("express");
+const {
+    bookTransportation
+  } = require("../Controllers/transportationController");
+  const router = express.Router();
 
 // POST /transportation/book - Book a transportation
-router.post('/book', authenticate, transportationController.book);
+router.post('/bookTransportation', bookTransportation);
 
 module.exports = router;

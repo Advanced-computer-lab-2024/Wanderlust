@@ -1,12 +1,9 @@
 const mongoose = require('mongoose');
- // models/Booking.js
 
 
-// Assuming you have Advertiser and Tourist (User) models already
-const Advertiser = require("./Advertiser");
-const Tourist = require("./Tourist");
 
-const BookingSchema = new mongoose.Schema({
+
+const transportationBookingSchema = new mongoose.Schema({
   // Reference to the Advertiser (who is offering the transportation)
   advertiserId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -25,6 +22,6 @@ const BookingSchema = new mongoose.Schema({
   },
 );
 
-const Booking = mongoose.model("Booking", BookingSchema);
+const transportationBooking = mongoose.model("TransportationBooking", transportationBookingSchema);
 
-module.exports = Booking;
+module.exports = transportationBooking;
