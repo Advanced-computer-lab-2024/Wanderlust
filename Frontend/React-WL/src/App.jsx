@@ -14,7 +14,7 @@ import AdminManageProductsPage from './Pages/AdminManageProductsPage';
 import AdminManageActivitiesPage from './Pages/AdminManageActivitiesPage';
 import AdminManagePreferenceTagsPage from './Pages/AdminManagePreferenceTagsPage';
 import AdminManageComplaintsPage from './Pages/AdminManageComplaintsPage';
-import ActivitiesPage from './Pages/Guest/ActivitiesPage';
+import ActivitiesGuest from './Pages/Guest/ActivitiesGuest';
 // import Tourist from './Pages/Tourist';
 import ItineraryTourist from './Pages/Tourist/ItineraryTourist';
 import LocationTourist from './Pages/Tourist/LocationTourist';
@@ -76,7 +76,7 @@ const App = () => {
         {/* Guest Routes */}
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/LocationPage" element={<LocationsPage />} />
-        <Route path="/activitiesPage" element={<ActivitiesPage />} />
+        <Route path="/activitiesGuest" element={<ActivitiesGuest />} />
         <Route path="/itinerary" element={<Itinerary />} />
 
 
