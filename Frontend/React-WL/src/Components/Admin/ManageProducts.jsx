@@ -118,7 +118,7 @@ const ManageProducts = () => {
 
     const archiveProduct = async (name) => {
         try {
-            const response = await axios.post('http://localhost:8000/api/product/archiveProduct', { name });
+            const response = await axios.put('http://localhost:8000/api/product/archiveProduct', { name });
             if (response.status === 200) {
                 alert('Product archived successfully');
                 fetchProducts();
@@ -132,7 +132,7 @@ const ManageProducts = () => {
 
     const unarchiveProduct = async (name) => {
         try {
-            const response = await axios.post('http://localhost:8000/api/product/unarchiveProduct', { name });
+            const response = await axios.put('http://localhost:8000/api/product/unarchiveProduct', { name });
             if (response.status === 200) {
                 alert('Product unarchived successfully');
                 fetchProducts();
