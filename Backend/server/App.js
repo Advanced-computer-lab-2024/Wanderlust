@@ -70,10 +70,12 @@ const sellerRoutes = require("./Routes/sellerRoutes");
 const itineraryRoutes = require("./Routes/itineraryRoutes");
 const bookingRoutes = require("./Routes/BookingRoutes");
 
+const transportationRoutes = require("./Routes/TransportationRoutes");
 const ComplaintRoutes = require("./Routes/ComplaintRoutes");
 
 const documentRoutes = require("./Routes/documentsRoutes");
 const { login } = require("./Controllers/authController");
+const Booking = require('../Models/Booking'); 
 
 
 //Routes
@@ -90,9 +92,12 @@ app.use("/api/advertiser", advertiserRoutes);
 app.use("/api/itinerary", itineraryRoutes);
 app.use("/api/bookings", bookingRoutes);
 
+
+
 app.use("/api/Complaint", ComplaintRoutes);
 
 app.use("/api/documents", documentRoutes);
+app.use("/api/transportation", transportationRoutes)
 
 
 app.use(express.json());
