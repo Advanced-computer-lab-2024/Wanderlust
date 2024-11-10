@@ -38,7 +38,7 @@ const itinerarySchema = new mongoose.Schema({
     languageOfTour: { 
       type: String, 
       required: true 
-    }, 
+    },
     price: { 
       type: Number,
        required: true
@@ -60,7 +60,30 @@ const itinerarySchema = new mongoose.Schema({
     isActive: { 
       type: Boolean,
       default: true 
+    },
+    flagged: {
+      type: Boolean,
+      default: false
+  },
+  ratings: [
+    {
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+        },
+        rating: {
+            type: Number,
+            required: true,
+            min: 1,
+            max: 5
+        },
+        review: {
+            type: String,
+            required: false
+        }
     }
+]
 }, 
 { timestamps: true }); 
 

@@ -7,12 +7,14 @@ const signUp = async (req, res) => {
         return res.status(400).json({ message: "All fields are required" });
     }
     let termsAccepted;
+    let roleApplicationStatus;
     if(role === "tourist"){
         termsAccepted = true;
         roleApplicationStatus = "approved";
     }
     else{
         termsAccepted = false;
+        roleApplicationStatus="pending";
     }
     console.log(username, email, password, mobileNumber, role, termsAccepted , roleApplicationStatus);
     try {

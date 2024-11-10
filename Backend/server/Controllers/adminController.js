@@ -137,6 +137,37 @@ const getPendingUsers = async (req, res) => {
   }
 };
 
+const approvePendingUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { userType, status } = req.body;
+    if (status !== "approved" && status !== "rejected") {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+    let user;
+    if (userType === "Advertiser") {
+      user = await advertiserModel.findOne({ userId });
+    } else if (userType === "Seller") {
+      user = await sellerModel.findOne({ userId });
+    } else if (userType === "TourGuide") {
+      user = await tourguideModel.findOne({ userId });
+    } else {
+      return res.status(400).json({ message: "Invalid user type" });
+    }
+    if (user) {
+      user.roleApplicationStatus = status;
+      await user.save();
+      if (status === "approved") {
+        return res.status(200).json({ message: "User approved successfully" });
+      }
+      return res.status(200).json({ message: "User rejected successfully" });
+    } else {
+      return res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
 // Create a new tourism governor
 const addTourismGovernor = async (req, res) => {
   try {
@@ -162,4 +193,5 @@ module.exports = {
   getAllUserDetails,
   getAdminDetails,
   getPendingUsers,
+  approvePendingUser,
 };

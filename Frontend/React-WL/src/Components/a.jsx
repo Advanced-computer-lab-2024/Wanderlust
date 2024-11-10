@@ -1,41 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Card from './Card';
-import { Phone, User, Mail, Clock, Briefcase, Award, Star, Wallet, BarChart2, PlusCircle, Settings, Eye, EyeOff, Medal } from 'lucide-react';
+import { Phone, User, Mail, Clock, Briefcase, Award, Star, Wallet, BarChart2, PlusCircle, Settings, Eye, EyeOff } from 'lucide-react';
 
 const TouristProfile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [preferenceTagOptions, setPreferenceTagOptions] = useState([]);
-  const [selectedPreferenceTags, setSelectedPreferenceTags] = useState([]);
   const [username, setUsername] = useState("");
-  const [showPreference, setShowpreference] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  
-  const getBadgeColor = (badge) => {
-    switch (badge) {
-      case 'Gold':
-        return 'text-yellow-500';
-      case 'Silver':
-        return 'text-gray-400';
-      default:
-        return 'text-yellow-800'; // Bronze or None
-    }
-  };
 
   useEffect(() => {
     fetchProfile();
-    fetchPreferenceTags();
   }, []);
-
-  const handlePreferenceTagSelect = (tag) => {
-    if (selectedPreferenceTags.includes(tag)) {
-      setSelectedPreferenceTags(selectedPreferenceTags.filter((t) => t !== tag));
-    } else {
-      setSelectedPreferenceTags([...selectedPreferenceTags, tag]);
-    }
-  };
 
   const fetchProfile = async () => {
     try {
@@ -45,8 +22,7 @@ const TouristProfile = () => {
         }),
         axios.get("http://localhost:8000/api/admin/getLoggedInUser", {
           headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
-        }),
-        
+        })
       ]);
 
       const combinedData = {
@@ -55,6 +31,7 @@ const TouristProfile = () => {
       };
 
       setProfile(combinedData);
+      console.log("Profile data:", combinedData);
     } catch (error) {
       console.error("Error fetching profile:", error);
       setError(error);
@@ -63,90 +40,13 @@ const TouristProfile = () => {
     }
   };
 
-  const fetchPreferenceTags = async () => {
-    try {
-      const response = await axios.get("http://localhost:8000/api/preferenceTag/getpreferenceTags");
-      setPreferenceTagOptions(response.data.map((tag) => tag.name));
-    } catch (error) {
-      console.error("Error fetching preference tags:", error);
-      setError(error);
-    }
-  };
-
   const handleAddPreference = () => {
-    setShowpreference(true);
-  };
-
-  const handleSavePreferences = async () => {
-    try {
-      await axios.put(`http://localhost:8000/api/preferenceTag/updateTouristPref/${profile._id}`, {
-        preferences: selectedPreferenceTags
-      }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
-      });
-      console.log(profile.id);
-      setProfile((prevProfile) => ({
-        ...prevProfile,
-        preferences: selectedPreferenceTags
-      }));
-      setShowpreference(false);
-    } catch (error) {
-      console.error("Error saving preferences:", error);
-      setError(error);
-    }
+    console.log("Add Preference clicked");
   };
 
   const toggleSettings = () => {
     setShowSettings(!showSettings);
   };
-
-  const togglePreference = () => {
-    setShowpreference(!showPreference);
-  };
-
-  const redeemPoints = async () => {
-    const username =profile.username;  
-    if(profile.points<10000){
-      alert("Insufficient Points");
-    }
-    else{
-      alert("Points Redeemed Successfully");
-
-    }
-
-    try {
-      const response = await fetch(`http://localhost:8000/api/tourist/redeemPoints/${username}`, {
-        method: 'PUT', 
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to redeem points');
-      }
-
-      const data = await response.json();
-      console.log('Redeemed successfully:', data);
-      setProfile((prevProfile) => ({
-        ...prevProfile,
-        points: data.points, // Update points
-        wallet: data.wallet, // Update wallet
-      }));
-
-    
-    } catch (error) {
-      console.error('Error:', error);
-
-      // Show error notification
-      alert("Insufficient Points");
-
-
-    }
-  };
-  
-
-
 
   if (loading) return (
     <div className="flex justify-center items-center h-64">
@@ -165,53 +65,30 @@ const TouristProfile = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen py-8">
-    <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex space-x-6">
+            <div className="flex items-center text-indigo-600">
+              <Star className="w-6 h-6 mr-1" />
+              <span className="text-lg font-semibold">Level: {profile.level}</span>
+            </div>
+            <div className="flex items-center text-indigo-600">
+              <BarChart2 className="w-6 h-6 mr-1" />
+              <span className="text-lg font-semibold">Points: {profile.points}</span>
+            </div>
+            <div className="flex items-center text-indigo-600">
+              <Wallet className="w-6 h-6 mr-1" />
+              <span className="text-lg font-semibold">Wallet: ${profile.wallet}</span>
+            </div>
+          </div>
 
-  <div className="flex justify-between items-center mb-3">
-    {/* Left side with Rank, Points, Wallet */}
-    <div className="flex space-x-4 items-center">
-      <div className="flex items-center text-indigo-600 space-x-1">
-        <span className="text-lg font-semibold">Rank:</span>
-        <Award className={`w-6 h-6 ${getBadgeColor(profile.badge)}`} />
-      </div>
-      <div className="flex items-center text-indigo-600 space-x-1">
-        <BarChart2 className="w-6 h-6" />
-        <span className="text-lg font-semibold">Points: {profile.points}</span>
-      </div>
-      <div className="flex items-center text-indigo-600 space-x-1">
-        <Wallet className="w-6 h-6" />
-        <span className="text-lg font-semibold">Wallet: ${profile.wallet}</span>
-      </div>
-    </div>
+          <div className="flex items-center text-indigo-600 cursor-pointer" onClick={toggleSettings}>
+            <Settings className="w-6 h-6 mr-1" />
+            <span className="text-lg font-semibold">Settings</span>
+          </div>
+        </div>
 
-    {/* Right side with Settings */}
-    <div className="flex items-center text-indigo-600 cursor-pointer" onClick={toggleSettings}>
-      <Settings className="w-6 h-6 mr-1" />
-      <span className="text-lg font-semibold">Settings</span>
-    </div>
-  </div>
-
-  {/* Redeem Button Section Below Points */}
-  <div className="flex justify-start mb-4">
-    <button className="ml-20 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700" onClick={redeemPoints}>
-      Redeem 
-    </button>
-  </div>
-
-
-
-
-        {showPreference && (
-      <PreferencePopup
-        onClose={togglePreference}
-        onSave={handleSavePreferences}
-        preferenceTagOptions={preferenceTagOptions}
-        selectedPreferenceTags={selectedPreferenceTags}
-        handlePreferenceTagSelect={handlePreferenceTagSelect}
-      />
-    )}
-
-{showSettings && <SettingsPopup profile={profile} username={username} onClose={toggleSettings} />}
+        {showSettings && <SettingsPopup profile={profile} username={username} onClose={toggleSettings} />}
 
         <Card>
           <div className="profile-container">
@@ -286,9 +163,7 @@ const TouristProfile = () => {
           </div>
         </Card>
       </div>
-      </div>
-
-    
+    </div>
   );
 };
 
@@ -301,52 +176,6 @@ const StatCard = ({ icon, title, value }) => (
     <p className="text-2xl font-bold text-indigo-600">{value}</p>
   </div>
 );
-
-const PreferencePopup = ({
-  onClose,
-  onSave,
-  preferenceTagOptions,
-  selectedPreferenceTags,
-  handlePreferenceTagSelect,
-}) => {
-  return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="absolute inset-0 bg-black opacity-50" onClick={onClose}></div>
-      <div className="bg-white rounded-lg shadow-lg p-6 z-10">
-        <h3 className="text-xl font-semibold text-indigo-600 mb-4">Add Preferences</h3>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {preferenceTagOptions.map((tag) => (
-            <button
-              key={tag}
-              onClick={() => handlePreferenceTagSelect(tag)}
-              className={`rounded-full py-1 px-3 ${
-                selectedPreferenceTags.includes(tag)
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              {tag}
-            </button>
-          ))}
-        </div>
-        <div className="mt-4 text-center">
-          <button
-            onClick={onSave}
-            className="bg-indigo-600 text-white py-2 px-4 rounded-md mr-2"
-          >
-            Save Preferences
-          </button>
-          <button
-            onClick={onClose}
-            className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const SettingsPopup = ({ profile, username, onClose }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -377,12 +206,7 @@ const SettingsPopup = ({ profile, username, onClose }) => {
 
         if (response.status === 200) {
             alert('Password updated successfully');
-            setShowPassword((prevProfile) => ({
-              ...prevProfile,
-              password :profile.password, 
-            }));
         }
-       
     } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
             alert(`Error: ${error.response.data.message}`);

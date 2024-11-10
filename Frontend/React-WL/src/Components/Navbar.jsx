@@ -34,7 +34,7 @@ const Navbar = ({t1, t2, t3, t4, t5, t6, p1, p2, p3, p4, p5, p6}) => {
               <div className="md:ml-auto">
                 <div className="flex space-x-2">
                   {/* Render only if the props are passed */}
-                  <Link to="/" className={getLinkClass('/')}>Home</Link>
+                  {/* <Link to="/" className={getLinkClass('/')}>Home</Link> */}
                   
                   {t1 && p1 && (
                     <Link to={p1} className={getLinkClass(p1)}>{t1}</Link>

@@ -2,8 +2,9 @@ const Activity = require("../Models/Activity.js");
 const { default: mongoose, get } = require("mongoose");
 const { findById } = require("../Models/tourGuide.js");
 const ActivityCatModel = require("../Models/ActivityCat.js");
-const User = require('../Models/user');
-const { convertCurrency } = require('./currencyConverter');
+const Booking = require("../Models/Booking.js");
+const User = require("../Models/user");
+const { convertCurrency } = require("./currencyConverter");
 
 const createActivity = async (req, res) => {
   const {
@@ -48,14 +49,17 @@ const getActivity = async (req, res) => {
   const { currency } = req.query; // Get the selected currency from query parameters
   try {
     const activities = await Activity.find()
-      .populate('category')
-      .populate('tags');
+      .populate("category")
+      .populate("tags");
 
     if (currency) {
       const convertedActivities = await Promise.all(
         activities.map(async (item) => {
-          const convertedItem = item.toObject(); 
-          convertedItem.price = await convertCurrency(convertedItem.price, currency); 
+          const convertedItem = item.toObject();
+          convertedItem.price = await convertCurrency(
+            convertedItem.price,
+            currency
+          );
           return convertedItem;
         })
       );
@@ -214,14 +218,14 @@ const searchActivity = async (req, res) => {
   }
 };
 
-//point 43 choose category of aactivities 
+//point 43 choose category of aactivities
 const getActivitiesByCategoryName = async (req, res) => {
   const { query } = req.query;
   try {
     const activities = await Activity.find()
       .populate("tags")
       .populate("category");
-    
+
     const filteredActivities = activities.filter((activity) => {
       const nameMatches = activity.name
         .toLowerCase()
@@ -302,18 +306,18 @@ const rateActivity = async (req, res) => {
   const { userId, rating, comment } = req.body;
 
   if (rating < 1 || rating > 5) {
-    return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+    return res.status(400).json({ message: "Rating must be between 1 and 5" });
   }
 
   try {
     const activity = await Activity.findById(activityId);
     if (!activity) {
-      return res.status(404).json({ message: 'Activity not found' });
+      return res.status(404).json({ message: "Activity not found" });
     }
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     const newComment = {
@@ -323,54 +327,94 @@ const rateActivity = async (req, res) => {
     };
     activity.comments.push(newComment);
     // Update the average rating
-    const totalRatings = activity.comments.reduce((acc, curr) => acc + curr.rating, 0);
+    const totalRatings = activity.comments.reduce(
+      (acc, curr) => acc + curr.rating,
+      0
+    );
     activity.rating = totalRatings / activity.comments.length;
 
     await activity.save();
 
-    res.status(200).json({ message: 'Rating and comment added successfully', activity });
+    res
+      .status(200)
+      .json({ message: "Rating and comment added successfully", activity });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
-const bookActivity = (req, res) => {
-  const { activityId, userId } = req.body;
+const bookActivity = async (req, res) => {
+  try {
+    const { activityId, userId } = req.body;
 
-  if (!activityId || !userId) {
-      return res.status(400).json({ error: 'Activity ID and User ID are required.' });
+    if (!activityId || !userId) {
+      return res
+        .status(400)
+        .json({ message: "Activity ID and User ID required" });
+    }
+    const activity = await Activity.findById(activityId);
+    if (!activity) {
+      return res.status(404).json({ message: "Activity not found" });
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const booking = await Booking.findOne({ activityId, userId });
+    if (booking) {
+      return res
+        .status(400)
+        .json({ message: "User has already booked this activity" });
+    }
+    // Create a new booking
+    const newBooking = new Booking({
+      activityId,
+      userId,
+    });
+
+    await newBooking.save(); // Save to the database
+
+    res
+      .status(201)
+      .json({ message: "Booking successful!", userId, activityId });
+  } catch (error) {
+    console.error("Error booking itinerary:", error);
+    res.status(500).json({ message: error.message });
   }
-
-  // Placeholder for booking logic (replace with actual booking logic)
-  console.log(`Booking requested for activity: ${activityId}, by user: ${userId}`);
-  res.status(200).json({ message: 'Booking successful!' });
 };
 const cancelActivityBooking = async (req, res) => {
-  const { bookingId } = req.params.bookingId; // Get the booking ID from the request params
+  const { bookingId } = req.params; // Get the booking ID from the request params
 
   try {
-      const booking = await ActivityBooking.findById(bookingId);
+    const booking = await Booking.findById(bookingId);
 
-      if (!booking) {
-          return res.status(404).json({ message: "Booking not found" });
-      }
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+    if (booking.activityId == null) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+    const activity = await Activity.findById(booking.activityId);
+    const activityTime = new Date(`${activity.date}T${activity.time}`);
+    // Check if the event start time is more than 48 hours away
+    const currentTime = new Date();
 
-      // Check if the event start time is more than 48 hours away
-      const currentTime = new Date();
-      const eventTime = new Date(booking.eventStartTime); // Assume you have an eventStartTime field
+    const eventTime = new Date(activityTime); // Assume you have an eventStartTime field
 
-      const timeDifference = eventTime - currentTime; // in milliseconds
-      const hoursDifference = timeDifference / (1000 * 60 * 60); // convert to hours
+    const timeDifference = eventTime - currentTime; // in milliseconds
+    const hoursDifference = timeDifference / (1000 * 60 * 60); // convert to hours
 
-      if (hoursDifference < 48) {
-          return res.status(400).json({ message: "Cannot cancel booking less than 48 hours before the event" });
-      }
+    if (hoursDifference < 48) {
+      return res.status(400).json({
+        message: `Cannot cancel booking less than 48 hours before the event, hoursDifference=${hoursDifference}`,
+      });
+    }
 
-      // If it's more than 48 hours, proceed to cancel the booking
-      await ActivityBooking.deleteOne({ _id: bookingId });
-      return res.status(200).json({ message: "Booking cancelled successfully" });
+    // If it's more than 48 hours, proceed to cancel the booking
+    await Booking.deleteOne({ _id: bookingId });
+    return res.status(200).json({ message: "Booking cancelled successfully" });
   } catch (error) {
-      return res.status(500).json({ message: "Error cancelling booking" });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -388,5 +432,5 @@ module.exports = {
   sendActivityLinkViaEmail,
   rateActivity,
   bookActivity,
-  cancelActivityBooking
+  cancelActivityBooking,
 };
