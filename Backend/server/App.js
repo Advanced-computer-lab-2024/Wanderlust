@@ -72,6 +72,7 @@ const itineraryRoutes = require("./Routes/itineraryRoutes");
 const ComplaintRoutes = require("./Routes/ComplaintRoutes");
 
 const documentRoutes = require("./Routes/documentsRoutes");
+const { login } = require("./Controllers/authController");
 
 
 //Routes
@@ -103,6 +104,7 @@ app.put("/updateLocation/:id", updateLocation);
 app.delete("/deleteLocation/:id", deleteLocation);
 app.get("/getLocation/:id", getLocationById);
 
+app.post("/login", login);
 //createLocation,
 //getLocations,
 //updateLocation,

@@ -276,29 +276,69 @@ const Itinerary = () => {
   );
 };
 
-const ItineraryItem = ({ item, onUpdate, onDelete }) => (
-  <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
-    <div className="p-6">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h2 className="text-2xl font-semibold mb-2 text-indigo-600">{item.title}</h2>
-          <p className="text-gray-600 text-sm flex items-center">
-            <Calendar className="mr-2" size={16} />
-            {item.timeline.start} - {item.timeline.end}
-          </p>
+const ItineraryItem = ({ item, onUpdate, onDelete }) => {
+  const handleBookItinerary = async () => {
+    try {
+
+      const userId = async () => {
+        try {
+          const response = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            },
+          });
+          console.log(response.data);
+          return response.data; // Assuming response.data contains the user ID
+        } catch (error) {
+          console.error("Error fetching user info:", error);
+        }
+      };
+      
+      const userIdValue = await userId();
+
+
+      const response = await axios.post("http://localhost:8000/api/itinerary/bookItinerary", {
+        itineraryId: item._id,
+        userId: userIdValue,
+      });
+
+      if (response.status === 201) {
+        alert("Booking successful!");
+      }
+    } catch (error) {
+      console.error("Error booking itinerary:", error);
+      alert("Error booking itinerary");
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
+      <div className="p-6">
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h2 className="text-2xl font-semibold mb-2 text-indigo-600">{item.title}</h2>
+            <p className="text-gray-600 text-sm flex items-center">
+              <Calendar className="mr-2" size={16} />
+              {item.timeline.start} - {item.timeline.end}
+            </p>
+          </div>
         </div>
-        <div>
-         
-          
-        </div>
+        <ItineraryDetails item={item} />
+        <ItineraryActivities activities={item.activities} />
+        <ItinerarySection title="Locations" items={item.locations} icon={<MapPin size={18} />} />
+        <ItinerarySection title="Available Dates" items={item.availableDates} icon={<Calendar size={18} />} />
+        
+        {/* Add Book Itinerary button here */}
+        <button
+          onClick={handleBookItinerary}
+          className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg mt-4 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+        >
+          Book Itinerary
+        </button>
       </div>
-      <ItineraryDetails item={item} />
-      <ItineraryActivities activities={item.activities} />
-      <ItinerarySection title="Locations" items={item.locations} icon={<MapPin size={18} />} />
-      <ItinerarySection title="Available Dates" items={item.availableDates} icon={<Calendar size={18} />} />
     </div>
-  </div>
-);
+  );
+};
 
 const ItineraryDetails = ({ item }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4 mb-6">

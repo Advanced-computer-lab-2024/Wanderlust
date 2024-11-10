@@ -60,6 +60,9 @@ const Login = () => {
         else if(data.role === "tourismGovernor") {
             navigate("/TourismGovernorProfile");
         }
+        else if(data.role === "seller") {
+            navigate("/SellerProfile");
+        }
         if(data.role === "tourguide" || data.role === "seller" || data.role === "advertiser") {
             const response2 = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
                 headers: {

@@ -34,6 +34,7 @@ import AdvertiserProfilePage from './Pages/Advertiser/AdvertiserProfilePage';
 import AdvertiserActivitiesPage from './Pages/Advertiser/AdvertiserActivitiesPage';
 import TourismGovernorLocationsPage from './Pages/TourismGovernor/TourismGovrernorLocationsPage';
 import TourismGovernorProfilePage from './Pages/TourismGovernor/TourismGovrernorProfilePage';
+import SellerMyProductsPage from './Pages/Seller/SellerMyProductsPage';
 const App = () => {
   return (
     <Router>
@@ -79,6 +80,7 @@ const App = () => {
         {/* Seller Routes */}
         <Route path="/SellerProfile" element={<SellerProfilePage />} />
         <Route path="/SellerProducts" element={<SellerProductsPage />} />
+        <Route path="/MySellerProducts" element={<SellerMyProductsPage />} />
 
         {/* Advertiser Routes */}
         <Route path="/AdvertiserProfile" element={<AdvertiserProfilePage />} />
