@@ -37,6 +37,7 @@ import TourismGovernorProfilePage from './Pages/TourismGovernor/TourismGovrernor
 import SellerMyProductsPage from './Pages/Seller/SellerMyProductsPage';
 import BookingTourist from './Pages/Tourist/TouristBookingsPage';
 import AdminViewDocuments from './Pages/AdminViewDocuments';
+import AdminUpdatePassword from './Pages/AdminUpdatePassword';
 const App = () => {
   return (
     <Router>
@@ -54,6 +55,7 @@ const App = () => {
         <Route path="/managepreferencetags" element={<AdminManagePreferenceTagsPage />} />
         <Route path="/managecomplaints" element={<AdminManageComplaintsPage />} />
         <Route path="/viewpendingdocuments" element={<AdminViewDocuments />} />
+        <Route path="/AdminUpdatePassword" element={<AdminUpdatePassword />} />
         <Route path="/complaint" element={<Complaint />} />
 
 
