@@ -117,15 +117,68 @@ const Itinerary = () => {
   };
   const fetchItinerary = async () => {
     try {
+      // Step 1: Fetch the logged-in user's bookings (similar to fetchBookings in activities)
+      const fetchBookings = async () => {
+        try {
+          // Get the logged-in tourist's ID
+          const userId = async () => {
+            try {
+              const response = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+                },
+              });
+              return response.data;  // Assuming response.data contains the user ID
+            } catch (error) {
+              console.error("Error fetching user info:", error);
+              return null;
+            }
+          };
+  
+          const userIdValue = await userId();
+  
+          // Fetch bookings for the current tourist
+          const response = await axios.get("http://localhost:8000/api/bookings/getBooking", {
+            params: {
+              userId: userIdValue,
+            },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            },
+          });
+  
+          if (Array.isArray(response.data)) {
+            return response.data;  // Return bookings array
+          } else {
+            return [];  // Return empty array if no valid bookings are found
+          }
+        } catch (error) {
+          console.error("Error fetching bookings:", error);
+          return [];
+        }
+      };
+  
+      // Step 2: Get the user's bookings and extract the booked itinerary IDs
+      const bookings = await fetchBookings();
+      const bookedItineraryIds = bookings.map((booking) => booking.itineraryId?._id);
+  
+      // Step 3: Fetch all itineraries from the API
       const response = await fetch('http://localhost:8000/api/itinerary/getitinerary');
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      if (Array.isArray(data) && data.length > 0) {
-        setItinerary(data);
+  
+      // Step 4: Filter out itineraries that have already been booked
+      const filteredItineraries = data.filter(
+        (itinerary) => !bookedItineraryIds.includes(itinerary._id)
+      );
+  
+      // Step 5: Update the state with the filtered itineraries
+      if (Array.isArray(filteredItineraries) && filteredItineraries.length > 0) {
+        setItinerary(filteredItineraries);
       } else {
-        console.log("Itinerary array is empty or undefined.");
+        console.log("Itinerary array is empty or all itineraries are booked.");
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -134,6 +187,7 @@ const Itinerary = () => {
       setLoading(false);
     }
   };
+  
 
   const handleCreate = () => {
     console.log("Create new itinerary");

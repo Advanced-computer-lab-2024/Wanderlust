@@ -319,7 +319,7 @@ const cancelItineraryBooking = async (req, res) => {
     }
 
     // If it's more than 48 hours, proceed to cancel the booking
-    await ItineraryBooking.deleteOne({ _id: bookingId });
+    await Booking.deleteOne({ _id: bookingId });
     return res.status(200).json({ message: "Booking cancelled successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });

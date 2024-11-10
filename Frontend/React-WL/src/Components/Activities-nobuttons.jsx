@@ -11,15 +11,69 @@ const Activities = ({ showCreateButton = true, showUpdateButton = true, showDele
   useEffect(() => {
     const fetchActivities = async () => {
       try {
+        // Step 1: Fetch the logged-in user's bookings
+        const fetchBookings = async () => {
+          try {
+            // Get the logged-in tourist's ID
+            const userId = async () => {
+              try {
+                const response = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+                  },
+                });
+                return response.data;  // Assuming response.data contains the user ID
+              } catch (error) {
+                console.error("Error fetching user info:", error);
+                return null;
+              }
+            };
+    
+            const userIdValue = await userId();
+    
+            // Fetch bookings for the current tourist
+            const response = await axios.get("http://localhost:8000/api/bookings/getBooking", {
+              params: {
+                userId: userIdValue,
+              },
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+              },
+            });
+    
+            if (Array.isArray(response.data)) {
+              return response.data;  // Return bookings array
+            } else {
+              return [];  // Return empty array if no valid bookings are found
+            }
+          } catch (error) {
+            console.error("Error fetching bookings:", error);
+            return [];
+          }
+        };
+    
+        // Step 2: Get the user's bookings and extract the booked activity IDs
+        const bookings = await fetchBookings();
+        const bookedActivityIds = bookings.map((booking) => booking.activityId?._id);
+    
+        // Step 3: Fetch all activities from the API
         const res = await fetch('http://localhost:8000/api/activity/getActivity');
         const data = await res.json();
-        setActivities(data);
+    
+        // Step 4: Filter out activities that have already been booked
+        const filteredActivities = data.filter(
+          (activity) => !bookedActivityIds.includes(activity._id)
+        );
+    
+        // Step 5: Update the state with the filtered activities
+        setActivities(filteredActivities);
       } catch (error) {
-        console.log('Error fetching data', error);
+        console.log('Error fetching activities', error);
       } finally {
         setLoading(false);
       }
     };
+    
 
     fetchActivities();
   }, []);

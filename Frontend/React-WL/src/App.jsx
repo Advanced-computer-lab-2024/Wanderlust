@@ -35,6 +35,7 @@ import AdvertiserActivitiesPage from './Pages/Advertiser/AdvertiserActivitiesPag
 import TourismGovernorLocationsPage from './Pages/TourismGovernor/TourismGovrernorLocationsPage';
 import TourismGovernorProfilePage from './Pages/TourismGovernor/TourismGovrernorProfilePage';
 import SellerMyProductsPage from './Pages/Seller/SellerMyProductsPage';
+import BookingTourist from './Pages/Tourist/TouristBookingsPage';
 const App = () => {
   return (
     <Router>
@@ -64,6 +65,7 @@ const App = () => {
         <Route path="/ProductTourist" element={<ProductTourist />} />
         <Route path="/ComplaintsTourist" element={<ComplaintsTouristPage />} />
         <Route path="/TouristProfile" element={<TouristProfilePage />} />
+        <Route path="/BookingsTourist" element={<BookingTourist />} />
 
         {/* Guest Routes */}
         <Route path="/register" element={<RegisterPage />} />
