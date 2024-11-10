@@ -38,6 +38,7 @@ import SellerMyProductsPage from './Pages/Seller/SellerMyProductsPage';
 import BookingTourist from './Pages/Tourist/TouristBookingsPage';
 import AdminViewDocuments from './Pages/AdminViewDocuments';
 import AdminUpdatePassword from './Pages/AdminUpdatePassword';
+import AdminManageItinerary from './Pages/AdminManageItinerary';
 const App = () => {
   return (
     <Router>
@@ -56,6 +57,7 @@ const App = () => {
         <Route path="/managecomplaints" element={<AdminManageComplaintsPage />} />
         <Route path="/viewpendingdocuments" element={<AdminViewDocuments />} />
         <Route path="/AdminUpdatePassword" element={<AdminUpdatePassword />} />
+        <Route path="/AdminManageItinerary" element={<AdminManageItinerary />} />
         <Route path="/complaint" element={<Complaint />} />
 
 
