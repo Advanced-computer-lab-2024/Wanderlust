@@ -21,7 +21,7 @@ const FlagItinerary = () => {
 
   const handleFlagItinerary = async (id) => {
     try {
-      const response = await axios.put(`http://localhost:8000/api/itinerary/${id}/flag`, {}, {
+      const response = await axios.put(`http://localhost:8000/api/itinerary/itinerary/${id}/flag`, {}, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('jwtToken')}`
         }
@@ -40,7 +40,7 @@ const FlagItinerary = () => {
 
   const handleUnflagItinerary = async (id) => {
     try {
-      const response = await axios.put(`http://localhost:8000/api/itinerary/${id}/unflag`, {}, {
+      const response = await axios.put(`http://localhost:8000/api/itinerary/itinerary/${id}/unflag`, {}, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('jwtToken')}`
         }
