@@ -19,7 +19,7 @@ const getTourist = async (req, res) => {
 
 const createTourist = async (req, res) => {
   const { userId } = req.params;
-  const { nationality, DOB, jobOrStudent } = req.body;
+  const { nationality, DOB, jobOrStudent,currency } = req.body;
   try {
     const user = await User.findById(userId);
     if (!user) {
@@ -30,6 +30,7 @@ const createTourist = async (req, res) => {
       nationality,
       DOB,
       jobOrStudent,
+      currency,
     });
     user.roleApplicationStatus = "approved";
     await tourist.save();
@@ -45,8 +46,8 @@ const updateTourist = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    var { username } = req.params;
-    const { email, password, mobileNumber, ...touristData } = req.body;
+    const { username } = req.params;
+    const { email, password, mobileNumber, currency, ...touristData } = req.body;
 
     // Find the User by username
     const user = await User.findOne({ username }).session(session);
@@ -54,6 +55,7 @@ const updateTourist = async (req, res) => {
       await session.abortTransaction();
       return res.status(404).json({ error: "User not found" });
     }
+
     // Define fields to update in User
     const userUpdates = {};
     if (email) userUpdates.email = email;
@@ -66,13 +68,18 @@ const updateTourist = async (req, res) => {
       session,
     });
 
-    // Update Tourist within the session
-    const updatedTourist = await touristModel
-      .findOneAndUpdate({ userId: user._id }, touristData, {
+    // Define fields to update in Tourist
+    const touristUpdates = { ...touristData };
+    if (currency) touristUpdates.currency = currency;
+     // Update Tourist within the session
+     const updatedTourist = await touristModel.findOneAndUpdate(
+      { userId: user._id },
+      touristUpdates,
+      {
         new: true,
         session,
-      })
-      .populate("userId");
+      }
+    ).populate("userId");
 
     if (!updatedTourist) {
       await session.abortTransaction();
@@ -90,39 +97,68 @@ const updateTourist = async (req, res) => {
 };
 
 const viewAll = async (req, res) => {
-  const locations = await locationsModel.find().populate("tags");
-  const activity = await activityModel
-    .find()
-    .populate("category")
-    .populate("tags");
-  const itinerary = await itineraryModel.find().populate("activities");
-  res.status(200).json({ locations, activity, itinerary });
+  const { touristId } = req.query; // Get the tourist ID from query parameters
+  try {
+    const locations = await Location.find().populate("tags");
+    const activities = await Activity.find()
+      .populate("category")
+      .populate("tags");
+    const itineraries = await Itinerary.find().populate("activities");
+    let currency = 'EGP'; // Default currency
+    if (touristId) {
+      const tourist = await Tourist.findById(touristId);
+      if (tourist && tourist.currency) {
+        currency = tourist.currency; // Use tourist's preferred currency
+      }
+    }
+    const convertedActivities = await Promise.all(
+      activities.map(async (item) => {
+        const convertedItem = item.toObject();
+        convertedItem.price = await convertCurrency(
+          convertedItem.price,
+          currency,
+          touristId
+        );
+        return convertedItem;
+      })
+    );
+
+    res.status(200).json({ locations, activities: convertedActivities, itineraries });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
+
 const redeemPoints = async (req, res) => {
   const { username } = req.params;
   try {
-    const user = await User.findOne({
-      username: username,
-    });
+    const user = await User.findOne({ username });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    const tourist = await touristModel.findOne({
-      userId: user._id,
-    });
+
+    const tourist = await Tourist.findOne({ userId: user._id });
     if (!tourist) {
       return res.status(404).json({ error: "Tourist not found" });
     }
+
     let cash = Math.floor(tourist.points / 10000) * 100;
-    tourist.wallet += cash;
+    let currency = tourist.currency || 'EGP'; // Default to EGP if no preferred currency is set
+
+    // Convert cash to the preferred currency
+    const convertedCash = await convertCurrency(cash, currency, tourist._id);
+
+    tourist.wallet += parseFloat(convertedCash);
     tourist.points -= (cash / 100) * 10000;
     updateBadge(tourist);
     await tourist.save();
-    res.status(200).json(tourist);
+
+    res.status(200).json({ tourist });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
+
 // Utility function or a method in your Tourist model
 const updatePointsOnPayment = async (touristId, amountPaid) => {
   const tourist = await touristModel.findById(touristId);

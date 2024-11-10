@@ -2,6 +2,7 @@ const locationModel = require("../Models/Locations.js");
 const preferenceTagModel = require("../Models/PreferenceTag.js");
 const { default: mongoose } = require("mongoose");
 const { convertCurrency } = require('./currencyConverter');
+const touristModel = require("../Models/Tourist");
 
 // Create a new location
 const createLocation = async (req, res) => {
@@ -39,22 +40,24 @@ const createLocation = async (req, res) => {
 
 // Get all locations
 const getLocations = async (req, res) => {
-  const { currency } = req.query; // Get the selected currency from query parameters
+  const { touristId } = req.query; // Get the tourist ID from query parameters
   try {
     const locations = await locationModel.find().populate('tags');
-
-    if (currency) {
-      const convertedLocations = await Promise.all(
-        locations.map(async (item) => {
-          const convertedItem = item.toObject(); // Convert Mongoose document to plain JavaScript object
-          convertedItem.ticketPrices = await convertCurrency(convertedItem.ticketPrices, currency); // Convert ticket price to selected currency
-          return convertedItem;
-        })
-      );
-      return res.status(200).json(convertedLocations);
+    let currency = 'EGP'; // Default currency
+    if (touristId) {
+      const tourist = await touristModel.findById(touristId);
+      if (tourist && tourist.currency) {
+        currency = tourist.currency; // Use tourist's preferred currency
+      }
     }
-
-    res.status(200).json(locations);
+    const convertedLocations = await Promise.all(
+      locations.map(async (item) => {
+        const convertedItem = item.toObject(); // Convert Mongoose document to plain JavaScript object
+        convertedItem.ticketPrices = await convertCurrency(convertedItem.ticketPrices, currency); // Convert ticket price to selected currency
+        return convertedItem;
+      })
+    );
+    return res.status(200).json(convertedLocations);
   } catch (error) {
     res.status(500).json({ message: "Error fetching locations", error: error.message });
   }

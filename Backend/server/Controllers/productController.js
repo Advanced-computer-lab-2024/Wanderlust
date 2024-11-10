@@ -1,6 +1,7 @@
 const Product = require("../Models/Products.js");
 const jwt = require('jsonwebtoken');
 const { convertCurrency } = require('./currencyConverter');
+const Tourist = require('../Models/Tourist');
 
 // Add a new product
 const addProduct = async (req, res) => {
@@ -98,7 +99,6 @@ const searchProductByName = async (req, res) => {
 };
 // Filter products by price
 const filterProductsByPrice = async (req, res) => {
-  const { currency } = req.query; // Get the selected currency from query parameters
   try {
     const { minPrice, maxPrice } = req.query;
     if (!minPrice && !maxPrice) {
@@ -106,22 +106,12 @@ const filterProductsByPrice = async (req, res) => {
         .status(400)
         .json({ message: "At least one of minPrice or maxPrice is required" });
     }
+
     const query = {};
     if (minPrice) query.price = { $gte: Number(minPrice) };
     if (maxPrice) query.price = { ...query.price, $lte: Number(maxPrice) };
 
     const products = await Product.find(query).populate("seller");
-
-    if (currency) {
-      const convertedProducts = await Promise.all(
-        products.map(async (item) => {
-          const convertedItem = item.toObject(); 
-          convertedItem.price = await convertCurrency(convertedItem.price, currency); 
-          return convertedItem;
-        })
-      );
-      return res.status(200).json({ products: convertedProducts });
-    }
 
     res.status(200).json({ products });
   } catch (error) {
@@ -145,14 +135,33 @@ const getProductsSortedByRating = async (req, res) => {
 
 //For tourists
 const viewAvailableProducts = async (req, res) => {
+  const { touristId } = req.query; // Get the tourist ID from query parameters
   try {
     const products = await Product.find({ archived: false }).populate("seller");
-    res.status(200).json(products);
+
+    let currency = 'EGP'; // Default currency
+    if (touristId) {
+      const tourist = await Tourist.findById(touristId);
+      if (tourist && tourist.currency) {
+        currency = tourist.currency; // Use tourist's preferred currency
+      }
+    }
+
+    const convertedProducts = await Promise.all(
+      products.map(async (item) => {
+        const convertedItem = item.toObject(); // Convert Mongoose document to plain JavaScript object
+        convertedItem.price = await convertCurrency(convertedItem.price, currency, touristId); // Convert price to selected currency
+        return convertedItem;
+      })
+    );
+
+    return res.status(200).json(convertedProducts);
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 //tourist rate a product they purschased
 const rateProduct = async (req, res) => {
   try {
