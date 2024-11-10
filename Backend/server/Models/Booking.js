@@ -16,6 +16,10 @@ const BookingSchema = new mongoose.Schema({
     ref: "User", // Reference to the User model
     required: true,
   },
+  attended: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
