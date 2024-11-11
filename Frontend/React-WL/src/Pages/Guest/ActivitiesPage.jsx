@@ -6,7 +6,7 @@ const Advertiser = () => {
   return (
     <>
       <GuestNavbar />
-    <Activities />
+    <Activities guestMode={true} />
 
     </>
   )

@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   createActivity,
   getActivity,
+  getActivityGuest,
   updateActivity,
   deleteActivity,
   getActivityById,
@@ -19,6 +20,7 @@ const {
 
 router.post("/createActivity", createActivity);
 router.get("/getActivity", getActivity);
+router.get("/getActivityGuest", getActivityGuest);
 router.get("/getActivityById", getActivityById);
 router.put("/updateActivity", updateActivity);
 router.delete("/deleteActivity", deleteActivity);

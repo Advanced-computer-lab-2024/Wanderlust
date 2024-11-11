@@ -65,12 +65,22 @@ const getActivity = async (req, res) => {
         convertedItem.price = await convertCurrency(
           convertedItem.price,
           currency,
-          touristId
         );
         return convertedItem;
       })
     );
     return res.status(200).json(convertedActivities);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const getActivityGuest = async (req, res) => {
+  try {
+    const activities = await Activity.find()
+      .populate("category")
+      .populate("tags");
+    res.status(200).json(activities);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -420,6 +430,7 @@ const cancelActivityBooking = async (req, res) => {
 module.exports = {
   createActivity,
   getActivity,
+  getActivityGuest,
   getActivityById,
   updateActivity,
   deleteActivity,

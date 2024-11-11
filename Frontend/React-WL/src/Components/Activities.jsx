@@ -3,28 +3,69 @@ import Activity from './Activity';
 import MultiRangeSlider from "multi-range-slider-react";
 import axios from 'axios';
 import CreateActivityForm from './CreateActivityForm';
-const Activities = ({ showCreateButton = true, showUpdateButton = true, showDeleteButton = true, onCreate }) => {
+
+const Activities = ({ guestMode, showCreateButton = true, showUpdateButton = true, showDeleteButton = true, onCreate }) => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [minValue, set_minValue] = useState(1);
   const [maxValue, set_maxValue] = useState(1000);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [touristId, settouristId] = useState(null);
+
+  const getTouristId = async () => {
+    try {
+      const [infoResponse, userResponse] = await Promise.all([
+        axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
+        }),
+        axios.get("http://localhost:8000/api/admin/getLoggedInUser", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
+        })
+      ]);
+
+      const combinedData = { ...infoResponse.data, ...userResponse.data };
+      console.log(combinedData);
+      return combinedData._id;
+    } catch (error) {
+      console.error("Error fetching tourist ID:", error);
+      return 1; // Fallback ID for guest mode if API fails
+    }
+  };
 
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/activity/getActivity');
-        const data = await res.json();
-        setActivities(data);
+        console.log("guestMode:", guestMode);
+        
+        // Set or retrieve tourist ID based on guest mode
+        if (guestMode) {
+          settouristId(1);
+        } else {
+          const id = await getTouristId();
+          settouristId(id);
+        }
+
+        // Fetch activities based on the retrieved tourist ID
+        const url = touristId === 1
+          ? "http://localhost:8000/api/activity/getActivityGuest"
+          : `http://localhost:8000/api/activity/getActivity?touristId=${touristId}`;
+
+        const res = await axios.get(url, {
+          headers: touristId !== 1 ? { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` } : undefined
+        });
+
+        setActivities(res.data);
+        console.log("Fetched activities:", res.data);
       } catch (error) {
-        console.log('Error fetching data', error);
+        console.error("Error fetching activities:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchActivities();
-  }, []);
+  }, [guestMode, touristId]);
+
   const handleInput = (e) => {
     set_minValue(e.minValue);
     set_maxValue(e.maxValue);
@@ -50,6 +91,9 @@ const Activities = ({ showCreateButton = true, showUpdateButton = true, showDele
       setLoading(false);
     }
   };
+
+ 
+
   const filterActivity = async () =>{
     try{
       var date = document.getElementById("date").value;
@@ -124,6 +168,7 @@ const Activities = ({ showCreateButton = true, showUpdateButton = true, showDele
   };
 
   return (
+    
     <section className="bg-blue-50 px-4 py-10">
       <div className="container mx-auto flex flex-col lg:flex-row">
         <div className="bg-white rounded-xl shadow-md p-6 lg:w-1/3 mb-6 lg:mb-0 lg:mr-6">

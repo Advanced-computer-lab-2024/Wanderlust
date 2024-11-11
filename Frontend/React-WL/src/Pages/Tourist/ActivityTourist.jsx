@@ -1,15 +1,14 @@
 import React from 'react'
-import Activities from '../../Components/Activities-nobuttons'
+import Activities from '../../Components/Activities'
 import TouristNavBar from '../../Components/NavBars/TouristNavBar'
 
 const ActivityTourist = () => {
     return (
       <>
-      
-      
+
       <TouristNavBar  />
       
-      <Activities />
+      <Activities showCreateButton={false} showDeleteButton={false} showUpdateButton={false} guestMode={false} />
       
   
      
