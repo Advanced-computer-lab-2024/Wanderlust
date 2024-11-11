@@ -4,7 +4,7 @@ import Card from '../Components/Card';
 import MultiRangeSlider from "multi-range-slider-react";
 import Activities from './Activities';
 import { Calendar, MapPin, Globe, DollarSign, Users, Check, Star } from 'lucide-react';
-
+import Activity from './Activity';
 const Itinerary = ({guestMode}) => {
   const [itinerary, setItinerary] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -448,7 +448,7 @@ const ItineraryActivities = ({ activities }) => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {activities.map((activity) => (
         <div key={activity.id} className="bg-gray-50 rounded-lg p-3 hover:shadow-md transition duration-300">
-          <Activities activity={activity} />
+          <Activity activity={activity} />
         </div>
       ))}
     </div>
