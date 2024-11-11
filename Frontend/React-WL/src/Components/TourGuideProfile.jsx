@@ -354,7 +354,7 @@ const SettingsPopup = ({ profile, username, onClose }) => {
           <h4 className="text-lg font-semibold text-indigo-600 mb-2">Account Details</h4>
           <div className="mb-2">
             <label className="block text-gray-600">Username</label>
-            {info && <p className="text-gray-800">{profile.username}</p>}
+            {profile && <p className="text-gray-800">{profile.username}</p>}
           </div>
           <div className="mb-2">
             <label className="block text-gray-600">Email</label>
