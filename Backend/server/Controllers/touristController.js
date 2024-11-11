@@ -137,18 +137,16 @@ const redeemPoints = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const tourist = await Tourist.findOne({ userId: user._id });
+    const tourist = await touristModel.findOne({ userId: user._id }); 
     if (!tourist) {
       return res.status(404).json({ error: "Tourist not found" });
     }
 
     let cash = Math.floor(tourist.points / 10000) * 100;
-    let currency = tourist.currency || 'EGP'; // Default to EGP if no preferred currency is set
 
     // Convert cash to the preferred currency
-    const convertedCash = await convertCurrency(cash, currency, tourist._id);
 
-    tourist.wallet += parseFloat(convertedCash);
+    tourist.wallet += parseFloat(cash);
     tourist.points -= (cash / 100) * 10000;
     updateBadge(tourist);
     await tourist.save();

@@ -5,11 +5,9 @@ import TouristNavBar from '../../Components/NavBars/TouristNavBar'
 const ActivityTourist = () => {
     return (
       <>
-      
-      
       <TouristNavBar  />
       
-      <Activities showCreateButton={false} showUpdateButton={false} showDeleteButton={false}/>
+      <Activities showCreateButton={false} showDeleteButton={false} showUpdateButton={false} guestMode={false} />
       
   
      

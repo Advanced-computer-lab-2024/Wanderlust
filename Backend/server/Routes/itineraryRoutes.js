@@ -6,6 +6,7 @@ const tourist = require('../Middleware/touristMiddleware');
 const { 
     createItinerary,
     getItinerary,
+    getItineraryGuest,
     updateItinerary,
     deleteItinerary,
     sortItineraries,
@@ -24,6 +25,7 @@ const {
 
   router.post("/createItinerary", createItinerary);
   router.get("/getItinerary", getItinerary);
+  router.get("/getItineraryGuest", getItineraryGuest);
   router.put("/updateItinerary", updateItinerary);
   router.delete("/deleteItinerary", deleteItinerary);
   router.get("/sortItineraries", sortItineraries);
