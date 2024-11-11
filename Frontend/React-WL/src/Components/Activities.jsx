@@ -43,6 +43,7 @@ const Activities = ({ guestMode, showCreateButton = true, showUpdateButton = tru
         } else {
           const id = await getTouristId();
           settouristId(id);
+          console.log(id);
         }
   
         // Fetch activities using getActivity API

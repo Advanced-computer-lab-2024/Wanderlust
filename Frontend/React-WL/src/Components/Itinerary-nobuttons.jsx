@@ -1,25 +1,120 @@
 import React, { useEffect, useState } from 'react';
-import Card from '../Components/Card';
 import axios from 'axios';
-import Activities from './Activity-nobuttons';
+import Card from '../Components/Card';
 import MultiRangeSlider from "multi-range-slider-react";
+import Activities from './Activities';
 import { Calendar, MapPin, Globe, DollarSign, Users, Check, Star } from 'lucide-react';
 
-const Itinerary = () => {
+const Itinerary = ({guestMode}) => {
   const [itinerary, setItinerary] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [minValue, set_minValue] = useState(1);
   const [maxValue, set_maxValue] = useState(10000);
-    useEffect(() => {
-      fetchItinerary();
-    }, []);
+  const [touristId, settouristId] = useState(null);
+  const [currency, setCurrency] = useState();
+
+
+  useEffect(() => {
+    const fetchCurrency = async () => {
+      const userCurrency = await getTouristId().currency;
+      setCurrency(userCurrency || 'EGP');  // Default to 'EGP' if no currency is fetched
+    };
+    fetchCurrency();
+  }, []);
+
+  const getTouristId = async () => {
+    try {
+      const [infoResponse, userResponse] = await Promise.all([
+        axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
+        }),
+        axios.get("http://localhost:8000/api/admin/getLoggedInUser", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
+        })
+      ]);
+
+      const combinedData = { ...infoResponse.data, ...userResponse.data };
+      console.log(combinedData);
+      return combinedData;
+    } catch (error) {
+      console.error("Error fetching tourist ID:", error);
+      return 1; // Fallback ID for guest mode if API fails
+    }
+  };
   
   
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log("guestMode:", guestMode);
+  
+        const user = await getTouristId();
+        let id = 1; // Default to guest mode
+        let currency = "EGP"; // Default currency if not found in user
+  
+        if (!guestMode) {
+          id = user._id;
+          currency = user.currency || currency;
+          settouristId(id);
+        } else {
+          settouristId(id); // Set touristId to 1 in guest mode
+        }
+  
+        // Define itinerary URL based on guestMode and currency
+        const itineraryUrl = id === 1
+          ? "http://localhost:8000/api/itinerary/getItineraryGuest"
+          : `http://localhost:8000/api/itinerary/getItinerary?currency=${currency}`;
+        
+        // Fetch itineraries based on the URL
+        const itineraryResponse = await axios.get(itineraryUrl, {
+          headers: id !== 1 ? { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` } : undefined
+        });
+  
+        let itineraryData = itineraryResponse.data;
+  
+        // Fetch bookings for the current tourist if not in guest mode
+        if (!guestMode) {
+          const userIdResponse = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            },
+          });
+          const userIdValue = userIdResponse.data?._id;
+  
+          const bookingsResponse = await axios.get("http://localhost:8000/api/bookings/getBooking", {
+            params: { userId: userIdValue },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            },
+          });
+  
+          const bookings = Array.isArray(bookingsResponse.data) ? bookingsResponse.data : [];
+          const bookedItineraryIds = bookings.map((booking) => booking.itineraryId?._id);
+  
+          // Filter itineraries based on bookings
+          itineraryData = itineraryData.filter(
+            (itinerary) => !bookedItineraryIds.includes(itinerary._id)
+          );
+        }
+  
+        // Update itinerary state with either filtered or fetched data
+        setItinerary(itineraryData);
+  
+      } catch (error) {
+        console.error("Error fetching itineraries or bookings:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchData();
+  }, [guestMode]);
+  
+  
 
-
-  const handleInput = (e) => {
+   const handleInput = (e) => {
     set_minValue(e.minValue);
     set_maxValue(e.maxValue);
   };
@@ -115,79 +210,6 @@ const Itinerary = () => {
       setLoading(false);
     }
   };
-  const fetchItinerary = async () => {
-    try {
-      // Step 1: Fetch the logged-in user's bookings (similar to fetchBookings in activities)
-      const fetchBookings = async () => {
-        try {
-          // Get the logged-in tourist's ID
-          const userId = async () => {
-            try {
-              const response = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
-                headers: {
-                  Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-                },
-              });
-              return response.data;  // Assuming response.data contains the user ID
-            } catch (error) {
-              console.error("Error fetching user info:", error);
-              return null;
-            }
-          };
-  
-          const userIdValue = await userId();
-  
-          // Fetch bookings for the current tourist
-          const response = await axios.get("http://localhost:8000/api/bookings/getBooking", {
-            params: {
-              userId: userIdValue,
-            },
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-            },
-          });
-  
-          if (Array.isArray(response.data)) {
-            return response.data;  // Return bookings array
-          } else {
-            return [];  // Return empty array if no valid bookings are found
-          }
-        } catch (error) {
-          console.error("Error fetching bookings:", error);
-          return [];
-        }
-      };
-  
-      // Step 2: Get the user's bookings and extract the booked itinerary IDs
-      const bookings = await fetchBookings();
-      const bookedItineraryIds = bookings.map((booking) => booking.itineraryId?._id);
-  
-      // Step 3: Fetch all itineraries from the API
-      const response = await fetch('http://localhost:8000/api/itinerary/getitinerary');
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-  
-      // Step 4: Filter out itineraries that have already been booked
-      const filteredItineraries = data.filter(
-        (itinerary) => !bookedItineraryIds.includes(itinerary._id)
-      );
-  
-      // Step 5: Update the state with the filtered itineraries
-      if (Array.isArray(filteredItineraries) && filteredItineraries.length > 0) {
-        setItinerary(filteredItineraries);
-      } else {
-        console.log("Itinerary array is empty or all itineraries are booked.");
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
 
   const handleCreate = () => {
     console.log("Create new itinerary");
