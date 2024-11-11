@@ -18,7 +18,8 @@ const {
     activateDeactivateItinerary,
     flagItinerary,
     unflagItinerary,
-    rateItinerary
+    rateItinerary,
+    generateShareLink
   } = require("../Controllers/ItineraryController");
 
   router.post("/createItinerary", createItinerary);
