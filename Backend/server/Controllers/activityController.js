@@ -269,7 +269,7 @@ const generateShareableLink = async (req, res) => {
     if (!activity) {
       return res.status(404).json({ error: "Activity not found" });
     }
-    const shareableLink = `http://localhost:8000/api/activity/${activityId}`;
+    const shareableLink = `http://localhost:8000/api/activity/getActivityById?id=${activityId}`;
     res.status(200).json({ shareableLink });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -285,7 +285,7 @@ const sendActivityLinkViaEmail = async (req, res) => {
     if (!activity) {
       return res.status(404).json({ error: "Activity not found" });
     }
-    const shareableLink = `http://localhost:8000/api/activity/${activityId}`;
+    const shareableLink = `http://localhost:8000/api/activity/getActivityById?id=${activityId}`;
     // Configure nodemailer
     const transporter = nodemailer.createTransport({
       service: "gmail",
