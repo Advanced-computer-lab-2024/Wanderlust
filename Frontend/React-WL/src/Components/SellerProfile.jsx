@@ -77,7 +77,7 @@ const SellerProfile = () => {
 if (profilePicture) {
     const formData = new FormData();
     formData.append('file', profilePicture); // Append the file
-    formData.append('userId', profile._id);  // Append the userId
+    formData.append('userId', profile.userId);  // Append the userId
   
     try {
       // Upload image to backend
@@ -210,6 +210,23 @@ const SettingsPopup = ({ profile, onClose }) => {
   const [passwordError, setPasswordError] = useState('');
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  const handleDeleteAccount = async () => {
+    try {
+
+      const response = await axios.get(
+        'http://localhost:8000/api/admin/requestDeleteAccount',
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
+          }
+        }
+      );
+      console.log(response);
+    } catch (error) {
+      const message = error.response?.data?.message || 'An error has occurred. Please try again.';
+      alert(`Error: ${message}`);
+    }
+  };
 
   const handleChangePassword = async () => {
     try {
@@ -309,13 +326,17 @@ const SettingsPopup = ({ profile, onClose }) => {
           )}
         </div>
 
-
-
         <button
           onClick={onClose}
-          className="mt-4 bg-red-600 text-white rounded px-4 py-2"
+          className="mt-4 bg-red-600 text-white rounded px-4 py-2 mr-2"
         >
           Close
+        </button>
+        <button
+          onClick={handleDeleteAccount}
+          className="mt-4 bg-red-600 text-white rounded px-4 py-2"
+        >
+          Delete Account
         </button>
       </div>
     </div>

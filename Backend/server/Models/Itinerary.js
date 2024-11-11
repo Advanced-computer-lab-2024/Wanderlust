@@ -21,6 +21,10 @@ const CommentSchema = new Schema({
 
 
 const itinerarySchema = new mongoose.Schema({
+    creator: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: 'TourGuide', 
+    },
     title: { 
           type: String,
           required: true

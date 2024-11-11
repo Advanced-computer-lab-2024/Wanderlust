@@ -7,6 +7,7 @@ const {
   authenticateUser,
   getLoggedInUser,
   getLoggedInInfo,
+  requestDeleteAccount,
   acceptTerms,
 } = require("../Controllers/authController");
 
@@ -25,5 +26,6 @@ router.post("/updatepassword", authenticateUser, updatePassword);
 router.get("/getLoggedInUser", getLoggedInUser);
 router.get("/getLoggedInInfo", getLoggedInInfo);
 router.post("/acceptTerms", acceptTerms);
+router.get("/requestDeleteAccount", requestDeleteAccount);
 
 module.exports = router;
