@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Card from './Card';
@@ -85,13 +84,14 @@ const TourGuideProfile = () => {
       const formData = new FormData();
       formData.append('image', selectedImage);
 
-      const response = await axios.post(
-        `http://localhost:8000/api/uploadImage/tourGuide/photo`,
+      const response = await axios.put(
+        `http://localhost:8000/api/documents/uploadImage/TourGuide/photo`,
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            
             Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+            'Content-Type': 'multipart/form-data',
           },
         }
       );
@@ -143,10 +143,10 @@ const TourGuideProfile = () => {
       if (response.data) {
         setProfile((prevProfile) => ({
           ...prevProfile,
-          YOE : response.data.tourGuide.YOE,
-          previousWork : response.data.tourGuide.previousWork,
+          YOE: response.data.tourGuide.YOE,
+          previousWork: response.data.tourGuide.previousWork,
+          profileImage: response.data.tourGuide.profileImage,
         }));
-
 
         setInfo((prevInfo) => ({
           ...prevInfo,
@@ -194,9 +194,9 @@ const TourGuideProfile = () => {
             <div className="p-6">
               <div className="flex items-center mb-6">
                 <div className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center">
-                  {profile.profileImage ? (
+                  {profile.photoUrl ? (
                     <img
-                      src={profile.profileImage}
+                      src={profile.photoUrl}
                       alt="Profile"
                       className="w-24 h-24 rounded-full object-cover"
                     />
@@ -261,7 +261,7 @@ const TourGuideProfile = () => {
                     type="tel"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="bg-gray-200 text-gray-800 rounded p-1 w-24"
+                    className="bg-gray-200 text-gray-800 rounded p-1 w-40"
                   />
                 </div>
                 <div className="mb-4">
@@ -273,13 +273,19 @@ const TourGuideProfile = () => {
                       onChange={handleImageUpload}
                       className="bg-gray-200 text-gray-800 rounded p-2 mr-2"
                     />
-                    {profile.profileImage && (
+                    {profile.photoUrl && (
                       <img
                         src={profile.profileImage}
                         alt="Profile"
                         className="w-16 h-16 rounded-full object-cover"
                       />
                     )}
+                    <button
+                      onClick={uploadProfileImage}
+                      className="bg-indigo-600 text-white py-2 px-4 rounded-md ml-2"
+                    >
+                      Upload
+                    </button>
                   </div>
                 </div>
                 <div className="flex justify-end">
@@ -315,6 +321,25 @@ const SettingsPopup = ({ profile, username, onClose }) => {
   const [passwordError, setPasswordError] = useState('');
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
+
+ 
+  const handleDeleteAccount = async () => {
+    try {
+
+      const response = await axios.get(
+        'http://localhost:8000/api/admin/requestDeleteAccount',
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
+          }
+        }
+      );
+      console.log(response);
+    } catch (error) {
+      const message = error.response?.data?.message || 'An error has occurred. Please try again.';
+      alert(`Error: ${message}`);
+    }
+  };
 
   const handleChangePassword = async () => {
     console.log(oldPassword);
@@ -430,6 +455,12 @@ const SettingsPopup = ({ profile, username, onClose }) => {
             className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md">
             Close
           </button>
+          <button
+          onClick={handleDeleteAccount}
+          className="mt-4 bg-red-600 text-white rounded px-4 py-2"
+        >
+          Delete Account
+        </button>
         </div>
       </div>
     </div>

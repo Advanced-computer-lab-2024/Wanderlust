@@ -1,6 +1,7 @@
 const Advertiser = require("../Models/Advertiser.js");
 const Activity = require("../Models/Activity.js");
 const User = require("../Models/user");
+const jwt = require('jsonwebtoken');
 
 //http://localhost:8000/api/advertiser/createAdvertiserProfile/userId
 const createAdvertiser = async (req, res) => {
@@ -55,7 +56,7 @@ const getAdvertiserByUsername = async (req, res) => {
 
 const updateAdvertiser = async (req, res) => {
   const { username } = req.body;
-  const { companyWebsite, companyProfile, hotline } = req.body;
+  const { mobileNumber,companyWebsite, companyProfile, hotline } = req.body;
 
   console.log("Updating advertiser:", {
     username,
@@ -65,14 +66,30 @@ const updateAdvertiser = async (req, res) => {
   });
 
   try {
-    const updatedAdvertiser = await Advertiser.findOneAndUpdate(
-      { username },
-      { companyWebsite, companyProfile, hotline },
-      { new: true, runValidators: true }
-    );
-
-    res.status(200).json(updatedAdvertiser);
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
+        return res.status(401).json({ message: 'Authorization header missing' });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    var advertiser = await Advertiser.findById(decoded.id);
+    const user = await User.findById(advertiser.userId);
+    console.log(user);
+    console.log(advertiser);
+    if (!user) {
+        console.log('User not found');
+        return res.status(404).json({ message: 'User not found' });
+    }
+    user.mobileNumber = mobileNumber;
+    await user.save();
+    advertiser.hotline = hotline;
+    advertiser.companyWebsite = companyWebsite;
+    advertiser.companyProfile = companyProfile;
+    await advertiser.save();
+    res.status(200).json({advertiser , user});
+    
   } catch (error) {
+    console.error("Error updating advertiser:", error);
     res.status(400).json({ error: error.message });
   }
 };
