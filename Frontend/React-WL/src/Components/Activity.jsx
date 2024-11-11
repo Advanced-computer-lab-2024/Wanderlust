@@ -1,4 +1,6 @@
 import React from 'react';
+import axios from "axios";
+
 import { Edit3, Trash2 } from 'lucide-react';
 
 const Activity = ({
@@ -16,6 +18,37 @@ const Activity = ({
   // Function to check if special discounts are available
   const hasSpecialDiscounts = (discounts) => {
     return discounts && discounts !== "undefined" && discounts.trim() !== "";
+  };
+  const handleBookActivity = async () => {
+    try {
+      const userId = async () => {
+        try {
+          const response = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            },
+          });
+          console.log(response.data);
+          return response.data; // Assuming response.data contains the user ID
+        } catch (error) {
+          console.error("Error fetching user info:", error);
+        }
+      };
+      
+      const userIdValue = await userId();
+      
+      const response2 = await axios.post("http://localhost:8000/api/activity/bookActivity", {
+        activityId: activity._id,
+        userId: userIdValue,
+      });
+
+      if (response2.status === 201) {
+        alert("Booking successful!");
+      }
+    } catch (error) {
+      console.error("Error booking activity:", error);
+      alert("Error booking activity. Please try again.");
+    }
   };
 
   return (
@@ -70,6 +103,14 @@ const Activity = ({
             )}
           </div>
         </div>
+        <div className="mt-4">
+          <button
+            onClick={handleBookActivity}
+            className="bg-blue-500 text-white px-3 py-1 rounded-md"
+          >
+            Book Activity
+          </button>
+        </div>
 
         {/* Update and Delete Buttons */}
         <div className="flex justify-end space-x-2 mt-4">
@@ -89,6 +130,7 @@ const Activity = ({
               <Trash2 className="mr-1" size={16} /> Delete
             </button>
           )}
+          
         </div>
       </div>
     </div>

@@ -7,6 +7,15 @@ const Products = () => {
     const [searchName, setSearchName] = useState('');
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
+    
+    // States for rating and form visibility
+    const [showRatingForm, setShowRatingForm] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [rating, setRating] = useState(0);
+    const [review, setReview] = useState('');
+    
+    // State to track purchased products
+    const [purchasedProducts, setPurchasedProducts] = useState({});
 
     useEffect(() => {
         fetchProducts();
@@ -56,6 +65,45 @@ const Products = () => {
         }
     };
 
+    const handlePurchase = (product) => {
+        setSelectedProduct(product); // Store the selected product
+        setShowRatingForm(true); // Show the rating form
+        
+        // Mark product as purchased
+        setPurchasedProducts((prevState) => ({
+            ...prevState,
+            [product._id]: true
+        }));
+    };
+
+    const submitRating = async () => {
+        if (!rating) {
+            alert('Please enter a rating.');
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem('token'); // Assuming the token is stored in localStorage
+            const response = await axios.post(
+                'http://localhost:8000/api/product/product/rate',
+                { productId: selectedProduct._id, rating, review },
+                { headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` } }
+            );
+
+            if (response.status === 200) {
+                alert('Rating submitted successfully');
+                setShowRatingForm(false); // Hide the form after submission
+                setRating(0); // Reset the form
+                setReview('');
+            } else {
+                alert('Failed to submit rating');
+            }
+        } catch (error) {
+            console.error('Error submitting rating:', error);
+            alert('Error submitting rating');
+        }
+    };
+
     return (
         <div className="container py-4 w-75">
             <div className="mb-4">
@@ -63,7 +111,6 @@ const Products = () => {
             </div>
 
             <div className="products-container p-4 border rounded shadow-sm">
-                
                 
                 <div className="mb-3">
                     <label htmlFor="sortOrder" className="form-label">Sort by Rating:</label>
@@ -96,18 +143,42 @@ const Products = () => {
                 
                 <div id="productsList">
                     {products.map(product => (
-                        <div key={product.name} className="product-item mb-3 p-3 border rounded">
+                        <div key={product._id} className="product-item mb-3 p-3 border rounded">
                             <span>Name: {product.name}</span><br />
                             <span>Price: ${product.price}</span><br />
                             <span>Description: {product.description}</span><br />
                             <span>Quantity: {product.quantity}</span><br />
                             <span>Rating: {product.rating}</span><br />
                             <span>Reviews: {product.reviews}</span><br />
-                            {/* <span>Seller: {product.seller.name}</span><br /> */}
                             <img src={product.picture} alt={product.name} style={{ maxWidth: '100px', maxHeight: '100px' }} /><br />
+
+                            <button 
+                                className="btn btn-success mt-2" 
+                                onClick={() => handlePurchase(product)} 
+                                disabled={purchasedProducts[product._id]}
+                            >
+                                {purchasedProducts[product._id] ? "Purchased!" : "Purchase"}
+                            </button>
                         </div>
                     ))}
                 </div>
+
+                {/* Rating Form Modal */}
+                {showRatingForm && (
+                    <div className="rating-form">
+                        <h3>Rate {selectedProduct.name}</h3>
+                        <div className="mb-3">
+                            <label htmlFor="rating">Rating (1-5):</label>
+                            <input type="number" id="rating" value={rating} onChange={(e) => setRating(e.target.value)} min="1" max="5" className="form-control" />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="review">Review:</label>
+                            <textarea id="review" value={review} onChange={(e) => setReview(e.target.value)} className="form-control" />
+                        </div>
+                        <button className="btn btn-primary" onClick={submitRating}>Submit</button>
+                        <button className="btn btn-secondary" onClick={() => setShowRatingForm(false)}>Cancel</button>
+                    </div>
+                )}
             </div>
         </div>
     );
