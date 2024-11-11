@@ -68,10 +68,13 @@ const advertiserRoutes = require("./Routes/advertiserRoutes");
 const categoryRoutes = require("./Routes/categoryRoutes");
 const sellerRoutes = require("./Routes/sellerRoutes");
 const itineraryRoutes = require("./Routes/itineraryRoutes");
+const bookingRoutes = require("./Routes/BookingRoutes");
 
+const transportationRoutes = require("./Routes/transportationRoutes");
 const ComplaintRoutes = require("./Routes/ComplaintRoutes");
 
 const documentRoutes = require("./Routes/documentsRoutes");
+const { login } = require("./Controllers/authController");
 
 
 //Routes
@@ -86,10 +89,14 @@ app.use("/api/seller", sellerRoutes);
 app.use("/api/tourGuide", tourGuideRoutes);
 app.use("/api/advertiser", advertiserRoutes);
 app.use("/api/itinerary", itineraryRoutes);
+app.use("/api/bookings", bookingRoutes);
+
+
 
 app.use("/api/Complaint", ComplaintRoutes);
 
 app.use("/api/documents", documentRoutes);
+app.use("/api/transportation", transportationRoutes)
 
 
 app.use(express.json());
@@ -103,6 +110,7 @@ app.put("/updateLocation/:id", updateLocation);
 app.delete("/deleteLocation/:id", deleteLocation);
 app.get("/getLocation/:id", getLocationById);
 
+app.post("/login", login);
 //createLocation,
 //getLocations,
 //updateLocation,

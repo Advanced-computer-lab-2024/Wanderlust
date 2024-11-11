@@ -1,7 +1,7 @@
 const tourGuideModel = require("../Models/tourGuide.js");
 const { default: mongoose, get } = require("mongoose");
 const User = require("../Models/user");
-
+const jwt = require('jsonwebtoken');
 const createTourGuideProfile = async (req, res) => {
   const { userId } = req.params;
   const { YOE, previousWork } = req.body;
@@ -51,15 +51,32 @@ const getTourGuide = async (req, res) => {
 
 const updateTourGuide = async (req, res) => {
   const { username } = req.body;
-  const { mobileNumber, YOE, previousWork } = req.body;
+  const {mobileNumber, YOE, previousWork } = req.body;
+  console.log(req.body);
   try {
-    const tourGuide = await tourGuideModel.findOneAndUpdate(
-      { username },
-      { mobileNumber, YOE, previousWork },
-      { new: true }
-    );
-    res.status(200).json(tourGuide);
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
+        return res.status(401).json({ message: 'Authorization header missing' });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    var tourGuide = await tourGuideModel.findById(decoded.id);
+    const user = await User.findById(tourGuide.userId);
+    console.log(user);
+    console.log(tourGuide);
+    if (!user) {
+        console.log('User not found');
+        return res.status(404).json({ message: 'User not found' });
+    }
+    user.mobileNumber = mobileNumber;
+    await user.save();
+    tourGuide.YOE = YOE;
+    tourGuide.previousWork = previousWork;
+    await tourGuide.save();
+    res.status(200).json({tourGuide , user});
+    
   } catch (error) {
+    console.error("Error updating tour guide:", error);
     res.status(400).json({ error: error.message });
   }
 };

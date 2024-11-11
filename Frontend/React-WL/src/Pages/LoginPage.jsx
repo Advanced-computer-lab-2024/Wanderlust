@@ -29,7 +29,7 @@ const Login = () => {
         if (response.data.success) {
             setShowTerms(false);
             if (role === "tourguide") {
-                navigate("/tgprofile");
+                navigate("/Tgprofile");
             } else if (role === "seller") {
                 navigate("/SellerProfile");
             } else if (role === "advertiser") {
@@ -60,6 +60,9 @@ const Login = () => {
         else if(data.role === "tourismGovernor") {
             navigate("/TourismGovernorProfile");
         }
+        else if(data.role === "seller") {
+            navigate("/SellerProfile");
+        }
         if(data.role === "tourguide" || data.role === "seller" || data.role === "advertiser") {
             const response2 = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
                 headers: {
@@ -69,7 +72,7 @@ const Login = () => {
             console.log(response2.data);
             if(response2.data.termsAccepted == true){
                 if(data.role === "tourguide") {
-                    navigate("/tgprofile");
+                    navigate("/Tgprofile");
                 } else if(data.role === "seller") {
                     navigate("/SellerProfile");
                 } else if(data.role === "advertiser") {

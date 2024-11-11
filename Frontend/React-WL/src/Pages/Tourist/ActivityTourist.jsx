@@ -1,5 +1,5 @@
 import React from 'react'
-import Activities from '../../Components/Activities-nobuttons'
+import Activities from '../../Components/Activities'
 import TouristNavBar from '../../Components/NavBars/TouristNavBar'
 
 const ActivityTourist = () => {
@@ -9,7 +9,7 @@ const ActivityTourist = () => {
       
       <TouristNavBar  />
       
-      <Activities />
+      <Activities showCreateButton={false} showUpdateButton={false} showDeleteButton={false}/>
       
   
      

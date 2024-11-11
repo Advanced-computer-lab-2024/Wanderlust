@@ -14,13 +14,13 @@ import AdminManageProductsPage from './Pages/AdminManageProductsPage';
 import AdminManageActivitiesPage from './Pages/AdminManageActivitiesPage';
 import AdminManagePreferenceTagsPage from './Pages/AdminManagePreferenceTagsPage';
 import AdminManageComplaintsPage from './Pages/AdminManageComplaintsPage';
-import ActivitiesPage from './Pages/Guest/ActivitiesPage';
+import ActivitiesGuest from './Pages/Guest/ActivitiesGuest';
 // import Tourist from './Pages/Tourist';
 import ItineraryTourist from './Pages/Tourist/ItineraryTourist';
 import LocationTourist from './Pages/Tourist/LocationTourist';
 import ActivityTourist from './Pages/Tourist/ActivityTourist';
 import ProductTourist from './Pages/Tourist/ProductTourist';
-import TgProfile from './Pages/Tourguide/Tgprofile';
+import Tgprofile from './Pages/Tourguide/Tgprofile';
 import Complaint from './Components/Admin/Complaint';
 import ComplaintsTouristPage from './Pages/Tourist/ComplaintsTouristPage';
 
@@ -34,6 +34,11 @@ import AdvertiserProfilePage from './Pages/Advertiser/AdvertiserProfilePage';
 import AdvertiserActivitiesPage from './Pages/Advertiser/AdvertiserActivitiesPage';
 import TourismGovernorLocationsPage from './Pages/TourismGovernor/TourismGovrernorLocationsPage';
 import TourismGovernorProfilePage from './Pages/TourismGovernor/TourismGovrernorProfilePage';
+import SellerMyProductsPage from './Pages/Seller/SellerMyProductsPage';
+import BookingTourist from './Pages/Tourist/TouristBookingsPage';
+import AdminViewDocuments from './Pages/AdminViewDocuments';
+import AdminUpdatePassword from './Pages/AdminUpdatePassword';
+import AdminManageItinerary from './Pages/AdminManageItinerary';
 const App = () => {
   return (
     <Router>
@@ -50,6 +55,9 @@ const App = () => {
         <Route path="/manageactivities" element={<AdminManageActivitiesPage />} />
         <Route path="/managepreferencetags" element={<AdminManagePreferenceTagsPage />} />
         <Route path="/managecomplaints" element={<AdminManageComplaintsPage />} />
+        <Route path="/viewpendingdocuments" element={<AdminViewDocuments />} />
+        <Route path="/AdminUpdatePassword" element={<AdminUpdatePassword />} />
+        <Route path="/AdminManageItinerary" element={<AdminManageItinerary />} />
         <Route path="/complaint" element={<Complaint />} />
 
 
@@ -63,22 +71,24 @@ const App = () => {
         <Route path="/ProductTourist" element={<ProductTourist />} />
         <Route path="/ComplaintsTourist" element={<ComplaintsTouristPage />} />
         <Route path="/TouristProfile" element={<TouristProfilePage />} />
+        <Route path="/BookingsTourist" element={<BookingTourist />} />
 
         {/* Guest Routes */}
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/LocationPage" element={<LocationsPage />} />
-        <Route path="/activitiesPage" element={<ActivitiesPage />} />
+        <Route path="/activitiesGuest" element={<ActivitiesGuest />} />
         <Route path="/itinerary" element={<Itinerary />} />
 
 
         {/* Tourguide Routes */}
-        <Route path="/TgProfile" element={<TgProfile />} />
+        <Route path="/Tgprofile" element={<Tgprofile />} />
         <Route path="/ItineraryTourguide" element={<ItineraryTourguidePage />} />
         <Route path="/ActivityTourguide" element={<ActivityTourguidePage />} />
 
         {/* Seller Routes */}
         <Route path="/SellerProfile" element={<SellerProfilePage />} />
         <Route path="/SellerProducts" element={<SellerProductsPage />} />
+        <Route path="/MySellerProducts" element={<SellerMyProductsPage />} />
 
         {/* Advertiser Routes */}
         <Route path="/AdvertiserProfile" element={<AdvertiserProfilePage />} />

@@ -4,7 +4,7 @@ import axios from 'axios';
 import Card from './Card';
 import { Phone, Calendar, User, Mail, Clock, Briefcase, Award, Star, Wallet, BarChart2, PlusCircle, Settings, Eye, EyeOff } from 'lucide-react';
 
-const TourGuideProfile = () => {
+const advProfile = () => {
   const [profile, setProfile] = useState(null);
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -127,7 +127,7 @@ const TourGuideProfile = () => {
       const response = await axios.put(
         'http://localhost:8000/api/tourGuide/updatetgprofile',
         {
-          username,
+          
           mobileNumber: phoneNumber,
           YOE,
           previousWork,
@@ -138,20 +138,18 @@ const TourGuideProfile = () => {
           },
         }
       );
-      console.log(response.data);
 
       if (response.data) {
         setProfile((prevProfile) => ({
           ...prevProfile,
-          YOE : response.data.tourGuide.YOE,
-          previousWork : response.data.tourGuide.previousWork,
+          YOE: response.data.YOE,
+          previousWork: response.data.previousWork,
         }));
 
-
-        setInfo((prevInfo) => ({
-          ...prevInfo,
-          mobileNumber: response.data.user.mobileNumber,
-        }));
+        // setInfo((prevInfo) => ({
+        //   ...prevInfo,
+        //   mobileNumber: response.data.mobileNumber,
+        // }));
 
         setShowUpdateForm(false);
         alert('Profile updated successfully!');
@@ -354,7 +352,7 @@ const SettingsPopup = ({ profile, username, onClose }) => {
           <h4 className="text-lg font-semibold text-indigo-600 mb-2">Account Details</h4>
           <div className="mb-2">
             <label className="block text-gray-600">Username</label>
-            {profile && <p className="text-gray-800">{profile.username}</p>}
+            {info && <p className="text-gray-800">{profile.username}</p>}
           </div>
           <div className="mb-2">
             <label className="block text-gray-600">Email</label>
@@ -437,4 +435,4 @@ const SettingsPopup = ({ profile, username, onClose }) => {
 };
 
 
-export default TourGuideProfile;
+export default advProfile;

@@ -4,6 +4,7 @@ const Activity = require("../Models/Activity");
 const PreferenceTagModel = require("../Models/PreferenceTag");
 const Booking = require("../Models/Booking");
 const User = require("../Models/user");
+const jwt = require('jsonwebtoken'); 
 
 const { convertCurrency } = require("./currencyConverter");
 
@@ -20,8 +21,12 @@ const createItinerary = async (req, res) => {
     accessibility,
     pickupLocation,
     dropoffLocation,
+    isActive,
   } = req.body;
   try {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const creatorId = decodedToken.id;
     const itinerary = await Itinerary.create({
       title,
       activities,
@@ -34,6 +39,8 @@ const createItinerary = async (req, res) => {
       accessibility,
       pickupLocation,
       dropoffLocation,
+      isActive,
+      creator: creatorId,
     });
     const populatedItenary = await Itinerary.findById(itinerary._id).populate(
       "activities"
@@ -45,10 +52,11 @@ const createItinerary = async (req, res) => {
 };
 //u have to enter currency wanted in postman example
 //http://localhost:8000/api/itinerary/getItinerary?currency=EUR
+//edited
 const getItinerary = async (req, res) => {
   const { currency } = req.query; // Get the selected currency from query parameters
   try {
-    const itineraries = await Itinerary.find().populate({
+    const itineraries = await Itinerary.find({ flagged: false }).populate({
       path: "activities",
       populate: { path: "category tags" },
     });
@@ -95,6 +103,7 @@ const updateItinerary = async (req, res) => {
     accessibility,
     pickupLocation,
     dropoffLocation,
+    isActive,
   } = req.body;
   try {
     const itenary = await Itinerary.findById(id);
@@ -115,6 +124,7 @@ const updateItinerary = async (req, res) => {
         accessibility,
         pickupLocation,
         dropoffLocation,
+        isActive,
       },
       { new: true }
     );
@@ -317,7 +327,7 @@ const cancelItineraryBooking = async (req, res) => {
     }
 
     // If it's more than 48 hours, proceed to cancel the booking
-    await ItineraryBooking.deleteOne({ _id: bookingId });
+    await Booking.deleteOne({ _id: bookingId });
     return res.status(200).json({ message: "Booking cancelled successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -379,6 +389,7 @@ const activateDeactivateItinerary = async (req, res) => {
   }
 };
 
+
 const generateShareLink = async (req, res) => {
   try {
     const { itineraryId } = req.params;
@@ -396,6 +407,73 @@ const generateShareLink = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Error generating share link" });
+
+// Flag an itinerary as inappropriate (admin only)
+const flagItinerary = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const itinerary = await Itinerary.findById(id);
+      if (!itinerary) {
+          return res.status(404).json({ message: 'Itinerary not found' });
+      }
+
+      itinerary.flagged = true;
+      await itinerary.save();
+      res.status(200).json({ message: 'Itinerary flagged successfully', itinerary });
+  } catch (error) {
+      console.error('Error flagging itinerary:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Unflag an itinerary as inappropriate (admin only)
+const unflagItinerary = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const itinerary = await Itinerary.findById(id);
+      if (!itinerary) {
+          return res.status(404).json({ message: 'Itinerary not found' });
+      }
+
+      itinerary.flagged = false;
+      await itinerary.save();
+      res.status(200).json({ message: 'Itinerary unflagged successfully', itinerary });
+  } catch (error) {
+      console.error('Error unflagging itinerary:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Tourist rate an itinerary they followed
+const rateItinerary = async (req, res) => {
+  try {
+      const { itineraryId, rating, review } = req.body;
+      if (!itineraryId || !rating) {
+          return res.status(400).json({ message: 'Itinerary ID and rating are required' });
+      }
+
+      const token = req.headers.authorization.split(' ')[1];
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+      const userId = decodedToken.id;
+
+      const itinerary = await Itinerary.findById(itineraryId);
+      if (!itinerary) {
+          return res.status(404).json({ message: 'Itinerary not found' });
+      }
+
+      const existingRating = itinerary.ratings.find(r => r.userId.toString() === userId);
+      if (existingRating) {
+          existingRating.rating = rating;
+          existingRating.review = review;
+      } else {
+          itinerary.ratings.push({ userId, rating, review });
+      }
+
+      await itinerary.save();
+      res.status(200).json({ message: 'Rating added successfully', itinerary });
+  } catch (error) {
+      console.error('Error rating itinerary:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -413,4 +491,7 @@ module.exports = {
   addComment,
   activateDeactivateItinerary,
   generateShareLink
+  flagItinerary,
+  unflagItinerary,
+  rateItinerary,
 };

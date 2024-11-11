@@ -31,7 +31,7 @@ router.get("/viewAvailableProducts", viewAvailableProducts);
 router.delete("/deleteproduct", deleteProductByName);
 router.put("/archiveProduct", archiveProduct);
 router.put("/unarchiveProduct", unarchiveProduct);
-router.post('/product/rate', authenticateUser, tourist, rateProduct);
+router.post('/product/rate', rateProduct);
 router.get('/product/:productId/details', authenticateUser, adminOrSeller, viewProductDetails);
 //extra
 router.post('/product/sale', addSale);
