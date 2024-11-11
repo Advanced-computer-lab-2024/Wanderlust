@@ -12,8 +12,16 @@ const fetchBookings = async (req, res) => {
     let bookings = await Booking.find({ userId })
       .populate("activityId") // Populate related activity data (if present)
       .populate("userId", "username email") // Populate user data (e.g., name and email)
-      .populate("itineraryId") // Populate related itinerary data (if present)
-      .exec();
+      .populate({
+      path: "itineraryId",
+      populate: {
+        path: "creator",
+        populate: {
+        path: "userId",
+        select: "username email"
+        }
+      }
+      })
 
     // Iterate and update the `attended` status based on the current time
     const currentTime = new Date();
