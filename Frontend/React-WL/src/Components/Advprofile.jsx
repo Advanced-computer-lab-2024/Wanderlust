@@ -4,7 +4,7 @@ import axios from 'axios';
 import Card from './Card';
 import { Phone, Calendar, User, Mail, Clock, Briefcase, Award, Star, Wallet, BarChart2, PlusCircle, Settings, Eye, EyeOff } from 'lucide-react';
 
-const TourGuideProfile = () => {
+const advProfile = () => {
   const [profile, setProfile] = useState(null);
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -435,4 +435,4 @@ const SettingsPopup = ({ profile, username, onClose }) => {
 };
 
 
-export default TourGuideProfile;
+export default advProfile;
