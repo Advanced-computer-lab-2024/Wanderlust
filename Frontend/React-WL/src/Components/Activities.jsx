@@ -97,7 +97,7 @@ const Activities = ({ guestMode, showCreateButton = true, showUpdateButton = tru
             return [];
           }
         };
-  
+
         // Step 2: Get the user's bookings and extract the booked activity IDs
         const bookings = await fetchBookings();
         const bookedActivityIds = bookings.map((booking) => booking.activityId?._id);
@@ -167,7 +167,7 @@ const Activities = ({ guestMode, showCreateButton = true, showUpdateButton = tru
       if (minValue) url += `minBudget=${minValue}&`;
       if (maxValue) url += `maxBudget=${maxValue}&`;
       if (date) url += `date=${date}&`;
-      if (category) url += `language=${category}&`;
+      if (category) url += `category=${category}&`;
       if (rating) url += `ratings=${rating}&`;
       url =
         url.slice(-1) === "&" || url.slice(-1) === "?"
@@ -263,6 +263,7 @@ const Activities = ({ guestMode, showCreateButton = true, showUpdateButton = tru
                 <option value="food">Food</option>
                 <option value="comedy show">Comedy Show</option>
                 <option value="parks">Parks</option>
+                <option value="party">Party</option>
               </select>
             </div>
             <div className="Datediv mb-4">
