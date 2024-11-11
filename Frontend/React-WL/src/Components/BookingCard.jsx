@@ -12,6 +12,30 @@ const BookingCard = ({ booking, onCancel }) => {
       return "No Name Available";
     }
   };
+  const handleBookTransportation = async () => {
+    const transportation = document.querySelector('select').value;
+
+    const response = await axios.get("http://localhost:8000/api/admin/getLoggedInUser", {
+      headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
+      }
+    });
+    const user = response.data;
+    // console.log(transportation);
+    try {
+      await axios.post(
+        `http://localhost:8000/api/transportation/bookTransportation`,
+        {
+          advertiserId: transportation == "uber" ? "67324784d7b329c5a5120909" : "67324738d7b329c5a5120903",
+          touristId : user._id,
+        },
+      );
+      alert("Transportation booked successfully!");
+    } catch (error) {
+      console.error("Error booking transportation:", error);
+      alert("Failed to book transportation. Please try again later.");
+    }
+  };
 
   const handleReviewTourGuide = async () => {
     const tourGuideRating = document.querySelector('input[placeholder="Rate the tourguide (1-5)"]').value;
@@ -150,6 +174,24 @@ const BookingCard = ({ booking, onCancel }) => {
       <p className="text-gray-600 text-sm">Booking Date: {formatDate(booking.createdAt)}</p>
       <p className="text-gray-600 text-sm">Price: ${getBookingPrice()}</p>
       <p className="text-gray-600 text-sm">Attended: {booking.attended ? "True" : "False"} </p>
+      {!booking.attended && (
+        <>
+      <div className="mt-2">
+        <label className="block text-gray-500 text-xs">Select Transportation:</label>
+        <select className="border rounded p-1 text-xs w-full">
+          <option value="london-cab">London Cab</option>
+          <option value="uber">Uber</option>
+        </select>
+      </div>
+      <div className="mt-2">
+        <button onClick={handleBookTransportation} className="bg-green-500 text-white px-4 py-2 rounded">
+          Book
+        </button>
+
+      </div>
+      </>
+      )}
+      
 
       <div className="mt-2"></div>
       <div className="mt-</div>2">
