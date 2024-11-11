@@ -3,7 +3,7 @@ import Navbar from '../../Components/Navbar'
 import TourGuideProfile from '../../Components/TourGuideProfile'
 import TourguideNavBar from '../../Components/NavBars/TourguideNavBar'
 
-const TgProfile = () => {
+const Tgprofile = () => {
   return (
     <>
     <TourguideNavBar/>
@@ -15,4 +15,4 @@ const TgProfile = () => {
   )
 }
 
-export default TgProfile
+export default Tgprofile

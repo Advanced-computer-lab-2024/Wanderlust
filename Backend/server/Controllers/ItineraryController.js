@@ -21,6 +21,7 @@ const createItinerary = async (req, res) => {
     accessibility,
     pickupLocation,
     dropoffLocation,
+    isActive,
   } = req.body;
   try {
     const token = req.headers.authorization.split(' ')[1];
@@ -38,6 +39,7 @@ const createItinerary = async (req, res) => {
       accessibility,
       pickupLocation,
       dropoffLocation,
+      isActive,
       creator: creatorId,
     });
     const populatedItenary = await Itinerary.findById(itinerary._id).populate(
@@ -101,6 +103,7 @@ const updateItinerary = async (req, res) => {
     accessibility,
     pickupLocation,
     dropoffLocation,
+    isActive,
   } = req.body;
   try {
     const itenary = await Itinerary.findById(id);
@@ -121,6 +124,7 @@ const updateItinerary = async (req, res) => {
         accessibility,
         pickupLocation,
         dropoffLocation,
+        isActive,
       },
       { new: true }
     );

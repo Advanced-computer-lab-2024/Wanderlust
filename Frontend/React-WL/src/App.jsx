@@ -20,7 +20,7 @@ import ItineraryTourist from './Pages/Tourist/ItineraryTourist';
 import LocationTourist from './Pages/Tourist/LocationTourist';
 import ActivityTourist from './Pages/Tourist/ActivityTourist';
 import ProductTourist from './Pages/Tourist/ProductTourist';
-import TgProfile from './Pages/Tourguide/Tgprofile';
+import Tgprofile from './Pages/Tourguide/Tgprofile';
 import Complaint from './Components/Admin/Complaint';
 import ComplaintsTouristPage from './Pages/Tourist/ComplaintsTouristPage';
 
@@ -81,7 +81,7 @@ const App = () => {
 
 
         {/* Tourguide Routes */}
-        <Route path="/TgProfile" element={<TgProfile />} />
+        <Route path="/Tgprofile" element={<Tgprofile />} />
         <Route path="/ItineraryTourguide" element={<ItineraryTourguidePage />} />
         <Route path="/ActivityTourguide" element={<ActivityTourguidePage />} />
 
