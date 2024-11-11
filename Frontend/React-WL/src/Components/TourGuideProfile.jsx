@@ -127,16 +127,14 @@ const TourGuideProfile = () => {
       const response = await axios.put(
         'http://localhost:8000/api/tourGuide/updatetgprofile',
         {
-          
-          mobileNumber: phoneNumber,
           YOE,
           previousWork,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-          },
-        }
+        // {
+        //   headers: {
+        //     Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+        //   },
+        // }
       );
 
       if (response.data) {
@@ -252,7 +250,7 @@ const TourGuideProfile = () => {
                     className="bg-gray-200 text-gray-800 rounded p-1 w-40"
                   />
                 </div>
-                <div className="flex items-center text-gray-600 mt-2">
+                {/* <div className="flex items-center text-gray-600 mt-2">
                   <Phone className="w-4 h-4 mr-2" />
                   <span>Phone Number: </span>
                   <input
@@ -261,7 +259,7 @@ const TourGuideProfile = () => {
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     className="bg-gray-200 text-gray-800 rounded p-1 w-24"
                   />
-                </div>
+                </div> */}
                 <div className="mb-4">
                   <label className="block text-gray-600">Profile Photo</label>
                   <div className="flex items-center">

@@ -51,11 +51,12 @@ const getTourGuide = async (req, res) => {
 
 const updateTourGuide = async (req, res) => {
   const { username } = req.body;
-  const { mobileNumber, YOE, previousWork } = req.body;
+  const { YOE, previousWork } = req.body;
+  console.log(req.body);
   try {
     const tourGuide = await tourGuideModel.findOneAndUpdate(
       { username },
-      { mobileNumber, YOE, previousWork },
+      { YOE, previousWork },
       { new: true }
     );
     res.status(200).json(tourGuide);
