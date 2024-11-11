@@ -6,7 +6,7 @@ const Booking = require("../Models/Booking");
 const User = require("../Models/user");
 const jwt = require('jsonwebtoken'); 
 
-const { convertCurrency } = require("./currencyConverter");
+const { getExchangeRates, convertCurrency } = require("./currencyConverter");
 
 const createItinerary = async (req, res) => {
   const {
@@ -89,6 +89,19 @@ const getItinerary = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+const getItineraryGuest = async (req, res) => {
+  try {
+    const itinerary = await Itinerary.find().populate({
+      path: "activities",
+      populate: { path: "category tags" }, // Populate nested fields if needed
+    });
+    res.status(200).json(itinerary);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 const updateItinerary = async (req, res) => {
   const {
     id,
@@ -482,6 +495,7 @@ const rateItinerary = async (req, res) => {
 module.exports = {
   createItinerary,
   getItinerary,
+  getItineraryGuest,
   updateItinerary,
   deleteItinerary,
   sortItineraries,
