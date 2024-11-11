@@ -27,5 +27,6 @@ const {
   router.delete("/cancelItineraryBooking/:bookingId", cancelItineraryBooking);
   router.post('/:itineraryId/comments', addComment);
   router.put('/:id/activateDeactivate', activateDeactivateItinerary);
+  router.get('/itineraries/:itineraryId/share', generateShareLink);
 
   module.exports = router;

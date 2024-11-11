@@ -65,7 +65,6 @@ const getActivity = async (req, res) => {
         convertedItem.price = await convertCurrency(
           convertedItem.price,
           currency,
-          touristId
         );
         return convertedItem;
       })
