@@ -2,14 +2,15 @@ import React from 'react'
 import Activities from '../../Components/Activities'
 import GuestNavbar from '../../Components/NavBars/GuestNavBar'
 
-const Advertiser = () => {
+const ActivitiesGuest = () => {
   return (
     <>
       <GuestNavbar />
-    <Activities guestMode={true} />
+
+      <Activities guestMode={true} showCreateButton={false} showUpdateButton={false} showDeleteButton={false} />
 
     </>
   )
 }
 
-export default Advertiser
+export default ActivitiesGuest

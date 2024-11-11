@@ -1,5 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const admin = require('../Middleware/adminMiddleware');
+const { authenticateUser  } = require('../Controllers/authController');
+const tourist = require('../Middleware/touristMiddleware');
 const { 
     createItinerary,
     getItinerary,
@@ -12,7 +15,11 @@ const {
     bookItinerary,
     cancelItineraryBooking,
     addComment,
-    activateDeactivateItinerary
+    activateDeactivateItinerary,
+    flagItinerary,
+    unflagItinerary,
+    rateItinerary,
+    generateShareLink
   } = require("../Controllers/ItineraryController");
 
   router.post("/createItinerary", createItinerary);
@@ -27,5 +34,12 @@ const {
   router.delete("/cancelItineraryBooking/:bookingId", cancelItineraryBooking);
   router.post('/:itineraryId/comments', addComment);
   router.put('/:id/activateDeactivate', activateDeactivateItinerary);
+  router.get('/itineraries/:itineraryId/share', generateShareLink);
+  //flag as inappropriate
+  router.put('/itinerary/:id/flag', authenticateUser, admin, flagItinerary);
+  //unflag as inappropriate
+  router.put('/itinerary/:id/unflag', authenticateUser, admin, unflagItinerary);
+  // Tourist rate an itinerary they followed
+router.post('/itinerary/rate', authenticateUser, tourist, rateItinerary);
 
   module.exports = router;

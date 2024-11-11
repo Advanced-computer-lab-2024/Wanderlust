@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, MapPin, Globe, DollarSign, Users, Plus, Trash, Check } from 'lucide-react';
 import Card from './Card';
-
+import axios from 'axios';
 const CreateItineraryForm = ({ onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     title: '',
@@ -17,7 +17,7 @@ const CreateItineraryForm = ({ onClose, onSubmit }) => {
     activities: [],
     locations: [],
     availableDates: [],
-    bookingOpen: true
+    isActive: false
   });
 
   const [availableActivities, setAvailableActivities] = useState([]);
@@ -48,6 +48,13 @@ const CreateItineraryForm = ({ onClose, onSubmit }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleToggleActive = () => {
+    setFormData(prev => ({
+      ...prev,
+      isActive: !Boolean(prev.isActive)  // Explicitly convert to boolean
+    }));
   };
 
   const handleChange = (e) => {
@@ -149,15 +156,14 @@ const CreateItineraryForm = ({ onClose, onSubmit }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:8000/api/itinerary/createitinerary', {
-        method: 'POST',
+      const response = await axios.post('http://localhost:8000/api/itinerary/createitinerary', formData, {
         headers: {
+          Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
       });
       
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error('Failed to create itinerary');
       }
       
@@ -172,6 +178,9 @@ const CreateItineraryForm = ({ onClose, onSubmit }) => {
   if (!onClose || !onSubmit) {
     return null;
   }
+
+  console.log(formData.isActive);
+  console.log(formData);
 
   return (
     <div className="fixed inset-0 bg-white bg-opacity-80 flex items-start justify-center z-50 overflow-y-auto py-8">
@@ -278,6 +287,34 @@ const CreateItineraryForm = ({ onClose, onSubmit }) => {
               </div>
             </div>
           </div>
+
+          <div className="flex items-center justify-between bg-gray-50 rounded-lg p-4">
+              <div className="flex items-center space-x-2">
+                <Calendar className="text-indigo-500" size={20} />
+                <span className="text-gray-700">Status</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={formData.isActive}
+                  onClick={handleToggleActive}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                    formData.isActive ? 'bg-indigo-600' : 'bg-gray-200'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      formData.isActive ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                  <span className="sr-only">Toggle Active Status</span>
+                </button>
+                <span className={`text-sm ${formData.isActive ? 'text-indigo-600' : 'text-gray-500'}`}>
+                  {formData.isActive ? 'Active' : 'Inactive'}
+                </span>
+              </div>
+            </div>
 
                {/* Activities Section */}
                <div className="space-y-4">

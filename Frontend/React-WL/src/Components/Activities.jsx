@@ -33,38 +33,91 @@ const Activities = ({ guestMode, showCreateButton = true, showUpdateButton = tru
   };
 
   useEffect(() => {
-    const fetchActivities = async () => {
+    const fetchData = async () => {
       try {
         console.log("guestMode:", guestMode);
-        
+  
         // Set or retrieve tourist ID based on guest mode
         if (guestMode) {
-          settouristId(1);
+          settouristId(1); // Guest mode, using fallback ID 1
         } else {
           const id = await getTouristId();
           settouristId(id);
         }
-
-        // Fetch activities based on the retrieved tourist ID
-        const url = touristId === 1
+  
+        // Fetch activities using getActivity API
+        const activityUrl = touristId === 1
           ? "http://localhost:8000/api/activity/getActivityGuest"
           : `http://localhost:8000/api/activity/getActivity?touristId=${touristId}`;
-
-        const res = await axios.get(url, {
+          
+        const activityResponse = await axios.get(activityUrl, {
           headers: touristId !== 1 ? { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` } : undefined
         });
-
-        setActivities(res.data);
-        console.log("Fetched activities:", res.data);
+        setActivities(activityResponse.data);
+        console.log("Fetched activities:", activityResponse.data);
+  
+        // Step 1: Fetch the logged-in user's bookings
+        const fetchBookings = async () => {
+          try {
+            // Get the logged-in tourist's ID
+            const userId = async () => {
+              try {
+                const response = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+                  },
+                });
+                return response.data;  // Assuming response.data contains the user ID
+              } catch (error) {
+                console.error("Error fetching user info:", error);
+                return null;
+              }
+            };
+  
+            const userIdValue = await userId();
+  
+            // Fetch bookings for the current tourist
+            const response = await axios.get("http://localhost:8000/api/bookings/getBooking", {
+              params: {
+                userId: userIdValue,
+              },
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+              },
+            });
+  
+            if (Array.isArray(response.data)) {
+              return response.data;  // Return bookings array
+            } else {
+              return [];  // Return empty array if no valid bookings are found
+            }
+          } catch (error) {
+            console.error("Error fetching bookings:", error);
+            return [];
+          }
+        };
+  
+        // Step 2: Get the user's bookings and extract the booked activity IDs
+        const bookings = await fetchBookings();
+        const bookedActivityIds = bookings.map((booking) => booking.activityId?._id);
+  
+        // Step 3: Filter out activities that have already been booked
+        const filteredActivities = activityResponse.data.filter(
+          (activity) => !bookedActivityIds.includes(activity._id)
+        );
+  
+        // Step 4: Update the state with the filtered activities
+        setActivities(filteredActivities);
       } catch (error) {
-        console.error("Error fetching activities:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchActivities();
+  
+    fetchData();
   }, [guestMode, touristId]);
+  
 
   const handleInput = (e) => {
     set_minValue(e.minValue);

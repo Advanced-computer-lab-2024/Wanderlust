@@ -26,6 +26,15 @@ const AdminDashboardComponent = () => {
     const handleManageComplaints = () => {
         navigate('/managecomplaints');
     }
+    const handleManagePendingUsers = () => {
+        navigate('/viewpendingdocuments');
+    }
+    const handleUpdatePassword = () => {
+        navigate('/AdminUpdatePassword');
+    }
+    const handleManageItinerary = () => {
+        navigate('/AdminManageItinerary');
+    }
     const handleViewProducts = () => {
         navigate('/adminviewproducts');
     }
@@ -36,6 +45,11 @@ const AdminDashboardComponent = () => {
                 <h1 className='text-2xl font-bold mb-6 text-center'>Admin Dashboard</h1>
             </div>
             <div className="d-flex flex-wrap gap-3">
+            <div className="flex-fill border rounded p-4 shadow-sm" style={{ flex: '1 1 calc(33.333% - 20px)' }}>
+                    <h2 className='text-gray-800 font-semibold'>Update Password</h2>
+                    <p>Update your Admin password.</p>
+                    <button className="btn btn-primary" onClick={handleUpdatePassword}>Update Password</button>
+                </div>
             <div className="flex-fill border rounded p-4 shadow-sm" style={{ flex: '1 1 calc(33.333% - 20px)' }}>
                     <h2 className='text-gray-800 font-semibold'>Manage Users</h2>
                     <p>View and manage all users in the system.</p>
@@ -70,6 +84,16 @@ const AdminDashboardComponent = () => {
                     <h2 className='text-gray-800 font-semibold'>Manage Complaints</h2>
                     <p>View and manage all complaints.</p>
                     <button className="btn btn-primary" onClick={handleManageComplaints}>Manage Complaints</button>
+                </div>
+                <div className="flex-fill border rounded p-4 shadow-sm" style={{ flex: '1 1 calc(33.333% - 20px)' }}>
+                    <h2 className='text-gray-800 font-semibold'>Manage Pending Users</h2>
+                    <p>View and manage all pending users based on their documents.</p>
+                    <button className="btn btn-primary" onClick={handleManagePendingUsers}>View Documents</button>
+                </div>
+                <div className="flex-fill border rounded p-4 shadow-sm" style={{ flex: '1 1 calc(33.333% - 20px)' }}>
+                    <h2 className='text-gray-800 font-semibold'>Manage Itineraries</h2>
+                    <p>View and manage all Itineraries.</p>
+                    <button className="btn btn-primary" onClick={handleManageItinerary}>View Itineraries</button>
                 </div>
                 {/* <div className="flex-fill border rounded p-4 shadow-sm" style={{ flex: '1 1 calc(33.333% - 20px)' }}>
                     <h2 className='text-gray-800 font-semibold'>View Product Details</h2>

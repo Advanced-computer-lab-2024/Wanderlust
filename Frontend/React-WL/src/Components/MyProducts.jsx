@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
-const ManageProducts = () => {
+const Seller = () => {
     const [products, setProducts] = useState([]);
     const [formData, setFormData] = useState({
         name: '',
@@ -116,55 +115,6 @@ const ManageProducts = () => {
         }
     };
 
-    const archiveProduct = async (name) => {
-        try {
-            const response = await axios.put('http://localhost:8000/api/product/archiveProduct', { name });
-            if (response.status === 200) {
-                alert('Product archived successfully');
-                fetchProducts();
-            } else {
-                alert('Failed to archive product: ' + response.data.message);
-            }
-        } catch (error) {
-            console.error('Error archiving product:', error);
-        }
-    };
-
-    const unarchiveProduct = async (name) => {
-        try {
-            const response = await axios.put('http://localhost:8000/api/product/unarchiveProduct', { name });
-            if (response.status === 200) {
-                alert('Product unarchived successfully');
-                fetchProducts();
-            } else {
-                alert('Failed to unarchive product: ' + response.data.message);
-            }
-        } catch (error) {
-            console.error('Error unarchiving product:', error);
-        }
-    };
-
-    const uploadProductImage = async (productId, file) => {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        try {
-            const response = await axios.put(`http://localhost:8000/api/documents/uploadProductImage/${productId}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            if (response.status === 200) {
-                alert('Product image uploaded successfully');
-                fetchProducts();
-            } else {
-                alert('Failed to upload product image: ' + response.data.message);
-            }
-        } catch (error) {
-            console.error('Error uploading product image:', error);
-        }
-    };
-
     const searchProducts = async () => {
         if (!searchName) {
             alert('Please enter a product name to search');
@@ -197,12 +147,12 @@ const ManageProducts = () => {
     };
 
     return (
-        <div className="container py-4">
+        <div className="container py-4 w-75">
             <div className="mb-4">
-                <h1>Manage Products</h1>
+                <h1 className='text-2xl font-bold mb-6 text-center'>Manage Products</h1>
             </div>
             <div className="form-container mb-4 p-4 border rounded shadow-sm">
-                <h2>Add Product</h2>
+                <h2 className='text-gray-800 font-semibold'>Add Product</h2>
                 <form onSubmit={handleAddProduct}>
                     <div className="mb-3">
                         <label htmlFor="addName" className="form-label">Name:</label>
@@ -240,7 +190,7 @@ const ManageProducts = () => {
                 </form>
             </div>
             <div className="form-container mb-4 p-4 border rounded shadow-sm">
-                <h2>Update Product</h2>
+                <h2 className='text-gray-800 font-semibold'>Update Product</h2>
                 <form onSubmit={handleUpdateProduct}>
                     <div className="mb-3">
                         <label htmlFor="updateName" className="form-label">Name:</label>
@@ -283,30 +233,15 @@ const ManageProducts = () => {
                 <div id="productsList" className=''>
                     {products.map(product => (
                         <div key={product.name} className="product-item mb-3 p-3 border rounded">
-                            <p><span className="fw-bold">Name:</span> {product.name}</p>
-                            <p><span className="fw-bold">Price:</span> ${product.price}</p>
-                            <p><span className="fw-bold">Description:</span> {product.description}</p>
-                            <p><span className="fw-bold">Quantity:</span> {product.quantity}</p>
-                            <p><span className="fw-bold">Rating:</span> {product.rating}</p>
-                            <p><span className="fw-bold">Reviews:</span> {product.reviews}</p>
-                            <p><span className="fw-bold">Sales:</span> {product.sales.map(sale => (
-                                <span key={sale._id}>{sale.quantity} </span>
-                            ))}</p>
-                            <p><span className="fw-bold">Seller:</span> {product.seller ? product.seller.username : 'Unknown'}</p>
+                            <span>Name: {product.name}</span><br />
+                            <span>Price: ${product.price}</span><br />
+                            <span>Description: {product.description}</span><br />
+                            <span>Quantity: {product.quantity}</span><br />
+                            <span>Rating: {product.rating}</span><br />
+                            <span>Reviews: {product.reviews}</span><br />
+                            {/* <span>Seller: {product.seller.name}</span><br /> */}
                             <img src={product.picture} alt={product.name} style={{ maxWidth: '100px', maxHeight: '100px' }} /><br />
-                            <form onSubmit={(e) => {
-                                e.preventDefault();
-                                const fileInput = e.target.elements.file;
-                                if (fileInput.files.length > 0) {
-                                    uploadProductImage(product._id, fileInput.files[0]);
-                                }
-                            }}>
-                                <input type="file" name="file" className="form-control mb-2" />
-                                <button type="submit" className="btn btn-secondary">Upload Image</button>
-                            </form>
                             <button className="btn btn-danger mt-2" onClick={() => deleteProduct(product.name)}>Delete Product</button>
-                            <button className="btn btn-warning mt-2" onClick={() => archiveProduct(product.name)}>Archive Product</button>
-                            <button className="btn btn-success mt-2" onClick={() => unarchiveProduct(product.name)}>Unarchive Product</button>
                         </div>
                     ))}
                 </div>
@@ -315,4 +250,4 @@ const ManageProducts = () => {
     );
 };
 
-export default ManageProducts;
+export default Seller;

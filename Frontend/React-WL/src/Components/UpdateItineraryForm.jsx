@@ -17,7 +17,7 @@ const UpdateItineraryForm = ({ itinerary, onClose, onSubmit }) => {
     activities: [],
     locations: [],
     availableDates: [],
-    bookingOpen: true
+    isActive: false
   });
 
   const [availableActivities, setAvailableActivities] = useState([]);
@@ -108,6 +108,13 @@ const UpdateItineraryForm = ({ itinerary, onClose, onSubmit }) => {
         };
       }
     });
+  };
+
+  const handleToggleActive = () => {
+    setFormData(prev => ({
+      ...prev,
+      isActive: !Boolean(prev.isActive)  // Explicitly convert to boolean
+    }));
   };
 
   const handleAddItem = (type, value, setter) => {
@@ -263,6 +270,34 @@ const UpdateItineraryForm = ({ itinerary, onClose, onSubmit }) => {
                     required
                   />
                 </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between bg-gray-50 rounded-lg p-4">
+              <div className="flex items-center space-x-2">
+                <Calendar className="text-indigo-500" size={20} />
+                <span className="text-gray-700">Status</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={formData.isActive}
+                  onClick={handleToggleActive}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                    formData.isActive ? 'bg-indigo-600' : 'bg-gray-200'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      formData.isActive ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                  <span className="sr-only">Toggle Active Status</span>
+                </button>
+                <span className={`text-sm ${formData.isActive ? 'text-indigo-600' : 'text-gray-500'}`}>
+                  {formData.isActive ? 'Active' : 'Inactive'}
+                </span>
               </div>
             </div>
 

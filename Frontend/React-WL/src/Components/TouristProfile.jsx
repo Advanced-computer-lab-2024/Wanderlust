@@ -106,6 +106,7 @@ const TouristProfile = () => {
 
   const redeemPoints = async () => {
     const username =profile.username;  
+    console.log(profile.points);
     if(profile.points<10000){
       alert("Insufficient Points");
     }
