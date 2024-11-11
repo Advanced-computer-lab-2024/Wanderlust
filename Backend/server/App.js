@@ -10,7 +10,7 @@ const cloudinary = require("cloudinary").v2;
 //Check db connection links in README file
 
 //calling for controllers
-const { signUp } = require('./Controllers/userController');
+const { signUp } = require("./Controllers/userController");
 const {
   createLocation,
   getLocations,
@@ -69,6 +69,7 @@ const categoryRoutes = require("./Routes/categoryRoutes");
 const sellerRoutes = require("./Routes/sellerRoutes");
 const itineraryRoutes = require("./Routes/itineraryRoutes");
 const bookingRoutes = require("./Routes/BookingRoutes");
+const hotelRoutes = require("./Routes/hotelRoutes");
 
 const transportationRoutes = require("./Routes/transportationRoutes");
 const ComplaintRoutes = require("./Routes/ComplaintRoutes");
@@ -76,9 +77,7 @@ const ComplaintRoutes = require("./Routes/ComplaintRoutes");
 const documentRoutes = require("./Routes/documentsRoutes");
 const { login } = require("./Controllers/authController");
 
-const flightRoutes = require('./Routes/flightRoutes');
-
-
+const flightRoutes = require("./Routes/flightRoutes");
 
 //Routes
 app.use("/api/tourist", touristRoutes);
@@ -93,22 +92,19 @@ app.use("/api/tourGuide", tourGuideRoutes);
 app.use("/api/advertiser", advertiserRoutes);
 app.use("/api/itinerary", itineraryRoutes);
 app.use("/api/bookings", bookingRoutes);
-
-
-app.use('/api', flightRoutes);
+app.use("/api/hotel", hotelRoutes);
+app.use("/api", flightRoutes);
 app.listen(3000, () => {
-  console.log('Server running on port 3000');
+  console.log("Server running on port 3000");
 });
-
 
 app.use("/api/Complaint", ComplaintRoutes);
 
 app.use("/api/documents", documentRoutes);
-app.use("/api/transportation", transportationRoutes)
-
+app.use("/api/transportation", transportationRoutes);
 
 app.use(express.json());
-app.post('/signup', signUp);
+app.post("/signup", signUp);
 
 app.use(express.json());
 app.post("/createLocation", createLocation);
