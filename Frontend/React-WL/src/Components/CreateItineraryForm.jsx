@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, MapPin, Globe, DollarSign, Users, Plus, Trash, Check } from 'lucide-react';
 import Card from './Card';
-
+import axios from 'axios';
 const CreateItineraryForm = ({ onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     title: '',
@@ -149,15 +149,14 @@ const CreateItineraryForm = ({ onClose, onSubmit }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:8000/api/itinerary/createitinerary', {
-        method: 'POST',
+      const response = await axios.post('http://localhost:8000/api/itinerary/createitinerary', formData, {
         headers: {
+          Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
       });
       
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error('Failed to create itinerary');
       }
       

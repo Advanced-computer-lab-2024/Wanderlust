@@ -159,7 +159,7 @@ const BookingCard = ({ booking, onCancel }) => {
             <p className="text-gray-500 text-xs">Activity: {booking.activityId.name}</p>
             <p className="text-gray-500 text-xs">Date: {new Date(booking.activityId.date).toLocaleDateString()}</p>
             <p className="text-gray-500 text-xs">Price: ${booking.activityId.price}</p>
-            {!booking.attended && (
+            {booking.attended && (
               <div className="mt-2">
               <h4 className="font-semibold text-sm">Add a Comment and Rating:</h4>
               <div className="mt-1">

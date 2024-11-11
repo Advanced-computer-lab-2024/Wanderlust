@@ -23,6 +23,9 @@ const createItinerary = async (req, res) => {
     dropoffLocation,
   } = req.body;
   try {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const creatorId = decodedToken.id;
     const itinerary = await Itinerary.create({
       title,
       activities,
@@ -35,6 +38,7 @@ const createItinerary = async (req, res) => {
       accessibility,
       pickupLocation,
       dropoffLocation,
+      creator: creatorId,
     });
     const populatedItenary = await Itinerary.findById(itinerary._id).populate(
       "activities"
