@@ -122,7 +122,7 @@ const Activities = ({ showCreateButton = true, showUpdateButton = true, showDele
       if (minValue) url += `minBudget=${minValue}&`;
       if (maxValue) url += `maxBudget=${maxValue}&`;
       if (date) url += `date=${date}&`;
-      if (category) url += `language=${category}&`;
+      if (category) url += `category=${category}&`;
       if (rating) url += `ratings=${rating}&`;
       url =
         url.slice(-1) === "&" || url.slice(-1) === "?"
