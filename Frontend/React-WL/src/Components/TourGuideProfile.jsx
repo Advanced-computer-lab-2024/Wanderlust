@@ -17,6 +17,8 @@ const TourGuideProfile = () => {
   const [previousWork, setPreviousWork] = useState(profile?.previousWork || '');
   const [phoneNumber, setPhoneNumber] = useState(info?.mobileNumber || '');
 
+  const [profilePicture, setProfilePicture] = useState(null);
+
   useEffect(() => {
     fetchProfile();
   }, []);
@@ -80,31 +82,27 @@ const TourGuideProfile = () => {
   };
 
   const uploadProfileImage = async () => {
+    if (!selectedImage) {
+      alert('Please select an image to upload.'); // Alert if no image is selected
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append('file', selectedImage); // Append the selected file
+    formData.append('userId', profile.userId);  // Append the userId
+  
     try {
-      const formData = new FormData();
-      formData.append('image', selectedImage);
-
       const response = await axios.put(
         `http://localhost:8000/api/documents/uploadImage/TourGuide/photo`,
         formData,
         {
           headers: {
-            
             Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
             'Content-Type': 'multipart/form-data',
           },
         }
       );
-
-      if (response.data.success) {
-        setProfile((prevProfile) => ({
-          ...prevProfile,
-          profileImage: response.data.imageUrl,
-        }));
-        alert('Profile image uploaded successfully!');
-      } else {
-        alert('Error uploading profile image. Please try again.');
-      }
+      alert('Image uploaded successfully!');
     } catch (error) {
       console.error('Error uploading profile image:', error);
       alert('An error occurred. Please try again later.');
@@ -116,6 +114,10 @@ const TourGuideProfile = () => {
   };
 
   const handleSaveProfile = async () => {
+    if (profilePicture) {
+      const formData = new FormData();
+      formData.append('file', profilePicture); // Append the file
+      formData.append('userId', profile.userId);
     try {
       console.log('Sending update request with:', {
         username,
@@ -160,9 +162,12 @@ const TourGuideProfile = () => {
       console.error('Error updating profile:', error);
       const errorMessage = error.response?.data?.error || 'An error occurred. Please try again later.';
       alert(errorMessage);
-    }
+    }}
   };
 
+  const handleProfilePictureChange = (e) => {
+      setSelectedImage(e.target.files[0]); // Set the uploaded file to state
+    };
   if (loading) return (
     <div className="flex justify-center items-center h-64">
       <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
@@ -194,15 +199,11 @@ const TourGuideProfile = () => {
             <div className="p-6">
               <div className="flex items-center mb-6">
                 <div className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center">
-                  {profile.photoUrl ? (
-                    <img
-                      src={profile.photoUrl}
-                      alt="Profile"
-                      className="w-24 h-24 rounded-full object-cover"
-                    />
-                  ) : (
-                    <User className="w-12 h-12 text-indigo-600" />
-                  )}
+                {profile.photoURL ? (
+                      <img src={profile.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-12 h-12 text-indigo-600" />
+                    )}
                 </div>
                 <div className="ml-6">
                   {info && <h2 className="text-2xl font-semibold text-indigo-600">{info.username}</h2>}
@@ -270,10 +271,10 @@ const TourGuideProfile = () => {
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={handleImageUpload}
+                      onChange={handleProfilePictureChange}
                       className="bg-gray-200 text-gray-800 rounded p-2 mr-2"
                     />
-                    {profile.photoUrl && (
+                    {profile.photoURL && (
                       <img
                         src={profile.profileImage}
                         alt="Profile"
