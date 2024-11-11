@@ -406,7 +406,9 @@ const generateShareLink = async (req, res) => {
     return res.status(200).json({ shareLink });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Error generating share link" });
+        return res.status(500).json({ message: "Error generating share link" });
+      }
+    };
 
 // Flag an itinerary as inappropriate (admin only)
 const flagItinerary = async (req, res) => {
@@ -490,8 +492,9 @@ module.exports = {
   cancelItineraryBooking,
   addComment,
   activateDeactivateItinerary,
-  generateShareLink
+  generateShareLink,
   flagItinerary,
   unflagItinerary,
   rateItinerary,
 };
+  
