@@ -364,6 +364,23 @@ const SettingsPopup = ({ profile, username, onClose }) => {
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
+  const handleDeleteAccount = async () => {
+    try {
+
+      const response = await axios.get(
+        'http://localhost:8000/api/admin/requestDeleteAccount',
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
+          }
+        }
+      );
+      console.log(response);
+    } catch (error) {
+      const message = error.response?.data?.message || 'An error has occurred. Please try again.';
+      alert(`Error: ${message}`);
+    }
+  };
   const handleChangePassword = async () => {
     try {
       const response = await axios.post(
@@ -520,6 +537,12 @@ const SettingsPopup = ({ profile, username, onClose }) => {
             className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md">
             Close
           </button>
+          <button
+          onClick={handleDeleteAccount}
+          className="mt-4 bg-red-600 text-white rounded px-4 py-2"
+        >
+          Delete Account
+        </button>
         </div>
       </div>
     </div>
