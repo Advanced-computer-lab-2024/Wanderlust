@@ -5,6 +5,7 @@ const ActivityCatModel = require("../Models/ActivityCat.js");
 const Booking = require("../Models/Booking.js");
 const User = require("../Models/user");
 const { convertCurrency } = require("./currencyConverter");
+const touristModel = require("../Models/Tourist");
 
 const createActivity = async (req, res) => {
   const {
@@ -46,27 +47,29 @@ const createActivity = async (req, res) => {
 };
 
 const getActivity = async (req, res) => {
-  const { currency } = req.query; // Get the selected currency from query parameters
+  const { touristId } = req.query; 
   try {
     const activities = await Activity.find()
       .populate("category")
       .populate("tags");
-
-    if (currency) {
-      const convertedActivities = await Promise.all(
-        activities.map(async (item) => {
-          const convertedItem = item.toObject();
-          convertedItem.price = await convertCurrency(
-            convertedItem.price,
-            currency
-          );
-          return convertedItem;
-        })
-      );
-      return res.status(200).json(convertedActivities);
+    let currency = 'EGP'; 
+    if (touristId) {
+      const tourist = await touristModel.findById(touristId);
+      if (tourist && tourist.currency) {
+        currency = tourist.currency; // Use tourist's preferred currency
+      }
     }
-
-    res.status(200).json(activities);
+    const convertedActivities = await Promise.all(
+      activities.map(async (item) => {
+        const convertedItem = item.toObject();
+        convertedItem.price = await convertCurrency(
+          convertedItem.price,
+          currency,
+        );
+        return convertedItem;
+      })
+    );
+    return res.status(200).json(convertedActivities);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

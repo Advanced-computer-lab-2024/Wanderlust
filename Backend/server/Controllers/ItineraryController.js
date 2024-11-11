@@ -389,6 +389,25 @@ const activateDeactivateItinerary = async (req, res) => {
   }
 };
 
+
+const generateShareLink = async (req, res) => {
+  try {
+    const { itineraryId } = req.params;
+    if (!itineraryId) {
+      return res.status(400).json({ message: "Itinerary ID is required" });
+    }
+
+    const itinerary = await Itinerary.findById(itineraryId);
+    if (!itinerary) {
+      return res.status(404).json({ message: "Itinerary not found" });
+    }
+
+    const shareLink = `${req.protocol}://${req.get('host')}/itineraries/${itineraryId}/share`;
+    return res.status(200).json({ shareLink });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error generating share link" });
+
 // Flag an itinerary as inappropriate (admin only)
 const flagItinerary = async (req, res) => {
   try {
@@ -471,6 +490,7 @@ module.exports = {
   cancelItineraryBooking,
   addComment,
   activateDeactivateItinerary,
+  generateShareLink
   flagItinerary,
   unflagItinerary,
   rateItinerary,

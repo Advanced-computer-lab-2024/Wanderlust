@@ -28,6 +28,10 @@ const touristSchema = new Schema({
     type: Number,
     default: 0,
   },
+  currency: {
+    type: String,
+    default: "EGP",
+  },
   badge: { type: String, default: "Bronze" },
   createdAt: {
     type: Date,

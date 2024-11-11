@@ -33,6 +33,7 @@ const {
   router.delete("/cancelItineraryBooking/:bookingId", cancelItineraryBooking);
   router.post('/:itineraryId/comments', addComment);
   router.put('/:id/activateDeactivate', activateDeactivateItinerary);
+  router.get('/itineraries/:itineraryId/share', generateShareLink);
   //flag as inappropriate
   router.put('/itinerary/:id/flag', authenticateUser, admin, flagItinerary);
   //unflag as inappropriate
