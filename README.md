@@ -65,6 +65,8 @@ mongoose
 3. Create a `.env` file in the backend directory and add your MongoDB URI:
    ```
    MONGO_URI=your_mongodb_uri
+   FLIGHT_API_KEY=ed8a7354aa4175d87801e50dfd692947
+
    ```
 
 ## API References

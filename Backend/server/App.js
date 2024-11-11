@@ -76,6 +76,9 @@ const ComplaintRoutes = require("./Routes/ComplaintRoutes");
 const documentRoutes = require("./Routes/documentsRoutes");
 const { login } = require("./Controllers/authController");
 
+const flightRoutes = require('./Routes/flightRoutes');
+
+
 
 //Routes
 app.use("/api/tourist", touristRoutes);
@@ -91,6 +94,11 @@ app.use("/api/advertiser", advertiserRoutes);
 app.use("/api/itinerary", itineraryRoutes);
 app.use("/api/bookings", bookingRoutes);
 
+
+app.use('/api', flightRoutes);
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
 
 
 app.use("/api/Complaint", ComplaintRoutes);
