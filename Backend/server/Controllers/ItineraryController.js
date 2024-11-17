@@ -56,7 +56,7 @@ const createItinerary = async (req, res) => {
 const getItinerary = async (req, res) => {
   const { currency } = req.query; // Get the selected currency from query parameters
   try {
-    const itineraries = await Itinerary.find({ flagged: false }).populate({
+    const itineraries = await Itinerary.find({ flagged: false , isActive : true}).populate({
       path: "activities",
       populate: { path: "category tags" },
     });

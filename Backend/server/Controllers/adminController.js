@@ -154,13 +154,21 @@ const approvePendingUser = async (req, res) => {
     } else {
       return res.status(400).json({ message: "Invalid user type" });
     }
+    const actualUser = await User.findById({ _id: userId });
+    if (actualUser) {
+      actualUser.roleApplicationStatus = status;
+      await actualUser.save();
+    } else {
+      return res.status(404).json({ message: "User not found" });
+    }
     if (user) {
       user.roleApplicationStatus = status;
       await user.save();
       if (status === "approved") {
         return res.status(200).json({ message: "User approved successfully" });
-      }
+      } else{
       return res.status(200).json({ message: "User rejected successfully" });
+      }
     } else {
       return res.status(404).json({ message: "User not found" });
     }

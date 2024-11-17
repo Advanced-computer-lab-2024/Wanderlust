@@ -23,7 +23,11 @@ const Products = () => {
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get(`http://localhost:8000/api/product/sortedByRating?sort=${sortOrder}`);
+            const responseUser = await axios.get('http://localhost:8000/api/admin/getLoggedInUser', { headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` } });
+            console.log(responseUser.data._id);
+            const response = await axios.get(`http://localhost:8000/api/product/viewAvailableProducts`,
+                { touristId : responseUser.data._id }
+            );
             if (response.status === 200) {
                 setProducts(response.data);
             } else {

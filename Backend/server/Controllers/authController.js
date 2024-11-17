@@ -199,7 +199,6 @@ const updatePassword = async (req, res) => {
 };
 const getLoggedInUser = async (req, res) => {
     try {
-        console.log('Getting logged in user');
         const authHeader = req.header('Authorization');
         if (!authHeader) {
             return res.status(401).json({ message: 'Authorization header missing' });
