@@ -4,6 +4,8 @@ const activityModel = require("../Models/Activity");
 const itineraryModel = require("../Models/Itinerary");
 const { default: mongoose } = require("mongoose");
 const User = require("../Models/user");
+const jwt = require("jsonwebtoken");
+const ProductModel = require("../Models/Products");
 
 const getTourist = async (req, res) => {
   const username = req.query.username;
@@ -188,10 +190,135 @@ const updateBadge = (tourist) => {
   else if (tourist.points <= 500000) tourist.badge = "Silver";
   else tourist.badge = "Gold";
 };
+
+const addProductToWishlist = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
+      return res.status(401).json({ message: 'Authorization header missing' });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (!tourist) {
+      return res.status(404).json({ message: 'Tourist not found' });
+    }
+
+    const product = await ProductModel.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    if (tourist.wishlist.includes(productId)) {
+      return res.status(400).json({ message: 'Product already in wishlist' });
+    }
+
+    tourist.wishlist.push(productId);
+    await tourist.save();
+    return res.status(200).json({ message: 'Product added to wishlist successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+const getWishlist = async (req, res) => {
+  try {
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
+      return res.status(401).json({ message: 'Authorization header missing' });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id }).populate('wishlist');
+    if (!tourist) {
+      return res.status(404).json({ message: 'Tourist not found' });
+    }
+
+    return res.status(200).json({ wishlist: tourist.wishlist });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const removeProductFromWishlist = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
+      return res.status(401).json({ message: 'Authorization header missing' });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (!tourist) {
+      return res.status(404).json({ message: 'Tourist not found' });
+    }
+
+    const productIndex = tourist.wishlist.indexOf(productId);
+    if (productIndex === -1) {
+      return res.status(400).json({ message: 'Product not in wishlist' });
+    }
+
+    tourist.wishlist.splice(productIndex, 1);
+    await tourist.save();
+    return res.status(200).json({ message: 'Product removed from wishlist successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const addProductToCart = async (req, res) => {
+  try {
+    const { quantity } = req.body;
+    const { productId } = req.params;
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
+      return res.status(401).json({ message: 'Authorization header missing' });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (!tourist) {
+      return res.status(404).json({ message: 'Tourist not found' });
+    }
+
+    const product = await ProductModel.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    const cartItemIndex = tourist.cart.findIndex(
+      (item) => item.product.toString() === productId
+    );
+
+    if (cartItemIndex > -1) {
+      tourist.cart[cartItemIndex].quantity += quantity;
+    } else {
+      tourist.cart.push({ product: productId, quantity });
+    }
+
+    await tourist.save();
+
+
+    return res.status(200).json({ message: 'Product added to cart successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+
 module.exports = {
   getTourist,
   createTourist,
   updateTourist,
   viewAll,
   redeemPoints,
+  updatePointsOnPayment,
+  addProductToWishlist,
+  getWishlist,
+  removeProductFromWishlist,
+  addProductToCart,
 };

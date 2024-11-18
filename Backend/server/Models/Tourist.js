@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const User = require("./user");
+const Product = require("./Products");
 
 const touristSchema = new Schema({
   userId: {
@@ -39,6 +40,24 @@ const touristSchema = new Schema({
   },
   preferences: {
     type: [String],
+    default: [],
+  },
+  
+  cart: [
+    {
+      product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+      quantity: {
+        type: Number,
+        default: 1,
+      },
+    },
+  ],
+  wishlist: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "Product",
     default: [],
   },
   updatedAt: {
