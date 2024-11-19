@@ -309,6 +309,174 @@ const addProductToCart = async (req, res) => {
   }
 };
 
+//remove product from cart
+const removeProductFromCart = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
+      return res.status(401).json({ message: 'Authorization header missing' });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (!tourist) {
+      return res.status(404).json({ message: 'Tourist not found' });
+    }
+
+    const cartItemIndex = tourist.cart.findIndex(
+      (item) => item.product.toString() === productId
+    );
+
+    if (cartItemIndex > -1) {
+      tourist.cart.splice(cartItemIndex, 1);
+      await tourist.save();
+      return res.status(200).json({ message: 'Product removed from cart successfully' });
+    } else {
+      return res.status(400).json({ message: 'Product not in cart' });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+//chnage quantity of product in cart
+const changeCartItemQuantity = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const { quantity } = req.body;
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
+      return res.status(401).json({ message: 'Authorization header missing' });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (!tourist) {
+      return res.status(404).json({ message: 'Tourist not found' });
+    }
+
+    const cartItemIndex = tourist.cart.findIndex(
+      (item) => item.product.toString() === productId
+    );
+
+    if (cartItemIndex > -1) {
+      tourist.cart[cartItemIndex].quantity = quantity;
+      await tourist.save();
+      return res.status(200).json({ message: 'Cart item quantity updated successfully' });
+    } else {
+      return res.status(400).json({ message: 'Product not in cart' });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+//checkout my order 
+/*
+  need to implement a payment processing function @ali Mousa 
+  for amgad edit this when Ali is done with payment processing function 
+*/
+const checkoutOrder = async (req, res) => {
+  try {
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
+      return res.status(401).json({ message: 'Authorization header missing' });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id }).populate('cart.product');
+    if (!tourist) {
+      return res.status(404).json({ message: 'Tourist not found' });
+    }
+
+    if (tourist.cart.length === 0) {
+      return res.status(400).json({ message: 'Cart is empty' });
+    }
+
+    let totalAmount = 0;
+    tourist.cart.forEach(item => {
+      totalAmount += item.product.price * item.quantity;
+    });
+
+    // Assuming you have a payment processing function
+    // const paymentResult = await processPayment(totalAmount);
+    // if (!paymentResult.success) {
+    //   return res.status(400).json({ message: 'Payment failed' });
+    // }
+
+    // Save the order to order history
+    const order = {
+      items: tourist.cart.map(item => ({
+        product: item.product._id,
+        quantity: item.quantity,
+        price: item.product.price
+      })),
+      totalAmount,
+      date: new Date()
+    };
+    tourist.orderHistory.push(order);
+
+    // Clear the cart after successful payment
+    tourist.cart = [];
+    await tourist.save();
+
+    res.status(200).json({ message: 'Order checked out successfully', order });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+//view all ordrs
+const viewAllOrders = async (req, res) => {
+  try {
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
+      return res.status(401).json({ message: 'Authorization header missing' });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id }).populate('orderHistory.items.product');
+    if (!tourist) {
+      return res.status(404).json({ message: 'Tourist not found' });
+    }
+
+    return res.status(200).json({ orderHistory: tourist.orderHistory });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+//view certain order and it's status 
+const viewOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
+      return res.status(401).json({ message: 'Authorization header missing' });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id }).populate('orderHistory.items.product');
+    if (!tourist) {
+      return res.status(404).json({ message: 'Tourist not found' });
+    }
+
+    const order = tourist.orderHistory.id(orderId);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    return res.status(200).json({ order });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 
 module.exports = {
   getTourist,
@@ -321,4 +489,9 @@ module.exports = {
   getWishlist,
   removeProductFromWishlist,
   addProductToCart,
+  removeProductFromCart,
+  changeCartItemQuantity,
+  checkoutOrder,
+  viewAllOrders,
+  viewOrder,
 };
