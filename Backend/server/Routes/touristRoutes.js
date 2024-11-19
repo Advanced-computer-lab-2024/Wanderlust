@@ -10,7 +10,17 @@ const {
   getWishlist,
   removeProductFromWishlist,
   addProductToCart,
+  removeProductFromCart,
+  changeCartItemQuantity,
+  checkoutOrder,
+  viewAllOrders,
+  viewOrder,
+  
 } = require("../Controllers/touristController");
+
+const { authenticateUser  } = require('../Controllers/authController');
+const tourist = require('../Middleware/touristMiddleware');
+
 const router = express.Router();
 
 router.get("/getTourist", getTourist);
@@ -23,5 +33,12 @@ router.put("/addProductToWishlist/:productId", addProductToWishlist);
 router.get("/getWishlist", getWishlist);
 router.delete("/removeProductFromWishlist/:productId", removeProductFromWishlist);
 router.put("/addProductToCart/:productId", addProductToCart);
+//new 
+router.delete('/removeFromCart/:productId', authenticateUser, tourist, removeProductFromCart);
+router.put('/cart/changeQuantity/:productId', authenticateUser, tourist, changeCartItemQuantity);
+router.post('/cart/checkout', authenticateUser, tourist, checkoutOrder);
+router.get('/viewAllOrders', authenticateUser, tourist, viewAllOrders);
+router.get('/viewOrder/:orderId', authenticateUser, tourist, viewOrder);
+
 
 module.exports = router;

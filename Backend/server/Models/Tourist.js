@@ -60,11 +60,41 @@ const touristSchema = new Schema({
     ref: "Product",
     default: [],
   },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  orderHistory: [
+    {
+      items: [
+        {
+          product: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product',
+            required: true
+          },
+          quantity: {
+            type: Number,
+            required: true
+          },
+          price: {
+            type: Number,
+            required: true
+          }
+        }
+      ],
+      totalAmount: {
+        type: Number,
+        required: true
+      },
+      date: {
+        type: Date,
+        default: Date.now
+      },
+      status: {
+        type: String,
+        enum: ['Pending', 'Shipped', 'Delivered', 'Cancelled'],
+        default: 'Pending'
+      }
+    }
+  ]
+}, { timestamps: true });
 
 const Tourist = mongoose.model("Tourist", touristSchema);
 
