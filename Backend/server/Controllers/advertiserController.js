@@ -94,11 +94,123 @@ const updateAdvertiser = async (req, res) => {
   }
 };
 
+const getSalesReport = async (req, res) => {
+  const { advertiserId } = req.params;
+  try {
+    const activities = await Activity.find({ advertiserId });
+    if (!activities.length) {
+      return res.status(404).json({ message: "No activities found for this advertiser." });
+    }
+
+    // Calculate total revenue
+    const totalRevenue = activities.reduce((sum, activity) => sum + activity.revenue, 0);
+
+    res.status(200).json({ totalRevenue, activities });
+  } catch (error) {
+    console.error("Error fetching sales report:", error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const filterSalesReport = async (req, res) => {
+  const { advertiserId } = req.params;
+  const { activityName, itinerary, startDate, endDate } = req.query;
+
+  try {
+    let query = { advertiserId };
+
+    if (activityName) query.activityName = activityName;
+    if (itinerary) query.itinerary = itinerary;
+    if (startDate && endDate) {
+      query.date = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    const activities = await Activity.find(query);
+
+    if (!activities.length) {
+      return res.status(404).json({ message: "No activities found for the given filters." });
+    }
+
+    // Calculate filtered revenue
+    const totalRevenue = activities.reduce((sum, activity) => sum + activity.revenue, 0);
+
+    res.status(200).json({ totalRevenue, activities });
+  } catch (error) {
+    console.error("Error filtering sales report:", error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const getTouristReport = async (req, res) => {
+  const { advertiserId } = req.params;
+
+  try {
+    const activities = await Activity.find({ advertiserId });
+    if (!activities.length) {
+      return res.status(404).json({ message: "No activities found for this advertiser." });
+    }
+
+    // Calculate total tourists
+    const totalTourists = activities.reduce((sum, activity) => sum + activity.totalTourists, 0);
+
+    res.status(200).json({ totalTourists, activities });
+  } catch (error) {
+    console.error("Error fetching tourist report:", error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const filterTouristReportByMonth = async (req, res) => {
+  const { advertiserId } = req.params;
+  const { year, month } = req.query; // Expecting year and month as query parameters
+
+  try {
+    // Validate inputs
+    if (!year || !month) {
+      return res.status(400).json({ error: "Year and month are required." });
+    }
+
+    const startDate = new Date(year, month - 1, 1); // Start of the month
+    const endDate = new Date(year, month, 0, 23, 59, 59); // End of the month
+
+    const activities = await Activity.find({
+      advertiserId,
+      date: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    });
+
+    if (!activities.length) {
+      return res.status(404).json({ message: "No activities found for the given month." });
+    }
+
+    // Calculate total tourists for the specified month
+    const totalTourists = activities.reduce((sum, activity) => sum + activity.totalTourists, 0);
+
+    res.status(200).json({
+      totalTourists,
+      activities,
+      reportPeriod: { year, month },
+    });
+  } catch (error) {
+    console.error("Error filtering tourist report by month:", error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createAdvertiser,
   getAdvertiser,
   getAdvertiserByUsername,
   updateAdvertiser,
+  getSalesReport,
+  filterSalesReport,
+  getTouristReport
+
 };
 
 // const deleteAdvertiser = async (req, res) => {
