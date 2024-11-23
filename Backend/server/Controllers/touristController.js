@@ -551,6 +551,120 @@ const bookEvent = async (req, res) => {
   }
 };
 
+const addDeliveryAddress = async (req, res) => {
+  try {
+    const { address } = req.body;
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+    tourist.deliveryAddresses.push(address);
+    await tourist.save();
+    return res.status(200).json({
+      message: "Delivery address added successfully",
+      deliveryAddresses: tourist.deliveryAddresses,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+const removeDeliveryAddress = async (req, res) => {
+  try {
+    const { addressId } = req.params;
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    const addressIndex = tourist.deliveryAddresses.findIndex(
+      (addr) => addr._id.toString() === addressId
+    );
+    if (addressIndex === -1) {
+      return res.status(404).json({ message: "Address not found" });
+    }
+
+    tourist.deliveryAddresses.splice(addressIndex, 1);
+    await tourist.save();
+
+    return res.status(200).json({
+      message: "Delivery address removed successfully",
+      deliveryAddresses: tourist.deliveryAddresses,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const updateDeliveryAddress = async (req, res) => {
+  try {
+    const { addressId } = req.params; // Assuming the address ID is passed as a URL parameter
+    const { updatedAddress } = req.body;
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    const addressIndex = tourist.deliveryAddresses.findIndex(
+      (addr) => addr._id.toString() === addressId
+    );
+    if (addressIndex === -1) {
+      return res.status(404).json({ message: "Address not found" });
+    }
+
+    // Update fields of the specific address
+    Object.assign(tourist.deliveryAddresses[addressIndex], updatedAddress);
+    await tourist.save();
+
+    return res.status(200).json({
+      message: "Delivery address updated successfully",
+      deliveryAddresses: tourist.deliveryAddresses,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const deliveryAddresses = async (req, res) => {
+  try {
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+    return res
+      .status(200)
+      .json({ deliveryAddresses: tourist.deliveryAddresses });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 module.exports = { bookEvent };
 
 module.exports = {
@@ -569,4 +683,8 @@ module.exports = {
   checkoutOrder,
   viewAllOrders,
   viewOrder,
+  addDeliveryAddress,
+  removeDeliveryAddress,
+  updateDeliveryAddress,
+  deliveryAddresses,
 };
