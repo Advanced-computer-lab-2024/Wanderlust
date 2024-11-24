@@ -282,14 +282,9 @@ const filterItinerariesByPref = async (req, res) => {
 };
 const bookItinerary = async (req, res) => {
   try {
-    const { itineraryId, paymentMethod } = req.body;
-    const authHeader = req.header("Authorization");
-    if (!authHeader) {
-      return res.status(401).json({ message: "Authorization header missing" });
-    }
-    const token = authHeader.replace("Bearer ", "");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const tourist = await touristModel.findOne({ _id: decoded.id });
+    const { itineraryId, paymentMethod, userId } = req.body;
+
+    const tourist = await touristModel.findOne({ userId: userId });
 
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
