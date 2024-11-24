@@ -15,7 +15,8 @@ const {
   checkoutOrder,
   viewAllOrders,
   viewOrder,
-  cancelOrder
+  cancelOrder,
+  getCart,
   
 } = require("../Controllers/touristController");
 
@@ -32,6 +33,7 @@ router.put("/redeemPoints/:username", redeemPoints);
 
 router.put("/addProductToWishlist/:productId", addProductToWishlist);
 router.get("/getWishlist", getWishlist);
+router.get("/getCart", getCart);
 router.delete("/removeProductFromWishlist/:productId", removeProductFromWishlist);
 router.put("/addProductToCart/:productId", addProductToCart);
 //new 
