@@ -15,6 +15,7 @@ const {
   checkoutOrder,
   viewAllOrders,
   viewOrder,
+  cancelOrder
   
 } = require("../Controllers/touristController");
 
@@ -39,6 +40,7 @@ router.put('/cart/changeQuantity/:productId', authenticateUser, tourist, changeC
 router.post('/cart/checkout', authenticateUser, tourist, checkoutOrder);
 router.get('/viewAllOrders', authenticateUser, tourist, viewAllOrders);
 router.get('/viewOrder/:orderId', authenticateUser, tourist, viewOrder);
+router.get('/cancelOrder/:orderId', authenticateUser, tourist, cancelOrder);
 
 
 module.exports = router;

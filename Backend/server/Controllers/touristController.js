@@ -477,6 +477,40 @@ const viewOrder = async (req, res) => {
   }
 };
 
+//105,106 - cancel order by removing it from the order history,adding cancelled order amount back to wallet
+const cancelOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
+      return res.status(401).json({ message: 'Authorization header missing' });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (!tourist) {
+      return res.status(404).json({ message: 'Tourist not found' });
+    }
+
+    // Find and remove the order from the order history
+    const orderIndex = tourist.orderHistory.findIndex(order => order._id.toString() === orderId);
+    const order = tourist.orderHistory.id(orderId);
+    if (orderIndex === -1) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    tourist.wallet += order.totalAmount;
+    tourist.orderHistory.splice(orderIndex, 1); // Remove the order
+    await tourist.save();
+
+    return res.status(200).json({ message: 'Order canceled successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+
 
 module.exports = {
   getTourist,
@@ -494,4 +528,5 @@ module.exports = {
   checkoutOrder,
   viewAllOrders,
   viewOrder,
+  cancelOrder
 };
