@@ -1,4 +1,3 @@
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Use your Stripe Secret Key
 const Booking = require("../Models/Booking");
 const touristModel = require("../Models/Tourist");
 const locationsModel = require("../Models/Locations");
@@ -505,52 +504,6 @@ const viewOrder = async (req, res) => {
   }
 };
 
-const bookEvent = async (req, res) => {
-  const { amount, bookingId, paymentMethod } = req.body;
-
-  try {
-    const authHeader = req.header("Authorization");
-    if (!authHeader) {
-      return res.status(401).json({ message: "Authorization header missing" });
-    }
-    const token = authHeader.replace("Bearer ", "");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const tourist = await touristModel.findOne({ _id: decoded.id });
-
-    if (paymentMethod === "wallet") {
-      // Wallet payment
-      if (tourist.wallet < amount) {
-        return res.status(400).json({ message: "Insufficient wallet balance" });
-      }
-
-      // Deduct from wallet and update booking
-      tourist.wallet -= amount;
-      await tourist.save();
-      const booking = await Booking.findByIdAndUpdate(bookingId, {
-        status: "paid",
-      });
-      if (!booking) {
-        return res.status(404).json({ message: "Booking not found" });
-      }
-
-      return res.json({ message: "Payment successful using wallet" });
-    } else if (paymentMethod === "card") {
-      // Stripe payment
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount,
-        currency: "usd",
-      });
-
-      return res.json({ clientSecret: paymentIntent.client_secret });
-    } else {
-      return res.status(400).json({ message: "Invalid payment method" });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
 const addDeliveryAddress = async (req, res) => {
   try {
     const { address } = req.body;
@@ -665,7 +618,6 @@ const deliveryAddresses = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-module.exports = { bookEvent };
 
 module.exports = {
   getTourist,

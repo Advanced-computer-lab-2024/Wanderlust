@@ -6,6 +6,8 @@ const Booking = require("../Models/Booking.js");
 const User = require("../Models/user");
 const { convertCurrency } = require("./currencyConverter");
 const touristModel = require("../Models/Tourist");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Use your Stripe Secret Key
+const jwt = require("jsonwebtoken");
 
 const createActivity = async (req, res) => {
   const {
@@ -47,12 +49,12 @@ const createActivity = async (req, res) => {
 };
 
 const getActivity = async (req, res) => {
-  const { touristId } = req.query; 
+  const { touristId } = req.query;
   try {
     const activities = await Activity.find()
       .populate("category")
       .populate("tags");
-    let currency = 'EGP'; 
+    let currency = "EGP";
     if (touristId) {
       const tourist = await touristModel.findById(touristId);
       if (tourist && tourist.currency) {
@@ -64,7 +66,7 @@ const getActivity = async (req, res) => {
         const convertedItem = item.toObject();
         convertedItem.price = await convertCurrency(
           convertedItem.price,
-          currency,
+          currency
         );
         return convertedItem;
       })
@@ -359,40 +361,67 @@ const rateActivity = async (req, res) => {
 
 const bookActivity = async (req, res) => {
   try {
-    const { activityId, userId } = req.body;
+    const { activityId, paymentMethod, userId } = req.body;
 
-    if (!activityId || !userId) {
-      return res
-        .status(400)
-        .json({ message: "Activity ID and User ID required" });
+    const tourist = await touristModel.findOne({ userId: userId });
+
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
     }
+
     const activity = await Activity.findById(activityId);
     if (!activity) {
       return res.status(404).json({ message: "Activity not found" });
     }
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    const booking = await Booking.findOne({ activityId, userId });
-    if (booking) {
+
+    const oldbooking = await Booking.findOne({
+      userId: tourist.userId,
+      activityId,
+    });
+    if (oldbooking) {
       return res
         .status(400)
         .json({ message: "User has already booked this activity" });
     }
-    // Create a new booking
-    const newBooking = new Booking({
-      activityId,
-      userId,
-    });
+    let booking = new Booking({ userId: tourist.userId, activityId });
 
-    await newBooking.save(); // Save to the database
+    if (paymentMethod === "wallet") {
+      // Wallet payment
+      if (tourist.wallet < activity.price) {
+        return res.status(400).json({ message: "Insufficient wallet balance" });
+      }
 
-    res
-      .status(201)
-      .json({ message: "Booking successful!", userId, activityId });
+      // Deduct from wallet and update booking
+      tourist.wallet -= activity.price;
+      await tourist.save();
+      await booking.save();
+      return res.json({ message: "Payment successful using wallet" });
+    } else if (paymentMethod === "card") {
+      // Stripe payment
+      try {
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: activity.price * 100, // Convert to cents
+          currency: tourist.currency,
+          automatic_payment_methods: {
+            enabled: true,
+            allow_redirects: "never",
+          },
+        });
+        await booking.save();
+        return res.json({
+          clientSecret: paymentIntent.client_secret,
+          paymentIntentId: paymentIntent.id,
+        });
+      } catch (error) {
+        return res
+          .status(500)
+          .json({ message: "Payment processing failed", error: error.message });
+      }
+    } else {
+      return res.status(400).json({ message: "Invalid payment method" });
+    }
   } catch (error) {
-    console.error("Error booking itinerary:", error);
+    console.error("Error booking activity:", error);
     res.status(500).json({ message: error.message });
   }
 };
