@@ -3,6 +3,7 @@ const preferenceTagModel = require("../Models/PreferenceTag.js");
 const { default: mongoose } = require("mongoose");
 const { convertCurrency } = require('./currencyConverter');
 const touristModel = require("../Models/Tourist");
+const jwt = require('jsonwebtoken');
 
 // Create a new location
 const createLocation = async (req, res) => {
@@ -16,7 +17,10 @@ const createLocation = async (req, res) => {
       ticketPrices,
       tags,
     } = req.body; // Destructure the required fields from request body
-
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const creatorId = decodedToken.id;
+    console.log(creatorId);
     const newLocation = new locationModel({
       name,
       description,
@@ -25,6 +29,7 @@ const createLocation = async (req, res) => {
       openingHours,
       ticketPrices,
       tags,
+      creator: creatorId,
     }); // Create a new location document
 
     await newLocation.save(); // Save the new location in the database
@@ -34,6 +39,7 @@ const createLocation = async (req, res) => {
       location: newLocation,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Error creating location", error });
   }
 };
