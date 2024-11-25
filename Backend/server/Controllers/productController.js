@@ -28,6 +28,11 @@ const addProduct = async (req, res) => {
         .json({ message: "Product with this name already exists" });
     }
 
+    // Extract token from the Authorization header
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const sellerId = decodedToken.id;
+
     const newProduct = new Product({
       name,
       description,
@@ -37,6 +42,7 @@ const addProduct = async (req, res) => {
       reviews,
       seller,
       picture,
+      seller: sellerId, // Automatically include sellerId
     });
     await newProduct.save();
     res

@@ -21,7 +21,7 @@ const admin = require('../Middleware/adminMiddleware');
 const adminOrSeller = require('../Middleware/sellerOrAdminMiddleware');
 
 //put /api before the call
-router.post("/addProduct", addProduct);
+router.post("/addProduct", authenticateUser, addProduct);
 router.put("/updateProductByName", updateProductByName);
 router.get("/searchProductByName", searchProductByName);
 router.get("/filterProductsByPrice", filterProductsByPrice);
