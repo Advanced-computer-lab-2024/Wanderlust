@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { authenticateUser } = require('../Controllers/authController');
 const {
   createActivity,
   getActivity,
@@ -18,7 +19,8 @@ const {
   cancelActivityBooking
 } = require("../Controllers/activityController");
 
-router.post("/createActivity", createActivity);
+
+router.post("/createActivity", authenticateUser, createActivity);
 router.get("/getActivity", getActivity);
 router.get("/getActivityGuest", getActivityGuest);
 router.get("/getActivityById", getActivityById);
