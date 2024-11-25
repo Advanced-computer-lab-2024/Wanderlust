@@ -13,6 +13,30 @@ const Products = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [rating, setRating] = useState(0);
     const [review, setReview] = useState('');
+    // States for cart form visibility and quantity
+    const [showCartForm, setShowCartForm] = useState(false);
+    const [cartQuantity, setCartQuantity] = useState(1);
+
+    const handleAddToCart = async () => {
+        try {
+            const response = await axios.put(
+                'http://localhost:8000/api/tourist/addProductToCart/'+selectedProduct._id,
+                { quantity: cartQuantity },
+                { headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` } }
+            );
+
+            if (response.status === 200) {
+                alert('Product added to cart successfully');
+                setShowCartForm(false); // Hide the form after adding to cart
+                setCartQuantity(1); // Reset the quantity
+            } else {
+                alert('Failed to add product to cart');
+            }
+        } catch (error) {
+            console.error('Error adding product to cart:', error);
+            alert('Error adding product to cart');
+        }
+    };
     
     // State to track purchased products
     const [purchasedProducts, setPurchasedProducts] = useState({});
@@ -107,6 +131,24 @@ const Products = () => {
             alert('Error submitting rating');
         }
     };
+    const handleSaveToWishlist = async (product) => {
+        try {
+            const response = await axios.put(
+                `http://localhost:8000/api/tourist/addProductToWishlist/${product._id}`,
+                {},
+                { headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` } }
+            );
+
+            if (response.status === 200) {
+                alert('Product added to wishlist successfully');
+            } else {
+                alert('Failed to add product to wishlist');
+            }
+        } catch (error) {
+            console.error('Error adding product to wishlist:', error);
+            alert('Error adding product to wishlist');
+        }
+    }
 
     return (
         <div className="container py-4 w-75">
@@ -144,6 +186,36 @@ const Products = () => {
                 </div>
 
                 <button className="btn btn-primary mb-4" onClick={filterProducts}>Filter</button>
+                {showCartForm && selectedProduct && (
+                    <div className="cart-form mb-3">
+                        <h3>Add {selectedProduct.name} to Cart</h3>
+                        <div className="mb-3">
+                            <label htmlFor="quantity">Quantity:</label>
+                            <input 
+                                type="number" 
+                                id="quantity" 
+                                value={cartQuantity} 
+                                onChange={(e) => setCartQuantity(e.target.value)} 
+                                min="1" 
+                                max={selectedProduct.quantity} 
+                                className="form-control" 
+                            />
+                        </div>
+                        <button 
+                            className="btn btn-primary" 
+                            onClick={handleAddToCart}
+                        >
+                            Add to Cart
+                        </button>
+                        <button 
+                            className="ms-2 btn btn-secondary" 
+                            onClick={() => setShowCartForm(false)}
+                        >
+                            Cancel
+                        </button>
+                        
+                    </div>
+                )}
                 
                 <div id="productsList">
                     {products.map(product => (
@@ -163,6 +235,22 @@ const Products = () => {
                             >
                                 {purchasedProducts[product._id] ? "Purchased!" : "Purchase"}
                             </button>
+                        <button 
+                            className="btn btn-warning mt-2 ms-2" 
+                            onClick={() => handleSaveToWishlist(product)}
+                        >
+                            Save to Wishlist
+                        </button>
+                        <button 
+                    className="btn btn-info mt-2 ms-2" 
+                    onClick={() => {
+                        setSelectedProduct(product);
+                        setShowCartForm(true);
+                    }}
+                >
+                    Add to Cart
+                </button>
+
                         </div>
                     ))}
                 </div>

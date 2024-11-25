@@ -195,9 +195,12 @@ const addProductToWishlist = async (req, res) => {
   try {
     const { productId } = req.params;
     const authHeader = req.header('Authorization');
+    console.log(authHeader);
+
     if (!authHeader) {
       return res.status(401).json({ message: 'Authorization header missing' });
     }
+    console.log(authHeader);
     const token = authHeader.replace('Bearer ', '');
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -210,6 +213,7 @@ const addProductToWishlist = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
+    console.log(product);
 
     if (tourist.wishlist.includes(productId)) {
       return res.status(400).json({ message: 'Product already in wishlist' });
@@ -313,10 +317,11 @@ const addProductToCart = async (req, res) => {
       (item) => item.product.toString() === productId
     );
 
+    const quantityToAdd = Number(quantity);
     if (cartItemIndex > -1) {
-      tourist.cart[cartItemIndex].quantity += quantity;
+      tourist.cart[cartItemIndex].quantity += quantityToAdd;
     } else {
-      tourist.cart.push({ product: productId, quantity });
+      tourist.cart.push({ product: productId, quantity: quantityToAdd });
     }
 
     await tourist.save();
