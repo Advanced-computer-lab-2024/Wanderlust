@@ -84,6 +84,11 @@ const ActivitySchema = new Schema({
       },
     },
   ],
+  advertiserId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Advertiser',
+    required: false,
+  }
 });
 
 // Middleware to update the updatedAt field

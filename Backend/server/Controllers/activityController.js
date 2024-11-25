@@ -6,6 +6,7 @@ const Booking = require("../Models/Booking.js");
 const User = require("../Models/user");
 const { convertCurrency } = require("./currencyConverter");
 const touristModel = require("../Models/Tourist");
+const jwt = require('jsonwebtoken');
 
 const createActivity = async (req, res) => {
   const {
@@ -23,6 +24,10 @@ const createActivity = async (req, res) => {
     bookingOpen,
   } = req.body;
   try {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const advertiserId = decodedToken.id;
+    
     const activity = await Activity.create({
       name,
       date,
@@ -36,6 +41,7 @@ const createActivity = async (req, res) => {
       tags,
       specialDiscounts,
       bookingOpen,
+      advertiserId, // Automatically include advertiserId
     });
     const populatedActivity = await Activity.findById(activity._id)
       .populate("category")
