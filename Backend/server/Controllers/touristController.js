@@ -1,3 +1,4 @@
+const Booking = require("../Models/Booking");
 const touristModel = require("../Models/Tourist");
 const locationsModel = require("../Models/Locations");
 const activityModel = require("../Models/Activity");
@@ -21,7 +22,7 @@ const getTourist = async (req, res) => {
 
 const createTourist = async (req, res) => {
   const { userId } = req.params;
-  const { nationality, DOB, jobOrStudent,currency } = req.body;
+  const { nationality, DOB, jobOrStudent, currency } = req.body;
   try {
     const user = await User.findById(userId);
     if (!user) {
@@ -49,7 +50,8 @@ const updateTourist = async (req, res) => {
   session.startTransaction();
   try {
     const { username } = req.params;
-    const { email, password, mobileNumber, currency, ...touristData } = req.body;
+    const { email, password, mobileNumber, currency, ...touristData } =
+      req.body;
 
     // Find the User by username
     const user = await User.findOne({ username }).session(session);
@@ -73,15 +75,13 @@ const updateTourist = async (req, res) => {
     // Define fields to update in Tourist
     const touristUpdates = { ...touristData };
     if (currency) touristUpdates.currency = currency;
-     // Update Tourist within the session
-     const updatedTourist = await touristModel.findOneAndUpdate(
-      { userId: user._id },
-      touristUpdates,
-      {
+    // Update Tourist within the session
+    const updatedTourist = await touristModel
+      .findOneAndUpdate({ userId: user._id }, touristUpdates, {
         new: true,
         session,
-      }
-    ).populate("userId");
+      })
+      .populate("userId");
 
     if (!updatedTourist) {
       await session.abortTransaction();
@@ -106,7 +106,7 @@ const viewAll = async (req, res) => {
       .populate("category")
       .populate("tags");
     const itineraries = await Itinerary.find().populate("activities");
-    let currency = 'EGP'; // Default currency
+    let currency = "EGP"; // Default currency
     if (touristId) {
       const tourist = await Tourist.findById(touristId);
       if (tourist && tourist.currency) {
@@ -125,7 +125,9 @@ const viewAll = async (req, res) => {
       })
     );
 
-    res.status(200).json({ locations, activities: convertedActivities, itineraries });
+    res
+      .status(200)
+      .json({ locations, activities: convertedActivities, itineraries });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -139,7 +141,7 @@ const redeemPoints = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const tourist = await touristModel.findOne({ userId: user._id }); 
+    const tourist = await touristModel.findOne({ userId: user._id });
     if (!tourist) {
       return res.status(404).json({ error: "Tourist not found" });
     }
@@ -161,28 +163,36 @@ const redeemPoints = async (req, res) => {
 
 // Utility function or a method in your Tourist model
 const updatePointsOnPayment = async (touristId, amountPaid) => {
-  const tourist = await touristModel.findById(touristId);
+  try {
+    const tourist = await touristModel.findById(touristId);
 
-  if (!tourist) throw new Error("Tourist not found");
+    if (!tourist) {
+      return res.status(404).json({ error: "Tourist not found" });
+    }
 
-  // Determine the level based on current points
-  let level;
-  if (tourist.points <= 100000) level = 1;
-  else if (tourist.points <= 500000) level = 2;
-  else level = 3;
+    // Determine the level based on current points
+    let level;
+    if (tourist.points <= 100000) level = 1;
+    else if (tourist.points <= 500000) level = 2;
+    else level = 3;
 
-  // Calculate additional points based on level
-  let pointsEarned;
-  if (level === 1) pointsEarned = amountPaid * 0.5;
-  else if (level === 2) pointsEarned = amountPaid * 1;
-  else pointsEarned = amountPaid * 1.5;
+    // Calculate additional points based on level
+    let pointsEarned;
+    if (level === 1) pointsEarned = amountPaid * 0.5;
+    else if (level === 2) pointsEarned = amountPaid * 1;
+    else pointsEarned = amountPaid * 1.5;
 
-  // Update total points
-  tourist.points += pointsEarned;
-  updateBadge(tourist);
-  // Save changes
-  await tourist.save();
-  return { points: tourist.points, badge: tourist.badge, level };
+    // Update total points
+    tourist.points += pointsEarned;
+    updateBadge(tourist);
+    // Save changes
+    await tourist.save();
+    return res
+      .status(200)
+      .json({ points: tourist.points, badge: tourist.badge, level });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
 };
 const updateBadge = (tourist) => {
   // Update the badge based on the new points total
@@ -194,50 +204,54 @@ const updateBadge = (tourist) => {
 const addProductToWishlist = async (req, res) => {
   try {
     const { productId } = req.params;
-    const authHeader = req.header('Authorization');
+    const authHeader = req.header("Authorization");
     console.log(authHeader);
 
     if (!authHeader) {
-      return res.status(401).json({ message: 'Authorization header missing' });
+      return res.status(401).json({ message: "Authorization header missing" });
     }
     console.log(authHeader);
-    const token = authHeader.replace('Bearer ', '');
+    const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const tourist = await touristModel.findOne({ _id: decoded.id });
     if (!tourist) {
-      return res.status(404).json({ message: 'Tourist not found' });
+      return res.status(404).json({ message: "Tourist not found" });
     }
 
     const product = await ProductModel.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({ message: "Product not found" });
     }
     console.log(product);
 
     if (tourist.wishlist.includes(productId)) {
-      return res.status(400).json({ message: 'Product already in wishlist' });
+      return res.status(400).json({ message: "Product already in wishlist" });
     }
 
     tourist.wishlist.push(productId);
     await tourist.save();
-    return res.status(200).json({ message: 'Product added to wishlist successfully' });
+    return res
+      .status(200)
+      .json({ message: "Product added to wishlist successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
-}
+};
 const getWishlist = async (req, res) => {
   try {
-    const authHeader = req.header('Authorization');
+    const authHeader = req.header("Authorization");
     if (!authHeader) {
-      return res.status(401).json({ message: 'Authorization header missing' });
+      return res.status(401).json({ message: "Authorization header missing" });
     }
-    const token = authHeader.replace('Bearer ', '');
+    const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const tourist = await touristModel.findOne({ _id: decoded.id }).populate('wishlist');
+    const tourist = await touristModel
+      .findOne({ _id: decoded.id })
+      .populate("wishlist");
     if (!tourist) {
-      return res.status(404).json({ message: 'Tourist not found' });
+      return res.status(404).json({ message: "Tourist not found" });
     }
 
     return res.status(200).json({ wishlist: tourist.wishlist });
@@ -247,16 +261,18 @@ const getWishlist = async (req, res) => {
 };
 const getCart = async (req, res) => {
   try {
-    const authHeader = req.header('Authorization');
+    const authHeader = req.header("Authorization");
     if (!authHeader) {
-      return res.status(401).json({ message: 'Authorization header missing' });
+      return res.status(401).json({ message: "Authorization header missing" });
     }
-    const token = authHeader.replace('Bearer ', '');
+    const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const tourist = await touristModel.findOne({ _id: decoded.id }).populate('cart.product');
+    const tourist = await touristModel
+      .findOne({ _id: decoded.id })
+      .populate("cart.product");
     if (!tourist) {
-      return res.status(404).json({ message: 'Tourist not found' });
+      return res.status(404).json({ message: "Tourist not found" });
     }
 
     return res.status(200).json({ cart: tourist.cart });
@@ -268,26 +284,28 @@ const getCart = async (req, res) => {
 const removeProductFromWishlist = async (req, res) => {
   try {
     const { productId } = req.params;
-    const authHeader = req.header('Authorization');
+    const authHeader = req.header("Authorization");
     if (!authHeader) {
-      return res.status(401).json({ message: 'Authorization header missing' });
+      return res.status(401).json({ message: "Authorization header missing" });
     }
-    const token = authHeader.replace('Bearer ', '');
+    const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const tourist = await touristModel.findOne({ _id: decoded.id });
     if (!tourist) {
-      return res.status(404).json({ message: 'Tourist not found' });
+      return res.status(404).json({ message: "Tourist not found" });
     }
 
     const productIndex = tourist.wishlist.indexOf(productId);
     if (productIndex === -1) {
-      return res.status(400).json({ message: 'Product not in wishlist' });
+      return res.status(400).json({ message: "Product not in wishlist" });
     }
 
     tourist.wishlist.splice(productIndex, 1);
     await tourist.save();
-    return res.status(200).json({ message: 'Product removed from wishlist successfully' });
+    return res
+      .status(200)
+      .json({ message: "Product removed from wishlist successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -297,21 +315,21 @@ const addProductToCart = async (req, res) => {
   try {
     const { quantity } = req.body;
     const { productId } = req.params;
-    const authHeader = req.header('Authorization');
+    const authHeader = req.header("Authorization");
     if (!authHeader) {
-      return res.status(401).json({ message: 'Authorization header missing' });
+      return res.status(401).json({ message: "Authorization header missing" });
     }
-    const token = authHeader.replace('Bearer ', '');
+    const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const tourist = await touristModel.findOne({ _id: decoded.id });
     if (!tourist) {
-      return res.status(404).json({ message: 'Tourist not found' });
+      return res.status(404).json({ message: "Tourist not found" });
     }
 
     const product = await ProductModel.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({ message: "Product not found" });
     }
     const cartItemIndex = tourist.cart.findIndex(
       (item) => item.product.toString() === productId
@@ -326,8 +344,9 @@ const addProductToCart = async (req, res) => {
 
     await tourist.save();
 
-
-    return res.status(200).json({ message: 'Product added to cart successfully' });
+    return res
+      .status(200)
+      .json({ message: "Product added to cart successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -337,16 +356,16 @@ const addProductToCart = async (req, res) => {
 const removeProductFromCart = async (req, res) => {
   try {
     const { productId } = req.params;
-    const authHeader = req.header('Authorization');
+    const authHeader = req.header("Authorization");
     if (!authHeader) {
-      return res.status(401).json({ message: 'Authorization header missing' });
+      return res.status(401).json({ message: "Authorization header missing" });
     }
-    const token = authHeader.replace('Bearer ', '');
+    const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const tourist = await touristModel.findOne({ _id: decoded.id });
     if (!tourist) {
-      return res.status(404).json({ message: 'Tourist not found' });
+      return res.status(404).json({ message: "Tourist not found" });
     }
 
     const cartItemIndex = tourist.cart.findIndex(
@@ -356,9 +375,11 @@ const removeProductFromCart = async (req, res) => {
     if (cartItemIndex > -1) {
       tourist.cart.splice(cartItemIndex, 1);
       await tourist.save();
-      return res.status(200).json({ message: 'Product removed from cart successfully' });
+      return res
+        .status(200)
+        .json({ message: "Product removed from cart successfully" });
     } else {
-      return res.status(400).json({ message: 'Product not in cart' });
+      return res.status(400).json({ message: "Product not in cart" });
     }
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -370,16 +391,16 @@ const changeCartItemQuantity = async (req, res) => {
   try {
     const { productId } = req.params;
     const { quantity } = req.body;
-    const authHeader = req.header('Authorization');
+    const authHeader = req.header("Authorization");
     if (!authHeader) {
-      return res.status(401).json({ message: 'Authorization header missing' });
+      return res.status(401).json({ message: "Authorization header missing" });
     }
-    const token = authHeader.replace('Bearer ', '');
+    const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const tourist = await touristModel.findOne({ _id: decoded.id });
     if (!tourist) {
-      return res.status(404).json({ message: 'Tourist not found' });
+      return res.status(404).json({ message: "Tourist not found" });
     }
 
     const cartItemIndex = tourist.cart.findIndex(
@@ -389,39 +410,43 @@ const changeCartItemQuantity = async (req, res) => {
     if (cartItemIndex > -1) {
       tourist.cart[cartItemIndex].quantity = quantity;
       await tourist.save();
-      return res.status(200).json({ message: 'Cart item quantity updated successfully' });
+      return res
+        .status(200)
+        .json({ message: "Cart item quantity updated successfully" });
     } else {
-      return res.status(400).json({ message: 'Product not in cart' });
+      return res.status(400).json({ message: "Product not in cart" });
     }
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
-//checkout my order 
+//checkout my order
 /*
   need to implement a payment processing function @ali Mousa 
   for amgad edit this when Ali is done with payment processing function 
 */
 const checkoutOrder = async (req, res) => {
   try {
-    const authHeader = req.header('Authorization');
+    const authHeader = req.header("Authorization");
     if (!authHeader) {
-      return res.status(401).json({ message: 'Authorization header missing' });
+      return res.status(401).json({ message: "Authorization header missing" });
     }
-    const token = authHeader.replace('Bearer ', '');
+    const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const tourist = await touristModel.findOne({ _id: decoded.id }).populate('cart.product');
+    const tourist = await touristModel
+      .findOne({ _id: decoded.id })
+      .populate("cart.product");
     if (!tourist) {
-      return res.status(404).json({ message: 'Tourist not found' });
+      return res.status(404).json({ message: "Tourist not found" });
     }
 
     if (tourist.cart.length === 0) {
-      return res.status(400).json({ message: 'Cart is empty' });
+      return res.status(400).json({ message: "Cart is empty" });
     }
 
     let totalAmount = 0;
-    tourist.cart.forEach(item => {
+    tourist.cart.forEach((item) => {
       totalAmount += item.product.price * item.quantity;
     });
 
@@ -433,13 +458,13 @@ const checkoutOrder = async (req, res) => {
 
     // Save the order to order history
     const order = {
-      items: tourist.cart.map(item => ({
+      items: tourist.cart.map((item) => ({
         product: item.product._id,
         quantity: item.quantity,
-        price: item.product.price
+        price: item.product.price,
       })),
       totalAmount,
-      date: new Date()
+      date: new Date(),
     };
     tourist.orderHistory.push(order);
 
@@ -447,7 +472,7 @@ const checkoutOrder = async (req, res) => {
     tourist.cart = [];
     await tourist.save();
 
-    res.status(200).json({ message: 'Order checked out successfully', order });
+    res.status(200).json({ message: "Order checked out successfully", order });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -456,16 +481,18 @@ const checkoutOrder = async (req, res) => {
 //view all ordrs
 const viewAllOrders = async (req, res) => {
   try {
-    const authHeader = req.header('Authorization');
+    const authHeader = req.header("Authorization");
     if (!authHeader) {
-      return res.status(401).json({ message: 'Authorization header missing' });
+      return res.status(401).json({ message: "Authorization header missing" });
     }
-    const token = authHeader.replace('Bearer ', '');
+    const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const tourist = await touristModel.findOne({ _id: decoded.id }).populate('orderHistory.items.product');
+    const tourist = await touristModel
+      .findOne({ _id: decoded.id })
+      .populate("orderHistory.items.product");
     if (!tourist) {
-      return res.status(404).json({ message: 'Tourist not found' });
+      return res.status(404).json({ message: "Tourist not found" });
     }
 
     return res.status(200).json({ orderHistory: tourist.orderHistory });
@@ -474,25 +501,27 @@ const viewAllOrders = async (req, res) => {
   }
 };
 
-//view certain order and it's status 
+//view certain order and it's status
 const viewOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const authHeader = req.header('Authorization');
+    const authHeader = req.header("Authorization");
     if (!authHeader) {
-      return res.status(401).json({ message: 'Authorization header missing' });
+      return res.status(401).json({ message: "Authorization header missing" });
     }
-    const token = authHeader.replace('Bearer ', '');
+    const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const tourist = await touristModel.findOne({ _id: decoded.id }).populate('orderHistory.items.product');
+    const tourist = await touristModel
+      .findOne({ _id: decoded.id })
+      .populate("orderHistory.items.product");
     if (!tourist) {
-      return res.status(404).json({ message: 'Tourist not found' });
+      return res.status(404).json({ message: "Tourist not found" });
     }
 
     const order = tourist.orderHistory.id(orderId);
     if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
+      return res.status(404).json({ message: "Order not found" });
     }
 
     return res.status(200).json({ order });
@@ -505,36 +534,150 @@ const viewOrder = async (req, res) => {
 const cancelOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const authHeader = req.header('Authorization');
+    const authHeader = req.header("Authorization");
     if (!authHeader) {
-      return res.status(401).json({ message: 'Authorization header missing' });
+      return res.status(401).json({ message: "Authorization header missing" });
     }
-    const token = authHeader.replace('Bearer ', '');
+    const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const tourist = await touristModel.findOne({ _id: decoded.id });
     if (!tourist) {
-      return res.status(404).json({ message: 'Tourist not found' });
+      return res.status(404).json({ message: "Tourist not found" });
     }
 
     // Find and remove the order from the order history
-    const orderIndex = tourist.orderHistory.findIndex(order => order._id.toString() === orderId);
+    const orderIndex = tourist.orderHistory.findIndex(
+      (order) => order._id.toString() === orderId
+    );
     const order = tourist.orderHistory.id(orderId);
     if (orderIndex === -1) {
-      return res.status(404).json({ message: 'Order not found' });
+      return res.status(404).json({ message: "Order not found" });
     }
 
     tourist.wallet += order.totalAmount;
     tourist.orderHistory.splice(orderIndex, 1); // Remove the order
     await tourist.save();
 
-    return res.status(200).json({ message: 'Order canceled successfully' });
+    return res.status(200).json({ message: "Order canceled successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
+const addDeliveryAddress = async (req, res) => {
+  try {
+    const { address } = req.body;
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+    tourist.deliveryAddresses.push(address);
+    await tourist.save();
+    return res.status(200).json({
+      message: "Delivery address added successfully",
+      deliveryAddresses: tourist.deliveryAddresses,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+const removeDeliveryAddress = async (req, res) => {
+  try {
+    const { addressId } = req.params;
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
 
+    const addressIndex = tourist.deliveryAddresses.findIndex(
+      (addr) => addr._id.toString() === addressId
+    );
+    if (addressIndex === -1) {
+      return res.status(404).json({ message: "Address not found" });
+    }
+
+    tourist.deliveryAddresses.splice(addressIndex, 1);
+    await tourist.save();
+
+    return res.status(200).json({
+      message: "Delivery address removed successfully",
+      deliveryAddresses: tourist.deliveryAddresses,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const updateDeliveryAddress = async (req, res) => {
+  try {
+    const { addressId } = req.params; // Assuming the address ID is passed as a URL parameter
+    const { updatedAddress } = req.body;
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    const addressIndex = tourist.deliveryAddresses.findIndex(
+      (addr) => addr._id.toString() === addressId
+    );
+    if (addressIndex === -1) {
+      return res.status(404).json({ message: "Address not found" });
+    }
+
+    // Update fields of the specific address
+    Object.assign(tourist.deliveryAddresses[addressIndex], updatedAddress);
+    await tourist.save();
+
+    return res.status(200).json({
+      message: "Delivery address updated successfully",
+      deliveryAddresses: tourist.deliveryAddresses,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const deliveryAddresses = async (req, res) => {
+  try {
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+    return res
+      .status(200)
+      .json({ deliveryAddresses: tourist.deliveryAddresses });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
   getTourist,
@@ -553,5 +696,9 @@ module.exports = {
   viewAllOrders,
   viewOrder,
   cancelOrder,
-  getCart
+  getCart,
+  addDeliveryAddress,
+  removeDeliveryAddress,
+  updateDeliveryAddress,
+  deliveryAddresses,
 };

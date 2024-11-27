@@ -1,10 +1,12 @@
 const axios = require("axios");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Use your Stripe Secret Key
 const Itinerary = require("../Models/Itinerary");
 const Activity = require("../Models/Activity");
 const PreferenceTagModel = require("../Models/PreferenceTag");
 const Booking = require("../Models/Booking");
 const User = require("../Models/user");
-const jwt = require('jsonwebtoken'); 
+const touristModel = require("../Models/Tourist"); // Add this line to import touristModel
+const jwt = require("jsonwebtoken");
 
 const { getExchangeRates, convertCurrency } = require("./currencyConverter");
 
@@ -24,7 +26,7 @@ const createItinerary = async (req, res) => {
     isActive,
   } = req.body;
   try {
-    const token = req.headers.authorization.split(' ')[1];
+    const token = req.headers.authorization.split(" ")[1];
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     const creatorId = decodedToken.id;
     const itinerary = await Itinerary.create({
@@ -56,7 +58,10 @@ const createItinerary = async (req, res) => {
 const getItinerary = async (req, res) => {
   const { currency } = req.query; // Get the selected currency from query parameters
   try {
-    const itineraries = await Itinerary.find({ flagged: false , isActive : true}).populate({
+    const itineraries = await Itinerary.find({
+      flagged: false,
+      isActive: true,
+    }).populate({
       path: "activities",
       populate: { path: "category tags" },
     });
@@ -275,40 +280,67 @@ const filterItinerariesByPref = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 const bookItinerary = async (req, res) => {
   try {
-    const { itineraryId, userId } = req.body;
-    if (!itineraryId || !userId) {
-      return res
-        .status(400)
-        .json({ message: "Please provide itinerary ID and user ID" });
+    const { itineraryId, paymentMethod, userId } = req.body;
+
+    const tourist = await touristModel.findOne({ userId: userId });
+
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
     }
+
     const itinerary = await Itinerary.findById(itineraryId);
     if (!itinerary) {
       return res.status(404).json({ message: "Itinerary not found" });
     }
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    const booking = await Booking.findOne({ itineraryId, userId });
-    if (booking) {
+
+    const oldbooking = await Booking.findOne({
+      userId: tourist.userId,
+      itineraryId,
+    });
+    if (oldbooking) {
       return res
         .status(400)
-        .json({ message: "You have already booked this itinerary" });
+        .json({ message: "User has already booked this itinerary" });
     }
-    // Create a new booking
-    const newBooking = new Booking({
-      itineraryId,
-      userId,
-    });
+    let booking = new Booking({ userId: tourist.userId, itineraryId });
 
-    await newBooking.save(); // Save to the database
+    if (paymentMethod === "wallet") {
+      // Wallet payment
+      if (tourist.wallet < itinerary.price) {
+        return res.status(400).json({ message: "Insufficient wallet balance" });
+      }
 
-    res
-      .status(201)
-      .json({ message: "Booking successful!", userId, itineraryId });
+      // Deduct from wallet and update booking
+      tourist.wallet -= itinerary.price;
+      await tourist.save();
+      await booking.save();
+      return res.json({ message: "Payment successful using wallet" });
+    } else if (paymentMethod === "card") {
+      // Stripe payment
+      try {
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: itinerary.price * 100, // Convert to cents
+          currency: tourist.currency,
+          automatic_payment_methods: {
+            enabled: true,
+            allow_redirects: "never",
+          },
+        });
+        await booking.save();
+        return res.json({
+          clientSecret: paymentIntent.client_secret,
+          paymentIntentId: paymentIntent.id,
+        });
+      } catch (error) {
+        return res
+          .status(500)
+          .json({ message: "Payment processing failed", error: error.message });
+      }
+    } else {
+      return res.status(400).json({ message: "Invalid payment method" });
+    }
   } catch (error) {
     console.error("Error booking itinerary:", error);
     res.status(500).json({ message: error.message });
@@ -402,7 +434,6 @@ const activateDeactivateItinerary = async (req, res) => {
   }
 };
 
-
 const generateShareLink = async (req, res) => {
   try {
     const { itineraryId } = req.params;
@@ -415,80 +446,90 @@ const generateShareLink = async (req, res) => {
       return res.status(404).json({ message: "Itinerary not found" });
     }
 
-    const shareLink = `${req.protocol}://${req.get('host')}/itineraries/${itineraryId}/share`;
+    const shareLink = `${req.protocol}://${req.get(
+      "host"
+    )}/itineraries/${itineraryId}/share`;
     return res.status(200).json({ shareLink });
   } catch (error) {
     console.error(error);
-        return res.status(500).json({ message: "Error generating share link" });
-      }
-    };
+    return res.status(500).json({ message: "Error generating share link" });
+  }
+};
 
 // Flag an itinerary as inappropriate (admin only)
 const flagItinerary = async (req, res) => {
   try {
-      const { id } = req.params;
-      const itinerary = await Itinerary.findById(id);
-      if (!itinerary) {
-          return res.status(404).json({ message: 'Itinerary not found' });
-      }
+    const { id } = req.params;
+    const itinerary = await Itinerary.findById(id);
+    if (!itinerary) {
+      return res.status(404).json({ message: "Itinerary not found" });
+    }
 
-      itinerary.flagged = true;
-      await itinerary.save();
-      res.status(200).json({ message: 'Itinerary flagged successfully', itinerary });
+    itinerary.flagged = true;
+    await itinerary.save();
+    res
+      .status(200)
+      .json({ message: "Itinerary flagged successfully", itinerary });
   } catch (error) {
-      console.error('Error flagging itinerary:', error);
-      res.status(500).json({ message: 'Server error', error: error.message });
+    console.error("Error flagging itinerary:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
 // Unflag an itinerary as inappropriate (admin only)
 const unflagItinerary = async (req, res) => {
   try {
-      const { id } = req.params;
-      const itinerary = await Itinerary.findById(id);
-      if (!itinerary) {
-          return res.status(404).json({ message: 'Itinerary not found' });
-      }
+    const { id } = req.params;
+    const itinerary = await Itinerary.findById(id);
+    if (!itinerary) {
+      return res.status(404).json({ message: "Itinerary not found" });
+    }
 
-      itinerary.flagged = false;
-      await itinerary.save();
-      res.status(200).json({ message: 'Itinerary unflagged successfully', itinerary });
+    itinerary.flagged = false;
+    await itinerary.save();
+    res
+      .status(200)
+      .json({ message: "Itinerary unflagged successfully", itinerary });
   } catch (error) {
-      console.error('Error unflagging itinerary:', error);
-      res.status(500).json({ message: 'Server error', error: error.message });
+    console.error("Error unflagging itinerary:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
 // Tourist rate an itinerary they followed
 const rateItinerary = async (req, res) => {
   try {
-      const { itineraryId, rating, review } = req.body;
-      if (!itineraryId || !rating) {
-          return res.status(400).json({ message: 'Itinerary ID and rating are required' });
-      }
+    const { itineraryId, rating, review } = req.body;
+    if (!itineraryId || !rating) {
+      return res
+        .status(400)
+        .json({ message: "Itinerary ID and rating are required" });
+    }
 
-      const token = req.headers.authorization.split(' ')[1];
-      const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-      const userId = decodedToken.id;
+    const token = req.headers.authorization.split(" ")[1];
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decodedToken.id;
 
-      const itinerary = await Itinerary.findById(itineraryId);
-      if (!itinerary) {
-          return res.status(404).json({ message: 'Itinerary not found' });
-      }
+    const itinerary = await Itinerary.findById(itineraryId);
+    if (!itinerary) {
+      return res.status(404).json({ message: "Itinerary not found" });
+    }
 
-      const existingRating = itinerary.ratings.find(r => r.userId.toString() === userId);
-      if (existingRating) {
-          existingRating.rating = rating;
-          existingRating.review = review;
-      } else {
-          itinerary.ratings.push({ userId, rating, review });
-      }
+    const existingRating = itinerary.ratings.find(
+      (r) => r.userId.toString() === userId
+    );
+    if (existingRating) {
+      existingRating.rating = rating;
+      existingRating.review = review;
+    } else {
+      itinerary.ratings.push({ userId, rating, review });
+    }
 
-      await itinerary.save();
-      res.status(200).json({ message: 'Rating added successfully', itinerary });
+    await itinerary.save();
+    res.status(200).json({ message: "Rating added successfully", itinerary });
   } catch (error) {
-      console.error('Error rating itinerary:', error);
-      res.status(500).json({ message: 'Server error', error: error.message });
+    console.error("Error rating itinerary:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -511,4 +552,3 @@ module.exports = {
   unflagItinerary,
   rateItinerary,
 };
-  
