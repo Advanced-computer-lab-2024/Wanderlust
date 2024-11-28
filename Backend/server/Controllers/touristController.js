@@ -7,6 +7,7 @@ const { default: mongoose } = require("mongoose");
 const User = require("../Models/user");
 const jwt = require("jsonwebtoken");
 const ProductModel = require("../Models/Products");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Use your Stripe Secret Key
 
 const getTourist = async (req, res) => {
   const username = req.query.username;
@@ -420,6 +421,20 @@ const changeCartItemQuantity = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+const processPayment = async (totalAmount) => {
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: totalAmount * 100, // Convert to cents
+      currency: tourist.currency,
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: "never",
+      },
+    });
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
 //checkout my order
 /*
   need to implement a payment processing function @ali Mousa 
@@ -567,6 +582,20 @@ const cancelOrder = async (req, res) => {
 const addDeliveryAddress = async (req, res) => {
   try {
     const { address } = req.body;
+    const { street, city, state, zipCode, country, floor, apartment } = address;
+    if (
+      !street ||
+      !city ||
+      !state ||
+      !zipCode ||
+      !country ||
+      !floor ||
+      !apartment
+    ) {
+      return res
+        .status(400)
+        .json({ message: "All address fields are required" });
+    }
     const authHeader = req.header("Authorization");
     if (!authHeader) {
       return res.status(401).json({ message: "Authorization header missing" });
