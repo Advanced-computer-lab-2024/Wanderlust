@@ -106,6 +106,7 @@ const TouristProfile = () => {
 
   const redeemPoints = async () => {
     const username =profile.username;  
+    console.log(profile.points);
     if(profile.points<10000){
       alert("Insufficient Points");
     }
@@ -348,6 +349,10 @@ const PreferencePopup = ({
   );
 };
 
+
+
+
+
 const SettingsPopup = ({ profile, username, onClose }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showChangePasswordFields, setShowChangePasswordFields] = useState(false);
@@ -355,48 +360,68 @@ const SettingsPopup = ({ profile, username, onClose }) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [currency, setCurrency] = useState("EGP"); // Default currency abbreviation
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   const handleChangePassword = async () => {
-    console.log(oldPassword);
     try {
-        const response = await axios.post(
-            'http://localhost:8000/api/admin/updatePassword',
-            {
-                oldPassword: oldPassword,
-                newPassword: newPassword,
-                confirmPassword: confirmPassword
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
-                }
-            }
-        );
+      const response = await axios.post(
+        'http://localhost:8000/api/admin/updatePassword',
+        {
+          oldPassword,
+          newPassword,
+          confirmPassword
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
+          }
+        }
+      );
 
-        if (response.status === 200) {
-            alert('Password updated successfully');
-            setShowPassword((prevProfile) => ({
-              ...prevProfile,
-              password :profile.password, 
-            }));
-        }
-       
+      if (response.status === 200) {
+        alert('Password updated successfully');
+      }
     } catch (error) {
-        if (error.response && error.response.data && error.response.data.message) {
-            alert(`Error: ${error.response.data.message}`);
-        } else {
-            alert('An error occurred. Please try again.');
-        }
+      const message = error.response?.data?.message || 'An error occurred. Please try again.';
+      alert(`Error: ${message}`);
     }
-};
+  };
+
+  const handleChangeCurrency = async (newCurrency) => {
+    setCurrency(newCurrency);
+  
+    try {
+      const username = profile.username; // Assuming `profile.username` contains the username
+  
+      const response = await axios.put(
+        `http://localhost:8000/api/tourist/updateTourist/${username}`,
+        { currency: newCurrency },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+  
+      if (response.status === 200) {
+        alert('Currency preference updated successfully');
+      }
+    } catch (error) {
+      alert('Failed to update currency preference');
+    }
+  };
+  
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="absolute inset-0 bg-black opacity-50" onClick={onClose}></div>
       <div className="bg-white rounded-lg shadow-lg p-6 z-10">
         <h3 className="text-xl font-semibold text-indigo-600 mb-4">Settings</h3>
+        
+        {/* Account Details Section */}
         <div className="mb-4">
           <h4 className="text-lg font-semibold text-indigo-600 mb-2">Account Details</h4>
           <div className="mb-2">
@@ -471,6 +496,24 @@ const SettingsPopup = ({ profile, username, onClose }) => {
           )}
         </div>
 
+        {/* Preferred Currency Section */}
+        <div className="mb-4">
+          <h4 className="text-lg font-semibold text-indigo-600 mb-2">Preferred Currency</h4>
+          <select
+            value={currency}
+            onChange={(e) => handleChangeCurrency(e.target.value)} 
+
+            className="w-full bg-gray-200 text-gray-800 rounded p-2"
+          >
+            <option value="EGP">EGP</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
+            <option value="SAR">SAR</option>
+          </select>
+        </div>
+
+        {/* Close Button */}
         <div className="mt-4 text-center">
           <button
             onClick={onClose}
@@ -482,5 +525,9 @@ const SettingsPopup = ({ profile, username, onClose }) => {
     </div>
   );
 };
+
+
+
+
 
 export default TouristProfile;

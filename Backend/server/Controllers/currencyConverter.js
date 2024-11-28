@@ -3,7 +3,7 @@ const Tourist = require('../Models/Tourist');
 
 const getExchangeRates = async (baseCurrency = 'EGP') => {
   try {
-    const response = await axios.get(`https://v6.exchangerate-api.com/v6/77676a6e9ec92dc31f556a19/latest/${baseCurrency}`);
+    const response = await axios.get(`https://v6.exchangerate-api.com/v6/24854109d0f837a5bd8882e3/latest/${baseCurrency}`);
     return response.data.conversion_rates;
   } catch (error) {
     throw new Error('Failed to fetch exchange rates');

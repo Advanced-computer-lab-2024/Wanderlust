@@ -8,7 +8,7 @@ const ItineraryTourist = () => {
     
     <TouristNavBar  />
     <div style={{ height: '35px' }}></div>
-    <Itineraries />
+    <Itineraries guestMode={false} />
     
 
 

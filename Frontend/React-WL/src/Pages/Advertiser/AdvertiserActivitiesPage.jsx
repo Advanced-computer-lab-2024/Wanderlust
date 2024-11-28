@@ -5,6 +5,7 @@ import Activities from '../../Components/Activities';
 const AdvertiserActivitiesPage = () => {
     return (
     <>      
+    hi
       <AdvertiserNavBar /> 
       <Activities />
     </>

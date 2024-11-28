@@ -3,16 +3,60 @@ import Activity from './Activity';
 import MultiRangeSlider from "multi-range-slider-react";
 import axios from 'axios';
 import CreateActivityForm from './CreateActivityForm';
-const Activities = ({ showCreateButton = true, showUpdateButton = true, showDeleteButton = true, onCreate }) => {
+
+const Activities = ({ guestMode, showCreateButton = true, showUpdateButton = true, showDeleteButton = true, onCreate }) => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [minValue, set_minValue] = useState(1);
   const [maxValue, set_maxValue] = useState(1000);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [touristId, settouristId] = useState(null);
+
+  const getTouristId = async () => {
+    try {
+      const [infoResponse, userResponse] = await Promise.all([
+        axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
+        }),
+        axios.get("http://localhost:8000/api/admin/getLoggedInUser", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
+        })
+      ]);
+
+      const combinedData = { ...infoResponse.data, ...userResponse.data };
+      console.log(combinedData);
+      return combinedData._id;
+    } catch (error) {
+      console.error("Error fetching tourist ID:", error);
+      return 1; // Fallback ID for guest mode if API fails
+    }
+  };
 
   useEffect(() => {
-    const fetchActivities = async () => {
+    const fetchData = async () => {
       try {
+        console.log("guestMode:", guestMode);
+  
+        // Set or retrieve tourist ID based on guest mode
+        if (guestMode) {
+          settouristId(1); // Guest mode, using fallback ID 1
+        } else {
+          const id = await getTouristId();
+          settouristId(id);
+          console.log(id);
+        }
+  
+        // Fetch activities using getActivity API
+        const activityUrl = touristId === 1
+          ? "http://localhost:8000/api/activity/getActivityGuest"
+          : `http://localhost:8000/api/activity/getActivity?touristId=${touristId}`;
+          
+        const activityResponse = await axios.get(activityUrl, {
+          headers: touristId !== 1 ? { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` } : undefined
+        });
+        setActivities(activityResponse.data);
+        console.log("Fetched activities:", activityResponse.data);
+  
         // Step 1: Fetch the logged-in user's bookings
         const fetchBookings = async () => {
           try {
@@ -30,9 +74,9 @@ const Activities = ({ showCreateButton = true, showUpdateButton = true, showDele
                 return null;
               }
             };
-    
+  
             const userIdValue = await userId();
-    
+  
             // Fetch bookings for the current tourist
             const response = await axios.get("http://localhost:8000/api/bookings/getBooking", {
               params: {
@@ -42,7 +86,7 @@ const Activities = ({ showCreateButton = true, showUpdateButton = true, showDele
                 Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
               },
             });
-    
+  
             if (Array.isArray(response.data)) {
               return response.data;  // Return bookings array
             } else {
@@ -53,31 +97,29 @@ const Activities = ({ showCreateButton = true, showUpdateButton = true, showDele
             return [];
           }
         };
-    
+  
         // Step 2: Get the user's bookings and extract the booked activity IDs
         const bookings = await fetchBookings();
         const bookedActivityIds = bookings.map((booking) => booking.activityId?._id);
-    
-        // Step 3: Fetch all activities from the API
-        const res = await fetch('http://localhost:8000/api/activity/getActivity');
-        const data = await res.json();
-    
-        // Step 4: Filter out activities that have already been booked
-        const filteredActivities = data.filter(
+  
+        // Step 3: Filter out activities that have already been booked
+        const filteredActivities = activityResponse.data.filter(
           (activity) => !bookedActivityIds.includes(activity._id)
         );
-    
-        // Step 5: Update the state with the filtered activities
+  
+        // Step 4: Update the state with the filtered activities
         setActivities(filteredActivities);
       } catch (error) {
-        console.log('Error fetching activities', error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
+  
+    fetchData();
+  }, [guestMode, touristId]);
+  
 
-    fetchActivities();
-  }, []);
   const handleInput = (e) => {
     set_minValue(e.minValue);
     set_maxValue(e.maxValue);
@@ -103,6 +145,9 @@ const Activities = ({ showCreateButton = true, showUpdateButton = true, showDele
       setLoading(false);
     }
   };
+
+ 
+
   const filterActivity = async () =>{
     try{
       var date = document.getElementById("date").value;
@@ -177,6 +222,7 @@ const Activities = ({ showCreateButton = true, showUpdateButton = true, showDele
   };
 
   return (
+    
     <section className="bg-blue-50 px-4 py-10">
       <div className="container mx-auto flex flex-col lg:flex-row">
         <div className="bg-white rounded-xl shadow-md p-6 lg:w-1/3 mb-6 lg:mb-0 lg:mr-6">

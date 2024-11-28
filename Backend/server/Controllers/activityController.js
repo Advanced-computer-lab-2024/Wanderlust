@@ -75,6 +75,17 @@ const getActivity = async (req, res) => {
   }
 };
 
+const getActivityGuest = async (req, res) => {
+  try {
+    const activities = await Activity.find()
+      .populate("category")
+      .populate("tags");
+    res.status(200).json(activities);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 const getActivityById = async (req, res) => {
   try {
     const id = req.query.id;
@@ -424,6 +435,7 @@ const cancelActivityBooking = async (req, res) => {
 module.exports = {
   createActivity,
   getActivity,
+  getActivityGuest,
   getActivityById,
   updateActivity,
   deleteActivity,
