@@ -23,7 +23,7 @@ const TouristCart = () => {
             setLoading(false);
         }
     };
-
+//remove done
     const removeFromCart = async (productId) => {
         try {
             const token = localStorage.getItem("jwtToken");
@@ -38,6 +38,24 @@ const TouristCart = () => {
             setError(error.message);
         }
     };
+    // change the quantity of the item in the cart
+    const changeCartItemQuantity = async (productId, quantity) => {
+        try {
+            const token = localStorage.getItem("jwtToken");
+            await axios.put(`http://localhost:8000/api/tourist/cart/changeQuantity/${productId}`, {
+                quantity,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            await fetchTouristCart(); // Fetch the updated cart from the server
+        } catch (error) {
+            console.error('Error changing item quantity:', error.response ? error.response.data : error.message);
+            setError(error.message);
+        }
+    };
+
 
     return (
         <div className="p-5 max-w-3xl mx-auto">
@@ -55,18 +73,26 @@ const TouristCart = () => {
                             <p className="mb-1">Quantity: {item.quantity}</p>
                             <p className="font-bold">Total: ${(item.product.price * item.quantity).toFixed(2)}</p>
                         </div>
-                        <button
-                            onClick={() => removeFromCart(item.product._id)}
-                            className="text-red-500 hover:text-red-700"
-                        >
-                            Remove
-                        </button>
+                        <div className="flex flex-col items-end">
+                            <button
+                                onClick={() => removeFromCart(item.product._id)}
+                                className="text-red-500 hover:text-red-700 mb-2"
+                            >
+                                Remove
+                            </button>
+                            <input
+                                type="number"
+                                value={item.quantity}
+                                onChange={(e) => changeCartItemQuantity(item.product._id, e.target.value)}
+                                className="p-1 border border-gray-300 rounded"
+                                min="1"
+                            />
+                        </div>
                     </div>
                 ))
             ) : (
                 <p className="text-center text-gray-500">Your cart is empty.</p>
             )}
-            <div className="mt-5"></div>
         </div>
     );
 };
