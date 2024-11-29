@@ -24,6 +24,21 @@ const TouristCart = () => {
         }
     };
 
+    const removeFromCart = async (itemId) => {
+        try {
+            const token = localStorage.getItem("jwtToken");
+            await axios.delete(`http://localhost:8000/api/tourist/removeFromCart${itemId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            await fetchTouristCart(); // Fetch the updated cart from the server
+        } catch (error) {
+            console.error('Error removing item from cart:', error.response ? error.response.data : error.message);
+            setError(error.message);
+        }
+    };
+
     return (
         <div className="p-5 max-w-3xl mx-auto">
             <h1 className="text-center text-2xl font-bold text-gray-800">My Cart</h1>
@@ -33,19 +48,29 @@ const TouristCart = () => {
                 <h1 className="text-center text-red-500">{error}</h1>
             ) : Array.isArray(cart) && cart.length > 0 ? (
                 cart.map((item) => (
-                    <div key={item._id} className="border border-gray-300 p-4 my-2 rounded-md">
-                        <h3 className="text-lg font-semibold mb-2">{item.product.name}</h3>
-                        <p className="mb-1">{item.product.description}</p>
-                        <p className="mb-1">Quantity: {item.quantity}</p>
-                        <p className="font-bold">Total: ${(item.product.price * item.quantity).toFixed(2)}</p>
+                    <div key={item._id} className="border border-gray-300 p-4 my-2 rounded-md flex justify-between items-center">
+                        <div>
+                            <h3 className="text-lg font-semibold mb-2">{item.product.name}</h3>
+                            <p className="mb-1">{item.product.description}</p>
+                            <p className="mb-1">Quantity: {item.quantity}</p>
+                            <p className="font-bold">Total: ${(item.product.price * item.quantity).toFixed(2)}</p>
+                        </div>
+                        <button
+                            onClick={() => removeFromCart(item._id)}
+                            className="text-red-500 hover:text-red-700"
+                        >
+                            Remove
+                        </button>
                     </div>
                 ))
             ) : (
                 <p className="text-center text-gray-500">Your cart is empty.</p>
             )}
-        <div className="mt-5"></div>
+            <div className="mt-5"></div>
         </div>
     );
 };
 
 export default TouristCart;
+
+
