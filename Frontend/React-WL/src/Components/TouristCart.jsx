@@ -24,10 +24,10 @@ const TouristCart = () => {
         }
     };
 
-    const removeFromCart = async (itemId) => {
+    const removeFromCart = async (productId) => {
         try {
             const token = localStorage.getItem("jwtToken");
-            await axios.delete(`http://localhost:8000/api/tourist/removeFromCart${itemId}`, {
+            await axios.delete(`http://localhost:8000/api/tourist/removeFromCart/${productId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -56,7 +56,7 @@ const TouristCart = () => {
                             <p className="font-bold">Total: ${(item.product.price * item.quantity).toFixed(2)}</p>
                         </div>
                         <button
-                            onClick={() => removeFromCart(item._id)}
+                            onClick={() => removeFromCart(item.product._id)}
                             className="text-red-500 hover:text-red-700"
                         >
                             Remove
