@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import BookingActivity from "./BookingActivity";
 import { Edit3, Trash2 } from "lucide-react";
-
+import { useNavigate } from "react-router-dom";
 const Activity = ({
   activity,
   showUpdateButton = true,
@@ -10,7 +10,7 @@ const Activity = ({
   onUpdate,
   onDelete,
 }) => {
-  const [showPayment, setShowPayment] = useState(false);
+  const navigate = useNavigate();
   // Function to generate Google Maps embed URL
   const getGoogleMapsEmbedUrl = (lat, lng) => {
     return `https://www.google.com/maps/embed/v1/place?key=AIzaSyA_eS_8ocAw_f4vgD01n-_vDIXG16QixpI&q=${lat},${lng}`;
@@ -21,7 +21,9 @@ const Activity = ({
     return discounts && discounts !== "undefined" && discounts.trim() !== "";
   };
   const handleBookActivity = async () => {
-    setShowPayment(true); // Show the payment modal
+    navigate("/BookingActivityPage", {
+      state: { activityId: activity._id, price: activity.price },
+    });
   };
 
   return (
@@ -95,17 +97,7 @@ const Activity = ({
             Book Activity
           </button>
         </div>
-        {showPayment && (
-          <div className="absolute inset-0 bg-gray-100 bg-opacity-90 flex items-center justify-center">
-            <BookingActivity bookingId={activity._id} amount={activity.price} />
-            <button
-              onClick={() => setShowPayment(false)}
-              className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-md"
-            >
-              Close
-            </button>
-          </div>
-        )}
+
         {/* Update and Delete Buttons */}
         <div className="flex justify-end space-x-2 mt-4">
           {showUpdateButton && (

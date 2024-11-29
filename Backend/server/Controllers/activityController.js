@@ -6,6 +6,7 @@ const Booking = require("../Models/Booking.js");
 const User = require("../Models/user");
 const { convertCurrency } = require("./currencyConverter");
 const touristModel = require("../Models/Tourist");
+const { updatePointsOnPayment } = require("./touristController");
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Use your Stripe Secret Key
 const jwt = require("jsonwebtoken");
@@ -389,7 +390,6 @@ const bookActivity = async (req, res) => {
         .status(400)
         .json({ message: "User has already booked this activity" });
     }
-    let booking = new Booking({ userId: tourist.userId, activityId });
 
     if (paymentMethod === "wallet") {
       // Wallet payment
@@ -400,7 +400,6 @@ const bookActivity = async (req, res) => {
       // Deduct from wallet and update booking
       tourist.wallet -= activity.price;
       await tourist.save();
-      await booking.save();
       return res.json({ message: "Payment successful using wallet" });
     } else if (paymentMethod === "card") {
       // Stripe payment
@@ -413,10 +412,9 @@ const bookActivity = async (req, res) => {
             allow_redirects: "never",
           },
         });
-        await booking.save();
         return res.json({
           clientSecret: paymentIntent.client_secret,
-          paymentIntentId: paymentIntent.id,
+          message: "Payment processing successful",
         });
       } catch (error) {
         return res
@@ -431,6 +429,40 @@ const bookActivity = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const paymentSuccess = async (req, res) => {
+  try {
+    const { userId, activityId, paymentIntentId } = req.body;
+    const tourist = await touristModel.findOne({ userId: userId });
+
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    const activity = await Activity.findById(activityId);
+    if (!activity) {
+      return res.status(404).json({ message: "Activity not found" });
+    }
+    // Validate the payment with Stripe
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    if (paymentIntent.status !== "succeeded") {
+      return res.status(400).json({ message: "Payment not successful" });
+    }
+
+    // Perform post-payment actions
+    const booking = new Booking({ userId, activityId });
+    await booking.save();
+
+    // Send confirmation email
+    await sendConfirmationEmail(userId, activityId);
+
+    await updatePointsOnPayment(tourist._id, activity.price);
+    return res.status(200).json({ message: "Post-payment actions completed" });
+  } catch (error) {
+    console.error("Error handling payment success:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const cancelActivityBooking = async (req, res) => {
   const { bookingId } = req.params; // Get the booking ID from the request params
 
@@ -482,5 +514,6 @@ module.exports = {
   sendActivityLinkViaEmail,
   rateActivity,
   bookActivity,
+  paymentSuccess,
   cancelActivityBooking,
 };

@@ -90,7 +90,20 @@ const BookingActivity = ({ activityId, price }) => {
           if (error) {
             alert(error.message);
           } else if (paymentIntent.status === "succeeded") {
-            alert("Payment successful via card");
+            await axios.post(
+              "/api/activity/paymentSuccess",
+              {
+                userId: userIdValue,
+                activityId,
+                paymentIntentId: paymentIntent.id,
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+                },
+              }
+            );
+            alert("Booking confirmed and actions completed!");
           }
         }
       } catch (error) {
