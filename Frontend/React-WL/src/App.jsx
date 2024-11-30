@@ -40,6 +40,7 @@ import BookingTourist from './Pages/Tourist/TouristBookingsPage';
 import AdminViewDocuments from './Pages/AdminViewDocuments';
 import AdminUpdatePassword from './Pages/AdminUpdatePassword';
 import AdminManageItinerary from './Pages/AdminManageItinerary';
+import TouristOrdersPage from './Pages/Tourist/TouristOrdersPage';
 const App = () => {
   return (
     <Router>
@@ -75,6 +76,7 @@ const App = () => {
         <Route path="/BookingsTourist" element={<BookingTourist />} />
         <Route path="/TouristCart" element={<TouristCartPage />} />
         <Route path="/TouristWishlist" element={<TouristWishlistPage />} />
+        <Route path="/TouristOrders" element={<TouristOrdersPage />} />
 
         {/* Guest Routes */}
         <Route path="/register" element={<RegisterPage />} />
