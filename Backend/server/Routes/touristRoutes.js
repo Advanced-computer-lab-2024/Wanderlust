@@ -67,7 +67,7 @@ router.post(
 );
 router.get("/viewAllOrders", authenticateUser, tourist, viewAllOrders);
 router.get("/viewOrder/:orderId", authenticateUser, tourist, viewOrder);
-router.get("/cancelOrder/:orderId", authenticateUser, tourist, cancelOrder);
+router.delete("/cancelOrder/:touristId/:orderId", authenticateUser, tourist, cancelOrder);
 router.put("/updatePointsOnPayment", updatePointsOnPayment);
 
 //addresses
@@ -90,6 +90,6 @@ router.put(
   updateDeliveryAddress
 );
 router.get("/deliveryAddresses", authenticateUser, tourist, deliveryAddresses);
-router.post("/usePromoCode/:username", authenticateUser, tourist, usePromoCode);
-router.post("/receiveBirthdayPromo/:username", authenticateUser, tourist, receiveBirthdayPromo);
+router.post("/usePromoCode/:touristId", authenticateUser, tourist, usePromoCode);
+router.post("/receiveBirthdayPromo/:touristId", authenticateUser, tourist, receiveBirthdayPromo);
 module.exports = router;

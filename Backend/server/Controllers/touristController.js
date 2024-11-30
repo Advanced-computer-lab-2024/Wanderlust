@@ -8,6 +8,8 @@ const User = require("../Models/user");
 const jwt = require("jsonwebtoken");
 const ProductModel = require("../Models/Products");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Use your Stripe Secret Key
+const nodemailer = require('nodemailer'); 
+
 
 const getTourist = async (req, res) => {
   const username = req.query.username;
@@ -627,7 +629,7 @@ const viewOrder = async (req, res) => {
 //105,106 - cancel order by removing it from the order history,adding cancelled order amount back to wallet
 const cancelOrder = async (req, res) => {
   try {
-    const { orderId } = req.params;
+    const { orderId, touristId } = req.params;
     const authHeader = req.header("Authorization");
     if (!authHeader) {
       return res.status(401).json({ message: "Authorization header missing" });
@@ -635,7 +637,11 @@ const cancelOrder = async (req, res) => {
     const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (decoded.id !== touristId) {
+      return res.status(403).json({ message: "Unauthorized access" });
+    }
+
+    const tourist = await touristModel.findById(touristId);
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
     }
@@ -789,15 +795,17 @@ const deliveryAddresses = async (req, res) => {
 
 const usePromoCode = async (req, res) => {
   try {
-    const { promoCode } = req.body;
-    const { username } = req.params;
-
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const { promoCode, touristId } = req.body;
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
     }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const tourist = await touristModel.findOne({ userId: user._id }).populate('cart.product');
+   
+
+    const tourist = await touristModel.findById(touristId).populate('cart.product');
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
     }
@@ -823,16 +831,25 @@ const usePromoCode = async (req, res) => {
 
 const receiveBirthdayPromo = async (req, res) => {
   try {
-    const { username } = req.params;
-
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const { touristId } = req.params;
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
     }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const tourist = await touristModel.findOne({ userId: user._id });
+    
+
+    const tourist = await touristModel.findById(touristId);
+    console.log(tourist); 
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    const user = await User.findById(tourist.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
     const today = new Date();
