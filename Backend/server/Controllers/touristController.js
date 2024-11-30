@@ -421,16 +421,45 @@ const changeCartItemQuantity = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-const processPayment = async (totalAmount) => {
+const processPayment = async (totalAmount, touristId, paymentMethod) => {
   try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: totalAmount * 100, // Convert to cents
-      currency: tourist.currency,
-      automatic_payment_methods: {
-        enabled: true,
-        allow_redirects: "never",
-      },
-    });
+    const tourist = await touristModel.findById(touristId);
+    if (paymentMethod === "wallet") {
+      // Wallet payment
+      if (tourist.wallet < totalAmount) {
+        return { success: false, message: "Insufficient wallet balance" };
+      }
+
+      // Deduct from wallet and update booking
+      tourist.wallet -= totalAmount;
+      await tourist.save();
+      return { success: true, message: "Payment successful using wallet" };
+    } else if (paymentMethod === "card") {
+      // Stripe payment
+      try {
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: totalAmount * 100, // Convert to cents
+          currency: tourist.currency,
+          automatic_payment_methods: {
+            enabled: true,
+            allow_redirects: "never",
+          },
+        });
+        return {
+          success: true,
+          clientSecret: paymentIntent.client_secret,
+          message: "Payment processing successful",
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: "Payment processing failed",
+          error: error.message,
+        };
+      }
+    } else {
+      return { success: false, message: "Invalid payment method" };
+    }
   } catch (error) {
     return { success: false, message: error.message };
   }
@@ -442,6 +471,8 @@ const processPayment = async (totalAmount) => {
 */
 const checkoutOrder = async (req, res) => {
   try {
+    const { paymentMethod } = req.body;
+
     const authHeader = req.header("Authorization");
     if (!authHeader) {
       return res.status(401).json({ message: "Authorization header missing" });
@@ -466,10 +497,50 @@ const checkoutOrder = async (req, res) => {
     });
 
     // Assuming you have a payment processing function
-    // const paymentResult = await processPayment(totalAmount);
-    // if (!paymentResult.success) {
-    //   return res.status(400).json({ message: 'Payment failed' });
-    // }
+    const paymentResult = await processPayment(
+      totalAmount,
+      tourist._id,
+      paymentMethod
+    );
+    if (!paymentResult.success) {
+      return res
+        .status(400)
+        .json({ message: paymentResult.message, totalAmount });
+    }
+    if (paymentMethod === "card" && paymentResult.clientSecret) {
+      return res.json({
+        clientSecret: paymentResult.clientSecret,
+        message: "Proceed with card payment",
+        totalAmount,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const cartPaymentSuccess = async (req, res) => {
+  try {
+    const { paymentIntentId, totalAmount } = req.body;
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel
+      .findOne({ _id: decoded.id })
+      .populate("cart.product");
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+    // Validate the payment with Stripe
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    if (paymentIntent.status !== "succeeded") {
+      return res.status(400).json({ message: "Payment not successful" });
+    }
+    // Perform post-payment actions
 
     // Save the order to order history
     const order = {
@@ -722,6 +793,7 @@ module.exports = {
   removeProductFromCart,
   changeCartItemQuantity,
   checkoutOrder,
+  cartPaymentSuccess,
   viewAllOrders,
   viewOrder,
   cancelOrder,
