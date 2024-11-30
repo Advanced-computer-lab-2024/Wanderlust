@@ -22,6 +22,8 @@ const {
   removeDeliveryAddress,
   updateDeliveryAddress,
   deliveryAddresses,
+  usePromoCode,
+  receiveBirthdayPromo
 } = require("../Controllers/touristController");
 
 const { authenticateUser } = require("../Controllers/authController");
@@ -88,5 +90,6 @@ router.put(
   updateDeliveryAddress
 );
 router.get("/deliveryAddresses", authenticateUser, tourist, deliveryAddresses);
-
+router.post("/usePromoCode/:username", authenticateUser, tourist, usePromoCode);
+router.post("/receiveBirthdayPromo/:username", authenticateUser, tourist, receiveBirthdayPromo);
 module.exports = router;

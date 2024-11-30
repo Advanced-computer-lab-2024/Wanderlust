@@ -433,6 +433,14 @@ const processPayment = async (totalAmount, touristId, paymentMethod) => {
       // Deduct from wallet and update booking
       tourist.wallet -= totalAmount;
       await tourist.save();
+
+      // Update points on payment
+      await updatePointsOnPayment(touristId, totalAmount);
+
+      // Update badge
+      updateBadge(tourist);
+      await tourist.save();
+
       return { success: true, message: "Payment successful using wallet" };
     } else if (paymentMethod === "card") {
       // Stripe payment
@@ -779,6 +787,89 @@ const deliveryAddresses = async (req, res) => {
   }
 };
 
+const usePromoCode = async (req, res) => {
+  try {
+    const { promoCode } = req.body;
+    const { username } = req.params;
+
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const tourist = await touristModel.findOne({ userId: user._id }).populate('cart.product');
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    const promo = await PromoCode.findOne({ code: promoCode });
+    if (!promo) {
+      return res.status(404).json({ message: "Promo code not found" });
+    }
+
+    let totalAmount = 0;
+    tourist.cart.forEach(item => {
+      totalAmount += item.product.price * item.quantity;
+    });
+
+    const discount = promo.discount;
+    const newTotalAmount = totalAmount - (totalAmount * (discount / 100));
+
+    res.status(200).json({ discount, newTotalAmount });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const receiveBirthdayPromo = async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const tourist = await touristModel.findOne({ userId: user._id });
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    const today = new Date();
+    const birthDate = new Date(tourist.DOB);
+
+    if (today.getDate() === birthDate.getDate() && today.getMonth() === birthDate.getMonth()) {
+      // Send email
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS
+        }
+      });
+
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: user.email,
+        subject: 'Happy Birthday!',
+        text: 'Happy Birthday! Enjoy a special discount on your next purchase.'
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          return res.status(500).json({ message: error.message });
+        } else {
+          return res.status(200).json({ message: 'Birthday email sent successfully' });
+        }
+      });
+    } else {
+      return res.status(200).json({ message: 'Today is not the tourist\'s birthday' });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getTourist,
   createTourist,
@@ -802,4 +893,6 @@ module.exports = {
   removeDeliveryAddress,
   updateDeliveryAddress,
   deliveryAddresses,
+  usePromoCode,
+  receiveBirthdayPromo
 };
