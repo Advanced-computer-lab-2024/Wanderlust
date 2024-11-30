@@ -16,33 +16,6 @@ import AdminManagePreferenceTagsPage from "./Pages/AdminManagePreferenceTagsPage
 import AdminManageComplaintsPage from "./Pages/AdminManageComplaintsPage";
 import ActivitiesGuest from "./Pages/Guest/ActivitiesGuest";
 // import Tourist from './Pages/Tourist';
-
-import ItineraryTourist from './Pages/Tourist/ItineraryTourist';
-import LocationTourist from './Pages/Tourist/LocationTourist';
-import ActivityTourist from './Pages/Tourist/ActivityTourist';
-import ProductTourist from './Pages/Tourist/ProductTourist';
-import Tgprofile from './Pages/Tourguide/Tgprofile';
-import Complaint from './Components/Admin/Complaint';
-import ComplaintsTouristPage from './Pages/Tourist/ComplaintsTouristPage';
-import TouristCartPage from './Pages/Tourist/TouristCartPage';
-import TouristWishlistPage from './Pages/Tourist/TouristWishlistPage';
-import  TouristProfilePage  from './Pages/Tourist/TouristProfilePage';
-import LocationsPage from './Pages/Guest/LocationsPage';
-import ItineraryTourguidePage from './Pages/Tourguide/ItineraryTourguidePage';
-import ActivityTourguidePage from './Pages/Tourguide/ActivityTourGuidePage';
-import SellerProductsPage from './Pages/Seller/SellerProductsPage';
-import SellerProfilePage from './Pages/Seller/SellerProfilePage';
-import AdvertiserProfilePage from './Pages/Advertiser/AdvertiserProfilePage';
-import AdvertiserActivitiesPage from './Pages/Advertiser/AdvertiserActivitiesPage';
-import TourismGovernorLocationsPage from './Pages/TourismGovernor/TourismGovrernorLocationsPage';
-import TourismGovernorProfilePage from './Pages/TourismGovernor/TourismGovrernorProfilePage';
-import SellerMyProductsPage from './Pages/Seller/SellerMyProductsPage';
-import BookingTourist from './Pages/Tourist/TouristBookingsPage';
-import AdminViewDocuments from './Pages/AdminViewDocuments';
-import AdminUpdatePassword from './Pages/AdminUpdatePassword';
-import AdminManageItinerary from './Pages/AdminManageItinerary';
-import TouristOrdersPage from './Pages/Tourist/TouristOrdersPage';
-
 import ItineraryTourist from "./Pages/Tourist/ItineraryTourist";
 import LocationTourist from "./Pages/Tourist/LocationTourist";
 import ActivityTourist from "./Pages/Tourist/ActivityTourist";
@@ -69,8 +42,6 @@ import BookingTourist from "./Pages/Tourist/TouristBookingsPage";
 import AdminViewDocuments from "./Pages/AdminViewDocuments";
 import AdminUpdatePassword from "./Pages/AdminUpdatePassword";
 import AdminManageItinerary from "./Pages/AdminManageItinerary";
-
-
 const App = () => {
   return (
     <Router>
@@ -119,7 +90,6 @@ const App = () => {
         <Route path="/TouristCart" element={<TouristCartPage />} />
         <Route path="/CartCheckoutPage" element={<CartCheckoutPage />} />
         <Route path="/TouristWishlist" element={<TouristWishlistPage />} />
-        <Route path="/TouristOrders" element={<TouristOrdersPage />} />
 
         {/* Guest Routes */}
         <Route path="/register" element={<RegisterPage />} />
