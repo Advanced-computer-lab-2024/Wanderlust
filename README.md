@@ -86,12 +86,13 @@ Testing is done using Postman for manual API testing.
 1. Start the backend server:
    ```bash
    cd Backend
-   npm start
+   cd server
+   nodemon app
    ```
 2. Start the frontend server:
    ```bash
-   cd ../Frontend
-   npm start
+   cd ../frontend/react-wl/src
+   npm run dev
    ```
 3. Open your browser and navigate to `http://localhost:8000` for the backend and `http://localhost:3000` for the frontend.
 
