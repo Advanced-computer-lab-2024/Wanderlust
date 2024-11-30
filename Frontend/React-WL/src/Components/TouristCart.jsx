@@ -75,17 +75,14 @@ const TouristCart = () => {
       setError(error.message);
     }
   };
+  const totalAmount = cart.reduce(
+    (sum, item) => sum + item.product.price * item.quantity,
+    0
+  );
   //checkout order
   const checkoutOrder = async () => {
-    try {
-      navigate("/CartCheckoutPage", { state: { cart: cart } });
-    } catch (error) {
-      console.error(
-        "Error checking out order:",
-        error.response ? error.response.data : error.message
-      );
-      setError(error.message);
-    }
+    // Redirect to the checkout page
+    navigate("/CartCheckoutPage", { state: { totalAmount: totalAmount } });
   };
 
   return (

@@ -13,6 +13,7 @@ const {
   removeProductFromCart,
   changeCartItemQuantity,
   checkoutOrder,
+  cartPaymentSuccess,
   viewAllOrders,
   viewOrder,
   cancelOrder,
@@ -56,6 +57,12 @@ router.put(
   changeCartItemQuantity
 );
 router.post("/cart/checkout", authenticateUser, tourist, checkoutOrder);
+router.post(
+  "/cart/paymentSuccess",
+  authenticateUser,
+  tourist,
+  cartPaymentSuccess
+);
 router.get("/viewAllOrders", authenticateUser, tourist, viewAllOrders);
 router.get("/viewOrder/:orderId", authenticateUser, tourist, viewOrder);
 router.get("/cancelOrder/:orderId", authenticateUser, tourist, cancelOrder);

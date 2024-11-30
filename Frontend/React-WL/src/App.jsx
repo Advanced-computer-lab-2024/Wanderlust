@@ -25,6 +25,7 @@ import Tgprofile from "./Pages/Tourguide/Tgprofile";
 import Complaint from "./Components/Admin/Complaint";
 import ComplaintsTouristPage from "./Pages/Tourist/ComplaintsTouristPage";
 import TouristCartPage from "./Pages/Tourist/TouristCartPage";
+import CartCheckoutPage from "./Pages/Tourist/CartCheckoutPage";
 import TouristWishlistPage from "./Pages/Tourist/TouristWishlistPage";
 import TouristProfilePage from "./Pages/Tourist/TouristProfilePage";
 import LocationsPage from "./Pages/Guest/LocationsPage";
@@ -87,6 +88,7 @@ const App = () => {
         <Route path="/TouristProfile" element={<TouristProfilePage />} />
         <Route path="/BookingsTourist" element={<BookingTourist />} />
         <Route path="/TouristCart" element={<TouristCartPage />} />
+        <Route path="/CartCheckoutPage" element={<CartCheckoutPage />} />
         <Route path="/TouristWishlist" element={<TouristWishlistPage />} />
 
         {/* Guest Routes */}
