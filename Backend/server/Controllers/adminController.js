@@ -5,6 +5,7 @@ const touristModel = require("../Models/Tourist.js");
 const advertiserModel = require("../Models/Advertiser");
 const sellerModel = require("../Models/Seller.js");
 const User = require("../Models/user");
+const PromoCode = require("../Models/PromoCode"); 
 //npm install jsonwebtoken
 const jwt = require("jsonwebtoken");
 
@@ -111,6 +112,39 @@ const getUserStatistics = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
+  }
+};
+// Function to generate a random promo code
+const generateRandomCode = (length) => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+};
+const createPromoCode = async (req, res) => {
+  try {
+    const { discount } = req.body;
+
+    // Generate a random promo code
+    const code = generateRandomCode(10);
+
+    // Set the expiry date to one month from the creation date
+    const expiryDate = new Date();
+    expiryDate.setMonth(expiryDate.getMonth() + 1);
+
+    // Check if the promo code already exists
+    const existingPromoCode = await PromoCode.findOne({ code });
+    if (existingPromoCode) {
+      return res.status(400).json({ message: "Promo code already exists" });
+    }
+
+    const newPromoCode = new PromoCode({ code, discount, expiryDate });
+    await newPromoCode.save();
+    res.status(201).json({ message: "Promo code created successfully", promoCode: newPromoCode });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 // helper get all usernames on system and account type
@@ -245,5 +279,6 @@ module.exports = {
   getAdminDetails,
   getPendingUsers,
   approvePendingUser,
-  getUserStatistics
+  getUserStatistics,
+  createPromoCode
 };
