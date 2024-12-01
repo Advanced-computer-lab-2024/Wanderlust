@@ -42,6 +42,7 @@ import BookingTourist from "./Pages/Tourist/TouristBookingsPage";
 import AdminViewDocuments from "./Pages/AdminViewDocuments";
 import AdminUpdatePassword from "./Pages/AdminUpdatePassword";
 import AdminManageItinerary from "./Pages/AdminManageItinerary";
+import AdminViewNotifications from "./Pages/AdminViewNotifications";
 import TouristOrdersPage from "./Pages/Tourist/TouristOrdersPage";
 import OrderDetailsPage from "./Pages/Tourist/OrderDetailsPage";
 import Guide from './Components/Guide'; // Import the Guide component
@@ -68,6 +69,7 @@ const App = () => {
         <Route path="/AdminUpdatePassword" element={<AdminUpdatePassword />} />
         <Route path="/AdminManageItinerary" element={<AdminManageItinerary />} />
         <Route path="/complaint" element={<Complaint />} />
+        <Route path="/viewnotifications" element={<AdminViewNotifications />} />
 
         {/* Tourist Routes */}
         <Route path="/ItineraryTourist" element={<ItineraryTourist />} />

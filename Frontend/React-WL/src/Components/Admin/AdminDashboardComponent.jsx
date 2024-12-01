@@ -4,31 +4,30 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const AdminDashboardComponent = () => {
-    const [notifications, setNotifications] = useState([]);
-    const navigate = useNavigate();
+    const [notificationsCount, setNotificationsCount] = useState(0);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        fetchNotifications();
-    }, []);
+  useEffect(() => {
+    fetchNotificationsCount();
+  }, []);
 
-    const fetchNotifications = async () => {
-        try {
-            const token = localStorage.getItem('jwtToken');
-            const response = await axios.get('http://localhost:8000/api/admin/getNotifications', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            if (response.status === 200) {
-                setNotifications(response.data);
-                console.log(response.data);
-            } else {
-                alert('Failed to fetch notifications: ' + response.data.message);
-            }
-        } catch (error) {
-            console.error('Error fetching notifications:', error);
+  const fetchNotificationsCount = async () => {
+    try {
+      const token = localStorage.getItem('jwtToken');
+      const response = await axios.get('http://localhost:8000/api/admin/getNotifications', {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-    };
+      });
+      if (response.status === 200) {
+        setNotificationsCount(response.data.length);
+      } else {
+        alert('Failed to fetch notifications: ' + response.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
     const handleAddAdmin = () => {
         navigate('/addadmin');
     };
@@ -62,7 +61,9 @@ const AdminDashboardComponent = () => {
     const handleViewProducts = () => {
         navigate('/adminviewproducts');
     }
-
+    const handleViewNotifications = () => {
+        navigate('/viewnotifications');
+      };
     return (
         <div className="p-4">
             <div className="mb-4">
@@ -119,11 +120,20 @@ const AdminDashboardComponent = () => {
                     <p>View and manage all Itineraries.</p>
                     <button className="btn btn-primary" onClick={handleManageItinerary}>View Itineraries</button>
                 </div>
-                {/* <div className="flex-fill border rounded p-4 shadow-sm" style={{ flex: '1 1 calc(33.333% - 20px)' }}>
-                    <h2 className='text-gray-800 font-semibold'>View Product Details</h2>
-                    <p>View the available quantity, and sales of each product.</p>
-                    <button className="btn btn-primary" onClick={handleViewProducts}>View Products</button>
-                </div> */}
+                <div className="flex-fill border rounded p-4 shadow-sm" style={{ flex: '1 1 calc(33.333% - 20px)' }}>
+          <h2 className='text-gray-800 font-semibold'>View Notifications</h2>
+          <p>View all notifications.</p>
+          <button className="btn btn-primary position-relative" onClick={handleViewNotifications}>
+            View Notifications
+            {notificationsCount > 0 && (
+              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {notificationsCount}
+                <span className="visually-hidden">unread notifications</span>
+              </span>
+            )}
+          </button>
+        </div>
+                
             </div>
         </div>
     );
