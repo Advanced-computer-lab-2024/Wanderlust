@@ -70,6 +70,8 @@ const sellerRoutes = require("./Routes/sellerRoutes");
 const itineraryRoutes = require("./Routes/itineraryRoutes");
 const bookingRoutes = require("./Routes/BookingRoutes");
 const hotelRoutes = require("./Routes/hotelRoutes");
+const guideRoutes = require('./Routes/guideRoutes'); 
+
 
 const transportationRoutes = require("./Routes/transportationRoutes");
 const ComplaintRoutes = require("./Routes/ComplaintRoutes");
@@ -80,6 +82,7 @@ const { login } = require("./Controllers/authController");
 const flightRoutes = require("./Routes/flightRoutes");
 
 //Routes
+app.use('/api', guideRoutes);
 app.use("/api/tourist", touristRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/admin", adminRoutes);

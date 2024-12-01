@@ -44,44 +44,32 @@ import AdminUpdatePassword from "./Pages/AdminUpdatePassword";
 import AdminManageItinerary from "./Pages/AdminManageItinerary";
 import TouristOrdersPage from "./Pages/Tourist/TouristOrdersPage";
 import OrderDetailsPage from "./Pages/Tourist/OrderDetailsPage";
+import Guide from './Components/Guide'; // Import the Guide component
+import './App.css';
 
 const App = () => {
   return (
     <Router>
+      <Guide /> {/* Include the Guide component here */}
+      <Navbar /> {/* Optional: Add the Navbar if you want it to appear on all pages */}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
-        {/* <Route path="/tourguide" element={<Tourguide />} /> */}
+        {/* Admin Routes */}
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/addadmin" element={<AddAdminPage />} />
-        <Route
-          path="/addtourismgovernor"
-          element={<AddTourismGovernorPage />}
-        />
+        <Route path="/addtourismgovernor" element={<AddTourismGovernorPage />} />
         <Route path="/viewusers" element={<AdminViewUsersPage />} />
         <Route path="/manageproducts" element={<AdminManageProductsPage />} />
-        <Route
-          path="/manageactivities"
-          element={<AdminManageActivitiesPage />}
-        />
-        <Route
-          path="/managepreferencetags"
-          element={<AdminManagePreferenceTagsPage />}
-        />
-        <Route
-          path="/managecomplaints"
-          element={<AdminManageComplaintsPage />}
-        />
+        <Route path="/manageactivities" element={<AdminManageActivitiesPage />} />
+        <Route path="/managepreferencetags" element={<AdminManagePreferenceTagsPage />} />
+        <Route path="/managecomplaints" element={<AdminManageComplaintsPage />} />
         <Route path="/viewpendingdocuments" element={<AdminViewDocuments />} />
         <Route path="/AdminUpdatePassword" element={<AdminUpdatePassword />} />
-        <Route
-          path="/AdminManageItinerary"
-          element={<AdminManageItinerary />}
-        />
+        <Route path="/AdminManageItinerary" element={<AdminManageItinerary />} />
         <Route path="/complaint" element={<Complaint />} />
 
-        {/* //tourist routes */}
-        {/* <Route path="/tourist" element={<Tourist />} /> */}
+        {/* Tourist Routes */}
         <Route path="/ItineraryTourist" element={<ItineraryTourist />} />
         <Route path="/LocationTourist" element={<LocationTourist />} />
         <Route path="/ActivityTourist" element={<ActivityTourist />} />
@@ -93,7 +81,7 @@ const App = () => {
         <Route path="/TouristCart" element={<TouristCartPage />} />
         <Route path="/CartCheckoutPage" element={<CartCheckoutPage />} />
         <Route path="/TouristWishlist" element={<TouristWishlistPage />} />
-        <Route path="/TouristOrders" element={<TouristOrdersPage />} /> 
+        <Route path="/TouristOrders" element={<TouristOrdersPage />} />
         <Route path="/OrderDetails/:orderId" element={<OrderDetailsPage />} />
 
         {/* Guest Routes */}
@@ -104,10 +92,7 @@ const App = () => {
 
         {/* Tourguide Routes */}
         <Route path="/Tgprofile" element={<Tgprofile />} />
-        <Route
-          path="/ItineraryTourguide"
-          element={<ItineraryTourguidePage />}
-        />
+        <Route path="/ItineraryTourguide" element={<ItineraryTourguidePage />} />
         <Route path="/ActivityTourguide" element={<ActivityTourguidePage />} />
 
         {/* Seller Routes */}
@@ -117,23 +102,15 @@ const App = () => {
 
         {/* Advertiser Routes */}
         <Route path="/AdvertiserProfile" element={<AdvertiserProfilePage />} />
-        <Route
-          path="/AdvertiserActivities"
-          element={<AdvertiserActivitiesPage />}
-        />
+        <Route path="/AdvertiserActivities" element={<AdvertiserActivitiesPage />} />
 
         {/* Tourism Governor Routes */}
-        <Route
-          path="/TourismGovernorProfile"
-          element={<TourismGovernorProfilePage />}
-        />
-        <Route
-          path="/TourismGovernorLocations"
-          element={<TourismGovernorLocationsPage />}
-        />
+        <Route path="/TourismGovernorProfile" element={<TourismGovernorProfilePage />} />
+        <Route path="/TourismGovernorLocations" element={<TourismGovernorLocationsPage />} />
       </Routes>
     </Router>
   );
 };
 
 export default App;
+ 
