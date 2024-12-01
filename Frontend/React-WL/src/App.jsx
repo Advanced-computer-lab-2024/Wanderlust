@@ -42,6 +42,9 @@ import BookingTourist from "./Pages/Tourist/TouristBookingsPage";
 import AdminViewDocuments from "./Pages/AdminViewDocuments";
 import AdminUpdatePassword from "./Pages/AdminUpdatePassword";
 import AdminManageItinerary from "./Pages/AdminManageItinerary";
+import TouristOrdersPage from "./Pages/Tourist/TouristOrdersPage";
+import OrderDetailsPage from "./Pages/Tourist/OrderDetailsPage";
+
 const App = () => {
   return (
     <Router>
@@ -90,6 +93,8 @@ const App = () => {
         <Route path="/TouristCart" element={<TouristCartPage />} />
         <Route path="/CartCheckoutPage" element={<CartCheckoutPage />} />
         <Route path="/TouristWishlist" element={<TouristWishlistPage />} />
+        <Route path="/TouristOrders" element={<TouristOrdersPage />} /> 
+        <Route path="/OrderDetails/:orderId" element={<OrderDetailsPage />} />
 
         {/* Guest Routes */}
         <Route path="/register" element={<RegisterPage />} />

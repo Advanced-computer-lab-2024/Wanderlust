@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Card from './Card';
+
 import { Phone, User, Mail, Clock, Briefcase, Award, Star, Wallet, BarChart2, PlusCircle, Settings, Eye, EyeOff, Medal } from 'lucide-react';
 
 const TouristProfile = () => {
@@ -190,6 +191,15 @@ const TouristProfile = () => {
       <Settings className="w-6 h-6 mr-1" />
       <span className="text-lg font-semibold">Settings</span>
     </div>
+  </div>
+  {/* Orders Button */}
+  <div className="flex justify-start mb-4">
+    <button
+      className="ml-20 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+      onClick={() => window.location.href = `/TouristOrders`}
+    >
+      Orders History
+    </button>
   </div>
 
   {/* Redeem Button Section Below Points */}
