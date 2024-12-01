@@ -3,6 +3,9 @@ const touristModel = require("../Models/Tourist");
 const locationsModel = require("../Models/Locations");
 const activityModel = require("../Models/Activity");
 const itineraryModel = require("../Models/Itinerary");
+const Notification = require('../Models/Notification'); // Assuming you have a Notification model
+const Admin = require('../Models/Admin'); // Assuming you have an Admin model
+
 const { default: mongoose } = require("mongoose");
 const User = require("../Models/user");
 const jwt = require("jsonwebtoken");
@@ -417,6 +420,16 @@ const changeCartItemQuantity = async (req, res) => {
       return res.status(404).json({ message: "Tourist not found" });
     }
 
+    const product = await ProductModel.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Check if the requested quantity is available
+    if (product.quantity < quantity) {
+      return res.status(400).json({ message: `Only ${product.quantity} units of ${product.name} are available` });
+    }
+
     const cartItemIndex = tourist.cart.findIndex(
       (item) => item.product.toString() === productId
     );
@@ -539,7 +552,25 @@ const checkoutOrder = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+const testOutOfStockNotification = async (req, res) => {
+  try {
+    // Create a notification for the admin
+    const adminUsers = await Admin.find({});
+    const message = `This is a test notification for out of stock products.`;
 
+    for (const admin of adminUsers) {
+      const notification = new Notification({
+        userId: admin._id,
+        message,
+      });
+      await notification.save();
+    }
+
+    res.status(200).json({ message: "Test notifications created for admin users" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 const cartPaymentSuccess = async (req, res) => {
   try {
     const { paymentIntentId, totalAmount } = req.body;
@@ -562,18 +593,28 @@ const cartPaymentSuccess = async (req, res) => {
       return res.status(400).json({ message: "Payment not successful" });
     }
     // Perform post-payment actions
-// Reduce product quantity after successful payment
-for (const item of tourist.cart) {
-  const product = item.product;
-  product.quantity -= item.quantity;
-  if (product.quantity < 0) {
-    return res.status(400).json({ message: `Insufficient stock for product: ${product.name}` });
+      // Reduce product quantity after successful payment
+    for (const item of tourist.cart) {
+        const product = item.product;
+        product.quantity -= item.quantity;
+        if (product.quantity < 0) {
+          return res.status(400).json({ message: `Insufficient stock for product: ${product.name}` });
+        }
+        if (product.quantity === 0) {
+          // Create a notification for the admin
+          const adminUsers = await Admin.find({});
+          const message = `The product ${product.name} is out of stock.`;
+
+          for (const admin of adminUsers) {
+            const notification = new Notification({
+              userId: admin._id,
+              message,
+            });
+            await notification.save();
+        }
   }
-  if (product.quantity === 0) {
-    // product.status = 'out of stock'; 
+    await product.save();
   }
-  await product.save();
-}
     // Save the order to order history
     const order = {
       items: tourist.cart.map((item) => ({
@@ -933,5 +974,6 @@ module.exports = {
   updateDeliveryAddress,
   deliveryAddresses,
   usePromoCode,
-  receiveBirthdayPromo
+  receiveBirthdayPromo,
+  testOutOfStockNotification
 };

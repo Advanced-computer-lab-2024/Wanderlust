@@ -22,7 +22,7 @@ router.get("/profile", adminController.getAdminDetails);
 //router.post("/updatepassword", adminController.authenticateAdmin,adminController.updateAdminPassword);
 router.get('/userStatistics',adminController.getUserStatistics);
 router.post('/createPromoCode', adminController.createPromoCode);
-
+router.get('/getNotifications', adminController.getNotifications);
 
 router.post("/login", login);
 router.post("/updatepassword", authenticateUser, updatePassword);

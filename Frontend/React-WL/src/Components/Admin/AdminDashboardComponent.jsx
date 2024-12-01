@@ -1,10 +1,34 @@
-import React from 'react';
+import React,{ useEffect, useState }  from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const AdminDashboardComponent = () => {
+    const [notifications, setNotifications] = useState([]);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        fetchNotifications();
+    }, []);
+
+    const fetchNotifications = async () => {
+        try {
+            const token = localStorage.getItem('jwtToken');
+            const response = await axios.get('http://localhost:8000/api/admin/getNotifications', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.status === 200) {
+                setNotifications(response.data);
+                console.log(response.data);
+            } else {
+                alert('Failed to fetch notifications: ' + response.data.message);
+            }
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+        }
+    };
     const handleAddAdmin = () => {
         navigate('/addadmin');
     };

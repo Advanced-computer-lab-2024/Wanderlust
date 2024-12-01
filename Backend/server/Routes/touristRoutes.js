@@ -23,7 +23,8 @@ const {
   updateDeliveryAddress,
   deliveryAddresses,
   usePromoCode,
-  receiveBirthdayPromo
+  receiveBirthdayPromo,
+  testOutOfStockNotification
 } = require("../Controllers/touristController");
 
 const { authenticateUser } = require("../Controllers/authController");
@@ -69,6 +70,8 @@ router.get("/viewAllOrders", authenticateUser, tourist, viewAllOrders);
 router.get("/viewOrder/:orderId", authenticateUser, tourist, viewOrder);
 router.delete("/cancelOrder/:touristId/:orderId", authenticateUser, tourist, cancelOrder);
 router.put("/updatePointsOnPayment", updatePointsOnPayment);
+router.post('/testOutOfStockNotification', testOutOfStockNotification);
+
 
 //addresses
 router.post(

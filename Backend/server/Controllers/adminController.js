@@ -6,6 +6,8 @@ const advertiserModel = require("../Models/Advertiser");
 const sellerModel = require("../Models/Seller.js");
 const User = require("../Models/user");
 const PromoCode = require("../Models/PromoCode"); 
+const Notification = require('../Models/Notification'); // Assuming you have a Notification model
+
 //npm install jsonwebtoken
 const jwt = require("jsonwebtoken");
 
@@ -112,6 +114,22 @@ const getUserStatistics = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
+  }
+};
+const getNotifications = async (req, res) => {
+  try {
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const notifications = await Notification.find({ userId: decoded.id }).sort({ createdAt: -1 });
+
+    res.status(200).json(notifications);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 // Function to generate a random promo code
@@ -280,5 +298,6 @@ module.exports = {
   getPendingUsers,
   approvePendingUser,
   getUserStatistics,
-  createPromoCode
+  createPromoCode,
+  getNotifications
 };
