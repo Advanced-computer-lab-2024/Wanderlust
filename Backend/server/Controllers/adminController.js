@@ -69,7 +69,50 @@ const deleteAccount = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+const getUserStatistics = async (req, res) => {
+  try {
+    const adminAccounts = await adminModel.find({}, "createdAt");
+    const tourismGovernorAccounts = await tourismGovernorModel.find({}, "createdAt");
+    const userAccounts = await User.find({}, "createdAt");
 
+    const allAccounts = [
+      ...adminAccounts,
+      ...tourismGovernorAccounts,
+      ...userAccounts,
+    ];
+
+    const totalUsers = allAccounts.length;
+
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+
+    const usersThisMonth = allAccounts.filter(account => {
+      const accountDate = new Date(account.createdAt);
+      return accountDate.getMonth() === currentMonth && accountDate.getFullYear() === currentYear;
+    }).length;
+
+    const usersPerMonth = allAccounts.reduce((acc, account) => {
+      const accountDate = new Date(account.createdAt);
+      const monthYear = `${accountDate.getMonth() + 1}-${accountDate.getFullYear()}`;
+      if (!acc[monthYear]) {
+        acc[monthYear] = 0;
+      }
+      acc[monthYear]++;
+      return acc;
+    }, {});
+
+    const totalMonths = Object.keys(usersPerMonth).length;
+    const averageUsersPerMonth = totalMonths ? (totalUsers / totalMonths).toFixed(2) : 0;
+
+    res.status(200).json({
+      totalUsers,
+      usersThisMonth,
+      averageUsersPerMonth,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
 // helper get all usernames on system and account type
 const getAllUserDetails = async (req, res) => {
   try {
@@ -202,4 +245,5 @@ module.exports = {
   getAdminDetails,
   getPendingUsers,
   approvePendingUser,
+  getUserStatistics
 };
