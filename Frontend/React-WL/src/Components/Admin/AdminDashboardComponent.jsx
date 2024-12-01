@@ -58,9 +58,6 @@ const AdminDashboardComponent = () => {
     const handleManageItinerary = () => {
         navigate('/AdminManageItinerary');
     }
-    const handleViewProducts = () => {
-        navigate('/adminviewproducts');
-    }
     const handleViewNotifications = () => {
         navigate('/viewnotifications');
       };

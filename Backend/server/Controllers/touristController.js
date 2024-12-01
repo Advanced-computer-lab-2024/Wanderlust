@@ -3,8 +3,10 @@ const touristModel = require("../Models/Tourist");
 const locationsModel = require("../Models/Locations");
 const activityModel = require("../Models/Activity");
 const itineraryModel = require("../Models/Itinerary");
-const Notification = require('../Models/Notification'); // Assuming you have a Notification model
-const Admin = require('../Models/Admin'); // Assuming you have an Admin model
+const Notification = require('../Models/Notification'); 
+const { createNotification } = require('./NotificationController');
+
+const Admin = require('../Models/Admin'); 
 
 const { default: mongoose } = require("mongoose");
 const User = require("../Models/user");
@@ -594,7 +596,7 @@ const cartPaymentSuccess = async (req, res) => {
     }
     // Perform post-payment actions
       // Reduce product quantity after successful payment
-    for (const item of tourist.cart) {
+      for (const item of tourist.cart) {
         const product = item.product;
         product.quantity -= item.quantity;
         if (product.quantity < 0) {
@@ -604,17 +606,12 @@ const cartPaymentSuccess = async (req, res) => {
           // Create a notification for the admin
           const adminUsers = await Admin.find({});
           const message = `The product ${product.name} is out of stock.`;
-
+      
           for (const admin of adminUsers) {
-            const notification = new Notification({
-              userId: admin._id,
-              message,
-            });
-            await notification.save();
+            await createNotification(admin._id, message);
+          }
         }
-  }
-    await product.save();
-  }
+      }
     // Save the order to order history
     const order = {
       items: tourist.cart.map((item) => ({
