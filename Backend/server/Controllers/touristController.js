@@ -334,13 +334,24 @@ const addProductToCart = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
+
+    const quantityToAdd = Number(quantity);
+
+    // Check if the requested quantity is available
+    if (product.quantity < quantityToAdd) {
+      return res.status(400).json({ message: `Only ${product.quantity} units of ${product.name} are available` });
+    }
+
     const cartItemIndex = tourist.cart.findIndex(
       (item) => item.product.toString() === productId
     );
 
-    const quantityToAdd = Number(quantity);
     if (cartItemIndex > -1) {
-      tourist.cart[cartItemIndex].quantity += quantityToAdd;
+      const newQuantity = tourist.cart[cartItemIndex].quantity + quantityToAdd;
+      if (newQuantity > product.quantity) {
+        return res.status(400).json({ message: `Only ${product.quantity} units of ${product.name} are available` });
+      }
+      tourist.cart[cartItemIndex].quantity = newQuantity;
     } else {
       tourist.cart.push({ product: productId, quantity: quantityToAdd });
     }
@@ -551,7 +562,18 @@ const cartPaymentSuccess = async (req, res) => {
       return res.status(400).json({ message: "Payment not successful" });
     }
     // Perform post-payment actions
-
+// Reduce product quantity after successful payment
+for (const item of tourist.cart) {
+  const product = item.product;
+  product.quantity -= item.quantity;
+  if (product.quantity < 0) {
+    return res.status(400).json({ message: `Insufficient stock for product: ${product.name}` });
+  }
+  if (product.quantity === 0) {
+    // product.status = 'out of stock'; 
+  }
+  await product.save();
+}
     // Save the order to order history
     const order = {
       items: tourist.cart.map((item) => ({
