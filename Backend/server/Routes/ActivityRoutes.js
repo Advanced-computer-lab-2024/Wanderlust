@@ -22,7 +22,6 @@ const {
   getSavedActivities,
   requestNotification,
   paymentSuccess,
-  cancelActivityBooking,
 } = require("../Controllers/activityController");
 
 router.post("/createActivity", authenticateUser, createActivity);
