@@ -185,38 +185,7 @@ const Products = () => {
                     </div>
                 </div>
 
-                <button className="btn btn-primary mb-4" onClick={filterProducts}>Filter</button>
-                {showCartForm && selectedProduct && (
-                    <div className="cart-form mb-3">
-                        <h3>Add {selectedProduct.name} to Cart</h3>
-                        <div className="mb-3">
-                            <label htmlFor="quantity">Quantity:</label>
-                            <input 
-                                type="number" 
-                                id="quantity" 
-                                value={cartQuantity} 
-                                onChange={(e) => setCartQuantity(e.target.value)} 
-                                min="1" 
-                                max={selectedProduct.quantity} 
-                                className="form-control" 
-                            />
-                        </div>
-                        <button 
-                            className="btn btn-primary" 
-                            onClick={handleAddToCart}
-                        >
-                            Add to Cart
-                        </button>
-                        <button 
-                            className="ms-2 btn btn-secondary" 
-                            onClick={() => setShowCartForm(false)}
-                        >
-                            Cancel
-                        </button>
-                        
-                    </div>
-                )}
-                
+                <button className="btn btn-primary mb-4" onClick={filterProducts}>Filter</button>                
                 <div id="productsList">
                     {products.map(product => (
                         <div key={product._id} className="product-item mb-3 p-3 border rounded">
@@ -272,6 +241,37 @@ const Products = () => {
                     </div>
                 )}
             </div>
+            {showCartForm && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white p-5 rounded-md">
+                        <h2 className="text-xl font-bold mb-4">Add {selectedProduct?.name} to Cart</h2>
+                        <label className="block mb-2">
+                            Quantity:
+                            <input
+                                type="number"
+                                value={cartQuantity}
+                                onChange={(e) => setCartQuantity(e.target.value)}
+                                className="border border-gray-300 p-2 rounded-md w-full"
+                                min="1"
+                            />
+                        </label>
+                        <div className="flex justify-end space-x-2">
+                            <button
+                                className="bg-gray-500 text-white px-4 py-2 rounded-md"
+                                onClick={() => setShowCartForm(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                                onClick={handleAddToCart}
+                            >
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

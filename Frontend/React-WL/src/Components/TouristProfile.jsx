@@ -185,7 +185,7 @@ const TouristProfile = () => {
       </div>
       <div className="flex items-center text-indigo-600 space-x-1">
         <BarChart2 className="w-6 h-6" />
-        <span className="text-lg font-semibold">Points: {profile.points}</span>
+        <span className="text-lg font-semibold">Points: {profile.points.toFixed(2)}</span>
       </div>
       <div className="flex items-center text-indigo-600 space-x-1">
         <Wallet className="w-6 h-6" />
