@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const locationsSchema = new mongoose.Schema({
+  creator: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'TourismGovernor', 
+  },
   name: { type: String, required: true },
   description: { type: String, required: true },
   pictures: { type: String },  // Store the image URL

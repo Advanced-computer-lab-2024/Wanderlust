@@ -5,6 +5,9 @@ const touristModel = require("../Models/Tourist.js");
 const advertiserModel = require("../Models/Advertiser");
 const sellerModel = require("../Models/Seller.js");
 const User = require("../Models/user");
+const PromoCode = require("../Models/PromoCode"); 
+const Notification = require('../Models/Notification'); // Assuming you have a Notification model
+
 //npm install jsonwebtoken
 const jwt = require("jsonwebtoken");
 
@@ -69,7 +72,99 @@ const deleteAccount = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+const getUserStatistics = async (req, res) => {
+  try {
+    const adminAccounts = await adminModel.find({}, "createdAt");
+    const tourismGovernorAccounts = await tourismGovernorModel.find({}, "createdAt");
+    const userAccounts = await User.find({}, "createdAt");
 
+    const allAccounts = [
+      ...adminAccounts,
+      ...tourismGovernorAccounts,
+      ...userAccounts,
+    ];
+
+    const totalUsers = allAccounts.length;
+
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+
+    const usersThisMonth = allAccounts.filter(account => {
+      const accountDate = new Date(account.createdAt);
+      return accountDate.getMonth() === currentMonth && accountDate.getFullYear() === currentYear;
+    }).length;
+
+    const usersPerMonth = allAccounts.reduce((acc, account) => {
+      const accountDate = new Date(account.createdAt);
+      const monthYear = `${accountDate.getMonth() + 1}-${accountDate.getFullYear()}`;
+      if (!acc[monthYear]) {
+        acc[monthYear] = 0;
+      }
+      acc[monthYear]++;
+      return acc;
+    }, {});
+
+    const totalMonths = Object.keys(usersPerMonth).length;
+    const averageUsersPerMonth = totalMonths ? (totalUsers / totalMonths).toFixed(2) : 0;
+
+    res.status(200).json({
+      totalUsers,
+      usersThisMonth,
+      averageUsersPerMonth,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+const getNotifications = async (req, res) => {
+  try {
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const notifications = await Notification.find({ userId: decoded.id }).sort({ createdAt: -1 });
+
+    res.status(200).json(notifications);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+// Function to generate a random promo code
+const generateRandomCode = (length) => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+};
+const createPromoCode = async (req, res) => {
+  try {
+    const { discount } = req.body;
+
+    // Generate a random promo code
+    const code = generateRandomCode(10);
+
+    // Set the expiry date to one month from the creation date
+    const expiryDate = new Date();
+    expiryDate.setMonth(expiryDate.getMonth() + 1);
+
+    // Check if the promo code already exists
+    const existingPromoCode = await PromoCode.findOne({ code });
+    if (existingPromoCode) {
+      return res.status(400).json({ message: "Promo code already exists" });
+    }
+
+    const newPromoCode = new PromoCode({ code, discount, expiryDate });
+    await newPromoCode.save();
+    res.status(201).json({ message: "Promo code created successfully", promoCode: newPromoCode });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
 // helper get all usernames on system and account type
 const getAllUserDetails = async (req, res) => {
   try {
@@ -154,13 +249,21 @@ const approvePendingUser = async (req, res) => {
     } else {
       return res.status(400).json({ message: "Invalid user type" });
     }
+    const actualUser = await User.findById({ _id: userId });
+    if (actualUser) {
+      actualUser.roleApplicationStatus = status;
+      await actualUser.save();
+    } else {
+      return res.status(404).json({ message: "User not found" });
+    }
     if (user) {
       user.roleApplicationStatus = status;
       await user.save();
       if (status === "approved") {
         return res.status(200).json({ message: "User approved successfully" });
-      }
+      } else{
       return res.status(200).json({ message: "User rejected successfully" });
+      }
     } else {
       return res.status(404).json({ message: "User not found" });
     }
@@ -194,4 +297,7 @@ module.exports = {
   getAdminDetails,
   getPendingUsers,
   approvePendingUser,
+  getUserStatistics,
+  createPromoCode,
+  getNotifications
 };

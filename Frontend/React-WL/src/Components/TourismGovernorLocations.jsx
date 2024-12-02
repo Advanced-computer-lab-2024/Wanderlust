@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
+import axios from 'axios';
 
 const TourismGovernorLocations = () => {
   const [locations, setLocations] = useState([]);
@@ -70,12 +71,12 @@ const TourismGovernorLocations = () => {
   const handleSubmitLocation = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8000/createLocation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(locationForm),
+      const response = await axios.post('http://localhost:8000/createLocation', locationForm, {
+        headers: { 
+          'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+        },
       });
-      if (response.ok) {
+      if (response.status === 201) {
         alert('Location added successfully!');
         setLocationForm({ name: '', description: '', pictures: '', location: '', openingHours: '', ticketPrices: '', tags: [] });
         setLocationFormVisible(false);

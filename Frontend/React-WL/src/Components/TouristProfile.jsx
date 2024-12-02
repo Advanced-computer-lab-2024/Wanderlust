@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Card from './Card';
+
 import { Phone, User, Mail, Clock, Briefcase, Award, Star, Wallet, BarChart2, PlusCircle, Settings, Eye, EyeOff, Medal } from 'lucide-react';
 
 const TouristProfile = () => {
@@ -191,6 +192,15 @@ const TouristProfile = () => {
       <span className="text-lg font-semibold">Settings</span>
     </div>
   </div>
+  {/* Orders Button */}
+  <div className="flex justify-start mb-4">
+    <button
+      className="ml-20 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+      onClick={() => window.location.href = `/TouristOrders`}
+    >
+      Orders History
+    </button>
+  </div>
 
   {/* Redeem Button Section Below Points */}
   <div className="flex justify-start mb-4">
@@ -364,6 +374,23 @@ const SettingsPopup = ({ profile, username, onClose }) => {
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
+  const handleDeleteAccount = async () => {
+    try {
+
+      const response = await axios.get(
+        'http://localhost:8000/api/admin/requestDeleteAccount',
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
+          }
+        }
+      );
+      console.log(response);
+    } catch (error) {
+      const message = error.response?.data?.message || 'An error has occurred. Please try again.';
+      alert(`Error: ${message}`);
+    }
+  };
   const handleChangePassword = async () => {
     try {
       const response = await axios.post(
@@ -520,6 +547,12 @@ const SettingsPopup = ({ profile, username, onClose }) => {
             className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md">
             Close
           </button>
+          <button
+          onClick={handleDeleteAccount}
+          className="mt-4 bg-red-600 text-white rounded px-4 py-2"
+        >
+          Delete Account
+        </button>
         </div>
       </div>
     </div>

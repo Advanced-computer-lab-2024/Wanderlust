@@ -1,10 +1,9 @@
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Card from './Card';
 import { Phone, Calendar, User, Mail, Clock, Briefcase, Award, Star, Wallet, BarChart2, PlusCircle, Settings, Eye, EyeOff } from 'lucide-react';
 
-const advProfile = () => {
+const AdvertiserProfile = () => {
   const [profile, setProfile] = useState(null);
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -14,9 +13,10 @@ const advProfile = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [showUpdateForm, setShowUpdateForm] = useState(false);
 
-  const [YOE, setYoe] = useState(profile?.YOE || '');
-  const [previousWork, setPreviousWork] = useState(profile?.previousWork || '');
+  const [website, setwebsite] = useState(profile?.website || '');
+  const [hotline, sethotline] = useState(profile?.hotline || '');
   const [phoneNumber, setPhoneNumber] = useState(info?.mobileNumber || '');
+  const [companyProfile, setCompanyProfile] = useState(profile?.companyProfile || '');
 
   useEffect(() => {
     fetchProfile();
@@ -28,14 +28,18 @@ const advProfile = () => {
 
   useEffect(() => {
     if (profile) {
-      setYoe(profile.YOE || '');
-      setPreviousWork(profile.previousWork || '');
+      setwebsite(profile.website || '');
+      sethotline(profile.hotline || '');
+      setPhoneNumber(profile.mobileNumber || '');
+      setCompanyProfile(profile.companyProfile || '');
     }
   }, [profile]);
 
   useEffect(() => {
     if (info) {
       setPhoneNumber(info.mobileNumber || '');
+      setUsername(info.username);
+      
     }
   }, [info]);
 
@@ -81,56 +85,62 @@ const advProfile = () => {
   };
 
   const uploadProfileImage = async () => {
+    if (!selectedImage) {
+      alert('Please select an image to upload.'); // Alert if no image is selected
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append('file', selectedImage); // Append the selected file
+    formData.append('userId', profile.userId);  // Append the userId
+  
     try {
-      const formData = new FormData();
-      formData.append('image', selectedImage);
-
-      const response = await axios.post(
-        `http://localhost:8000/api/uploadImage/tourGuide/photo`,
+      const response = await axios.put(
+        `http://localhost:8000/api/documents/uploadImage/Advertiser/logo`,
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+            'Content-Type': 'multipart/form-data',
           },
         }
       );
-
-      if (response.data.success) {
-        setProfile((prevProfile) => ({
-          ...prevProfile,
-          profileImage: response.data.imageUrl,
-        }));
-        alert('Profile image uploaded successfully!');
-      } else {
-        alert('Error uploading profile image. Please try again.');
-      }
+      alert('Image uploaded successfully!');
     } catch (error) {
       console.error('Error uploading profile image:', error);
       alert('An error occurred. Please try again later.');
     }
   };
 
+
   const handleUpdateProfile = () => {
     setShowUpdateForm(true);
   };
 
   const handleSaveProfile = async () => {
+    if (profilePicture) {
+      const formData = new FormData();
+      formData.append('file', profilePicture); // Append the file
+      formData.append('userId', profile.userId);
     try {
       console.log('Sending update request with:', {
         username,
         mobileNumber: phoneNumber,
-        YOE,
-        previousWork,
+        companyProfile,
+        website,
+        hotline,
       });
 
       const response = await axios.put(
-        'http://localhost:8000/api/tourGuide/updatetgprofile',
+        'http://localhost:8000/api/advertiser/updateAdvertiser',
         {
-          
+          username,
           mobileNumber: phoneNumber,
-          YOE,
-          previousWork,
+          companyProfile,
+          website,
+          hotline,
+
+          
         },
         {
           headers: {
@@ -138,18 +148,20 @@ const advProfile = () => {
           },
         }
       );
+      console.log(response.data);
 
       if (response.data) {
         setProfile((prevProfile) => ({
           ...prevProfile,
-          YOE: response.data.YOE,
-          previousWork: response.data.previousWork,
+          hotline: response.data.advertiser.hotline,
+          website: response.data.advertiser.website,
+          CompanyProfile: response.data.advertiser.companyProfile,
         }));
 
-        // setInfo((prevInfo) => ({
-        //   ...prevInfo,
-        //   mobileNumber: response.data.mobileNumber,
-        // }));
+        setInfo((prevInfo) => ({
+          ...prevInfo,
+          mobileNumber: response.data.user.mobileNumber,
+        }));
 
         setShowUpdateForm(false);
         alert('Profile updated successfully!');
@@ -158,7 +170,10 @@ const advProfile = () => {
       console.error('Error updating profile:', error);
       const errorMessage = error.response?.data?.error || 'An error occurred. Please try again later.';
       alert(errorMessage);
-    }
+    }}
+  };
+  const handleProfilePictureChange = (e) => {
+    setSelectedImage(e.target.files[0]); // Set the uploaded file to state
   };
 
   if (loading) return (
@@ -192,15 +207,11 @@ const advProfile = () => {
             <div className="p-6">
               <div className="flex items-center mb-6">
                 <div className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center">
-                  {profile.profileImage ? (
-                    <img
-                      src={profile.profileImage}
-                      alt="Profile"
-                      className="w-24 h-24 rounded-full object-cover"
-                    />
-                  ) : (
-                    <User className="w-12 h-12 text-indigo-600" />
-                  )}
+                {profile.logoURL ? (
+                      <img src={profile.logoURL} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-12 h-12 text-indigo-600" />
+                    )}
                 </div>
                 <div className="ml-6">
                   {info && <h2 className="text-2xl font-semibold text-indigo-600">{info.username}</h2>}
@@ -213,12 +224,16 @@ const advProfile = () => {
                     {info && <span>{info.email || "N/A"}</span>}
                   </div>
                   <div className="flex items-center text-gray-600 mt-2">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    <span>{profile.YOE || "N/A"} years of experience</span>
+                    <Phone className="w-4 h-4 mr-2" />
+                    <span>{profile.hotline || "N/A"}</span>
                   </div>
                   <div className="flex items-center text-gray-600 mt-2">
                     <Briefcase className="w-4 h-4 mr-2" />
-                    <span>{profile.previousWork || "N/A"}</span>
+                    <span>{profile.companyProfile || "N/A"}</span>
+                  </div>
+                  <div className="flex items-center text-gray-600 mt-2">
+                    <Briefcase className="w-4 h-4 mr-2" />
+                    <span>{profile.website || "N/A"}</span>
                   </div>
                 </div>
               </div>
@@ -233,22 +248,22 @@ const advProfile = () => {
             <div className="bg-white rounded-xl shadow-md overflow-hidden">
               <div className="p-6">
                 <div className="flex items-center text-gray-600 mt-2">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  <span>Years of Experience: </span>
+                  <Briefcase className="w-4 h-4 mr-2" />
+                  <span>Website </span>
                   <input
-                    type="number"
-                    value={YOE}
-                    onChange={(e) => setYoe(e.target.value)}
-                    className="bg-gray-200 text-gray-800 rounded p-1 w-20"
+                    type="text"
+                    value={website}
+                    onChange={(e) => setwebsite(e.target.value)}
+                    className="bg-gray-200 text-gray-800 rounded p-1 w-80"
                   />
                 </div>
                 <div className="flex items-center text-gray-600 mt-2">
                   <Briefcase className="w-4 h-4 mr-2" />
-                  <span>Previous Work: </span>
+                  <span>Company Profile: </span>
                   <input
                     type="text"
-                    value={previousWork}
-                    onChange={(e) => setPreviousWork(e.target.value)}
+                    value={companyProfile}
+                    onChange={(e) => setCompanyProfile(e.target.value)}
                     className="bg-gray-200 text-gray-800 rounded p-1 w-40"
                   />
                 </div>
@@ -259,6 +274,16 @@ const advProfile = () => {
                     type="tel"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="bg-gray-200 text-gray-800 rounded p-1 w-40"
+                  />
+                </div>
+                <div className="flex items-center text-gray-600 mt-2">
+                  <Phone className="w-4 h-4 mr-2" />
+                  <span>Hotline: </span>
+                  <input
+                    type="tel"
+                    value={hotline}
+                    onChange={(e) => sethotline(e.target.value)}
                     className="bg-gray-200 text-gray-800 rounded p-1 w-24"
                   />
                 </div>
@@ -268,18 +293,25 @@ const advProfile = () => {
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={handleImageUpload}
+                      onChange={handleProfilePictureChange}
                       className="bg-gray-200 text-gray-800 rounded p-2 mr-2"
                     />
-                    {profile.profileImage && (
+                    {profile.logoURL && (
                       <img
                         src={profile.profileImage}
                         alt="Profile"
                         className="w-16 h-16 rounded-full object-cover"
                       />
                     )}
+                    <button
+                      onClick={uploadProfileImage}
+                      className="bg-indigo-600 text-white py-2 px-4 rounded-md ml-2"
+                    >
+                      Upload
+                    </button>
                   </div>
                 </div>
+          
                 <div className="flex justify-end">
                   <button
                     onClick={handleSaveProfile}
@@ -313,6 +345,25 @@ const SettingsPopup = ({ profile, username, onClose }) => {
   const [passwordError, setPasswordError] = useState('');
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
+
+ 
+  const handleDeleteAccount = async () => {
+    try {
+
+      const response = await axios.get(
+        'http://localhost:8000/api/admin/requestDeleteAccount',
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
+          }
+        }
+      );
+      console.log(response);
+    } catch (error) {
+      const message = error.response?.data?.message || 'An error has occurred. Please try again.';
+      alert(`Error: ${message}`);
+    }
+  };
 
   const handleChangePassword = async () => {
     console.log(oldPassword);
@@ -352,7 +403,7 @@ const SettingsPopup = ({ profile, username, onClose }) => {
           <h4 className="text-lg font-semibold text-indigo-600 mb-2">Account Details</h4>
           <div className="mb-2">
             <label className="block text-gray-600">Username</label>
-            {info && <p className="text-gray-800">{profile.username}</p>}
+            {profile && <p className="text-gray-800">{profile.username}</p>}
           </div>
           <div className="mb-2">
             <label className="block text-gray-600">Email</label>
@@ -428,6 +479,12 @@ const SettingsPopup = ({ profile, username, onClose }) => {
             className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md">
             Close
           </button>
+          <button
+          onClick={handleDeleteAccount}
+          className="mt-4 bg-red-600 text-white rounded px-4 py-2"
+        >
+          Delete Account
+        </button>
         </div>
       </div>
     </div>
@@ -435,4 +492,4 @@ const SettingsPopup = ({ profile, username, onClose }) => {
 };
 
 
-export default advProfile;
+export default AdvertiserProfile;

@@ -6,6 +6,10 @@ const Booking = require("../Models/Booking.js");
 const User = require("../Models/user");
 const { convertCurrency } = require("./currencyConverter");
 const touristModel = require("../Models/Tourist");
+const { updatePointsOnPayment } = require("./touristController");
+
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Use your Stripe Secret Key
+const jwt = require("jsonwebtoken");
 
 const createActivity = async (req, res) => {
   const {
@@ -23,6 +27,10 @@ const createActivity = async (req, res) => {
     bookingOpen,
   } = req.body;
   try {
+    const token = req.headers.authorization.split(" ")[1];
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const advertiserId = decodedToken.id;
+
     const activity = await Activity.create({
       name,
       date,
@@ -36,6 +44,7 @@ const createActivity = async (req, res) => {
       tags,
       specialDiscounts,
       bookingOpen,
+      advertiserId, // Automatically include advertiserId
     });
     const populatedActivity = await Activity.findById(activity._id)
       .populate("category")
@@ -47,12 +56,12 @@ const createActivity = async (req, res) => {
 };
 
 const getActivity = async (req, res) => {
-  const { touristId } = req.query; 
+  const { touristId } = req.query;
   try {
     const activities = await Activity.find()
       .populate("category")
       .populate("tags");
-    let currency = 'EGP'; 
+    let currency = "EGP";
     if (touristId) {
       const tourist = await touristModel.findById(touristId);
       if (tourist && tourist.currency) {
@@ -64,7 +73,7 @@ const getActivity = async (req, res) => {
         const convertedItem = item.toObject();
         convertedItem.price = await convertCurrency(
           convertedItem.price,
-          currency,
+          currency
         );
         return convertedItem;
       })
@@ -269,7 +278,7 @@ const generateShareableLink = async (req, res) => {
     if (!activity) {
       return res.status(404).json({ error: "Activity not found" });
     }
-    const shareableLink = `http://localhost:8000/api/activity/${activityId}`;
+    const shareableLink = `http://localhost:8000/api/activity/getActivityById?id=${activityId}`;
     res.status(200).json({ shareableLink });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -285,7 +294,7 @@ const sendActivityLinkViaEmail = async (req, res) => {
     if (!activity) {
       return res.status(404).json({ error: "Activity not found" });
     }
-    const shareableLink = `http://localhost:8000/api/activity/${activityId}`;
+    const shareableLink = `http://localhost:8000/api/activity/getActivityById?id=${activityId}`;
     // Configure nodemailer
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -359,43 +368,101 @@ const rateActivity = async (req, res) => {
 
 const bookActivity = async (req, res) => {
   try {
-    const { activityId, userId } = req.body;
+    const { activityId, paymentMethod, userId } = req.body;
 
-    if (!activityId || !userId) {
-      return res
-        .status(400)
-        .json({ message: "Activity ID and User ID required" });
+    const tourist = await touristModel.findOne({ userId: userId });
+
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
     }
+
     const activity = await Activity.findById(activityId);
     if (!activity) {
       return res.status(404).json({ message: "Activity not found" });
     }
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    const booking = await Booking.findOne({ activityId, userId });
-    if (booking) {
+
+    const oldbooking = await Booking.findOne({
+      userId: tourist.userId,
+      activityId,
+    });
+    if (oldbooking) {
       return res
         .status(400)
         .json({ message: "User has already booked this activity" });
     }
-    // Create a new booking
-    const newBooking = new Booking({
-      activityId,
-      userId,
-    });
 
-    await newBooking.save(); // Save to the database
+    if (paymentMethod === "wallet") {
+      // Wallet payment
+      if (tourist.wallet < activity.price) {
+        return res.status(400).json({ message: "Insufficient wallet balance" });
+      }
 
-    res
-      .status(201)
-      .json({ message: "Booking successful!", userId, activityId });
+      // Deduct from wallet and update booking
+      tourist.wallet -= activity.price;
+      await tourist.save();
+      return res.json({ message: "Payment successful using wallet" });
+    } else if (paymentMethod === "card") {
+      // Stripe payment
+      try {
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: activity.price * 100, // Convert to cents
+          currency: tourist.currency,
+          automatic_payment_methods: {
+            enabled: true,
+            allow_redirects: "never",
+          },
+        });
+        return res.json({
+          clientSecret: paymentIntent.client_secret,
+          message: "Payment processing successful",
+        });
+      } catch (error) {
+        return res
+          .status(500)
+          .json({ message: "Payment processing failed", error: error.message });
+      }
+    } else {
+      return res.status(400).json({ message: "Invalid payment method" });
+    }
   } catch (error) {
-    console.error("Error booking itinerary:", error);
+    console.error("Error booking activity:", error);
     res.status(500).json({ message: error.message });
   }
 };
+const paymentSuccess = async (req, res) => {
+  try {
+    const { userId, activityId, paymentIntentId } = req.body;
+    const tourist = await touristModel.findOne({ userId: userId });
+
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    const activity = await Activity.findById(activityId);
+    if (!activity) {
+      return res.status(404).json({ message: "Activity not found" });
+    }
+    // Validate the payment with Stripe
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    if (paymentIntent.status !== "succeeded") {
+      return res.status(400).json({ message: "Payment not successful" });
+    }
+
+    // Perform post-payment actions
+    const booking = new Booking({ userId, activityId });
+    await booking.save();
+
+    // Send confirmation email
+    await sendConfirmationEmail(userId, activityId);
+
+    await updatePointsOnPayment(tourist._id, activity.price);
+    return res.status(200).json({ message: "Post-payment actions completed" });
+  } catch (error) {
+    console.error("Error handling payment success:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const cancelActivityBooking = async (req, res) => {
   const { bookingId } = req.params; // Get the booking ID from the request params
 
@@ -526,6 +593,7 @@ module.exports = {
   sendActivityLinkViaEmail,
   rateActivity,
   bookActivity,
+  paymentSuccess,
   cancelActivityBooking,
   saveActivity,
   unsaveActivity,
