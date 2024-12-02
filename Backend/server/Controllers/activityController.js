@@ -7,6 +7,7 @@ const User = require("../Models/user");
 const { convertCurrency } = require("./currencyConverter");
 const touristModel = require("../Models/Tourist");
 const { updatePointsOnPayment } = require("./touristController");
+const { sendReceipt } = require("./NotificationController");
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Use your Stripe Secret Key
 const jwt = require("jsonwebtoken");
@@ -474,7 +475,12 @@ const postPaymentSuccess = async (activityId, touristId) => {
     updateBadge(tourist);
     await tourist.save();
     // Send confirmation email
-    await sendConfirmationEmail(userId, activityId);
+    await sendReceipt(
+      tourist.email,
+      tourist.name,
+      activity.name,
+      activity.price
+    );
     await updatePointsOnPayment(tourist._id, activity.price);
 
     return { success: true, message: "Post-payment actions completed" };
