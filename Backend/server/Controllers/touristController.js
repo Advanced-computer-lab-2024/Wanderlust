@@ -557,7 +557,7 @@ const checkoutOrder = async (req, res) => {
 };
 const testOutOfStockNotification = async (req, res) => {
   try {
-    const { adminId, sellerId } = req.body;
+    const { adminId } = req.body;
 
     // Create a notification for the specified admin
     if (adminId) {
@@ -578,14 +578,14 @@ const testOutOfStockNotification = async (req, res) => {
     }
 
     // Optionally, create a test notification for a seller
-    if (sellerId) {
-      const seller = await Seller.findById(sellerId).populate('userId');
-      if (!seller) {
-        return res.status(404).json({ message: 'Seller not found' });
-      }
-      const sellerMessage = `This is a test notification for your out of stock product.`;
-      await createNotification(seller.userId._id, sellerMessage, 'seller');
-    }
+    // if (sellerId) {
+    //   const seller = await Seller.findById(sellerId).populate('userId');
+    //   if (!seller) {
+    //     return res.status(404).json({ message: 'Seller not found' });
+    //   }
+    //   const sellerMessage = `This is a test notification for your out of stock product.`;
+    //   await createNotification(seller.userId._id, sellerMessage, 'seller');
+    // }
 
     res.status(200).json({ message: "Test notifications created for admin and seller users" });
   } catch (error) {
