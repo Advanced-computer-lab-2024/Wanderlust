@@ -51,8 +51,8 @@ import './App.css';
 const App = () => {
   return (
     <Router>
-      <Guide /> {/* Include the Guide component here */}
-      <Navbar /> {/* Optional: Add the Navbar if you want it to appear on all pages */}
+      {/* <Guide />  */}
+      {/* <Navbar />  */}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />

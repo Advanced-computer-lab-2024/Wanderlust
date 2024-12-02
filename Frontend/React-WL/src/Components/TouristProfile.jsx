@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Card from './Card';
+import { useNavigate } from 'react-router-dom';
 
-import { Phone, User, Mail, Clock, Briefcase, Award, Star, Wallet, BarChart2, PlusCircle, Settings, Eye, EyeOff, Medal } from 'lucide-react';
+import {ShoppingCart, Heart, Phone, User, Mail, Clock, Briefcase, Award, Star, Wallet, BarChart2, PlusCircle, Settings, Eye, EyeOff, Medal } from 'lucide-react';
 
 const TouristProfile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [preferenceTagOptions, setPreferenceTagOptions] = useState([]);
   const [selectedPreferenceTags, setSelectedPreferenceTags] = useState([]);
@@ -171,8 +173,13 @@ const TouristProfile = () => {
 
   <div className="flex justify-between items-center mb-3">
     {/* Left side with Rank, Points, Wallet */}
-    <div className="flex space-x-4 items-center">
-      <div className="flex items-center text-indigo-600 space-x-1">
+    {/* <div className="flex space-x-4 items-center">
+
+
+    </div> */}
+
+    {/* Right side with Settings */}
+    <div className="flex items-center text-indigo-600 space-x-1">
         <span className="text-lg font-semibold">Rank:</span>
         <Award className={`w-6 h-6 ${getBadgeColor(profile.badge)}`} />
       </div>
@@ -182,32 +189,38 @@ const TouristProfile = () => {
       </div>
       <div className="flex items-center text-indigo-600 space-x-1">
         <Wallet className="w-6 h-6" />
-        <span className="text-lg font-semibold">Wallet: ${profile.wallet}</span>
+        <span className="text-lg font-semibold">Wallet: ${profile.wallet.toFixed(2)}</span>
       </div>
-    </div>
-
-    {/* Right side with Settings */}
+    <div className="flex items-center text-indigo-600 space-x-1 flex items-center text-indigo-600 cursor-pointer" onClick={() => navigate(`/TouristWishlist`)}>
+        <Heart className="w-6 h-6" />
+        <span className="text-lg font-semibold">Wishlist</span>
+      </div>
+      <div className="flex items-center text-indigo-600 space-x-1 flex items-center text-indigo-600 cursor-pointer" onClick={() => navigate(`/TouristCart`)}>
+        <ShoppingCart className="w-6 h-6" />
+        <span className="text-lg font-semibold">Cart</span>
+      </div>
     <div className="flex items-center text-indigo-600 cursor-pointer" onClick={toggleSettings}>
       <Settings className="w-6 h-6 mr-1" />
       <span className="text-lg font-semibold">Settings</span>
     </div>
   </div>
+    {/* Redeem Button Section Below Points */}
+    <div className="flex justify-start mb-4">
+    <button className="ml-20 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700" onClick={redeemPoints}>
+      Redeem 
+    </button>
+  </div>
   {/* Orders Button */}
   <div className="flex justify-start mb-4">
     <button
       className="ml-20 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-      onClick={() => window.location.href = `/TouristOrders`}
+      onClick={() => navigate(`/TouristOrders`)}
     >
       Orders History
     </button>
   </div>
 
-  {/* Redeem Button Section Below Points */}
-  <div className="flex justify-start mb-4">
-    <button className="ml-20 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700" onClick={redeemPoints}>
-      Redeem 
-    </button>
-  </div>
+
 
 
 

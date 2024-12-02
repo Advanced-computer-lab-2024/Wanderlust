@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 
 const Register = () => {
   const [role, setRole] = useState("");
+  const navigate = useNavigate();
   const [nationalities, setNationalities] = useState([]);
   const [documents, setDocuments] = useState({
     idTourGuideDocument: null,
@@ -204,6 +207,8 @@ const Register = () => {
         }
       );
     }
+    navigate("/login");
+
   };
 
   return (
