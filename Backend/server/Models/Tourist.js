@@ -41,6 +41,14 @@ const touristSchema = new Schema({
     type: [String],
     default: [],
   },
+  savedActivities: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Activity",
+  }],
+  notificationRequests: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Activity",
+  }],
   updatedAt: {
     type: Date,
     default: Date.now,

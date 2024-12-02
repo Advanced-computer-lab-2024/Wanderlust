@@ -15,7 +15,11 @@ const {
   sendActivityLinkViaEmail,
   rateActivity,
   bookActivity,
-  cancelActivityBooking
+  cancelActivityBooking,
+  saveActivity,
+  unsaveActivity,
+  getSavedActivities,
+  requestNotification
 } = require("../Controllers/activityController");
 
 router.post("/createActivity", createActivity);
@@ -33,5 +37,9 @@ router.post('/shareMail/:activityId/email', sendActivityLinkViaEmail);
 router.post('/rate/:activityId', rateActivity);
 router.post("/bookActivity", bookActivity);
 router.delete("/cancelActivityBooking/:bookingId", cancelActivityBooking);
+router.post('/saveActivity', saveActivity);
+router.post('/unsaveActivity', unsaveActivity);
+router.get('/savedActivities/:touristId', getSavedActivities);
+router.post('/requestNotification', requestNotification);
 
 module.exports = router;
