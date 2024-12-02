@@ -74,8 +74,10 @@ const ViewComplaint = () => {
                             className="form-control mt-2" 
                             placeholder="Enter your reply here" 
                         />
-                        <button onClick={replyToComplaint} className="btn bg-indigo-500 hover:bg-indigo-600 text-white mt-2 mr-2">Reply</button>
-                        <button onClick={changeStatus} className="btn bg-indigo-500 hover:bg-indigo-600 text-white mt-2">Change Status</button>
+                        <button onClick={replyToComplaint} className="btn bg-indigo-500 hover:bg-indigo-600 text-white mt-2 mr-2">Submit</button>
+                        <button onClick={changeStatus} className={`btn mt-2 ${complaint.status === 'resolved' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white`}>
+                            {complaint.status === 'resolved' ? 'Mark as Pending' : 'Mark as Resolved'}
+                        </button>
                     </div>
             </div>
         </div>
