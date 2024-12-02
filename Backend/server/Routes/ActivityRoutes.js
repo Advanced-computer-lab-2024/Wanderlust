@@ -20,7 +20,7 @@ const {
   saveActivity,
   unsaveActivity,
   getSavedActivities,
-  requestNotification
+  requestNotification,
   paymentSuccess,
   cancelActivityBooking,
 } = require("../Controllers/activityController");

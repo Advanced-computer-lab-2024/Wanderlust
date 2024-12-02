@@ -6,7 +6,6 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 const cloudinary = require("cloudinary").v2;
 const cron = require('node-cron');
-const { sendNotifications } = require('./Controllers/notifications');
 
 //Make sure to add your MongoDB URI in the .env file as MONGO_URI="your mongodb uri"
 //Check db connection links in README file
