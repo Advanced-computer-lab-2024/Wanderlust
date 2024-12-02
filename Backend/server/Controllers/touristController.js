@@ -3,19 +3,18 @@ const touristModel = require("../Models/Tourist");
 const locationsModel = require("../Models/Locations");
 const activityModel = require("../Models/Activity");
 const itineraryModel = require("../Models/Itinerary");
-const Notification = require('../Models/Notification'); 
-const Seller = require('../Models/Seller');
-const { createNotification } = require('./NotificationController');
+const Notification = require("../Models/Notification");
+const Seller = require("../Models/Seller");
+const { createNotification } = require("./NotificationController");
 
-const Admin = require('../Models/Admin'); 
+const Admin = require("../Models/Admin");
 
 const { default: mongoose } = require("mongoose");
 const User = require("../Models/user");
 const jwt = require("jsonwebtoken");
 const ProductModel = require("../Models/Products");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Use your Stripe Secret Key
-const nodemailer = require('nodemailer'); 
-
+const nodemailer = require("nodemailer");
 
 const getTourist = async (req, res) => {
   const username = req.query.username;
@@ -177,7 +176,7 @@ const updatePointsOnPayment = async (touristId, amountPaid) => {
     const tourist = await touristModel.findById(touristId);
 
     if (!tourist) {
-      return res.status(404).json({ error: "Tourist not found" });
+      return { error: "Tourist not found" };
     }
 
     // Determine the level based on current points
@@ -197,11 +196,9 @@ const updatePointsOnPayment = async (touristId, amountPaid) => {
     updateBadge(tourist);
     // Save changes
     await tourist.save();
-    return res
-      .status(200)
-      .json({ points: tourist.points, badge: tourist.badge, level });
+    return { points: tourist.points, badge: tourist.badge, level };
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return { error: error.message };
   }
 };
 const updateBadge = (tourist) => {
@@ -346,7 +343,9 @@ const addProductToCart = async (req, res) => {
 
     // Check if the requested quantity is available
     if (product.quantity < quantityToAdd) {
-      return res.status(400).json({ message: `Only ${product.quantity} units of ${product.name} are available` });
+      return res.status(400).json({
+        message: `Only ${product.quantity} units of ${product.name} are available`,
+      });
     }
 
     const cartItemIndex = tourist.cart.findIndex(
@@ -356,7 +355,9 @@ const addProductToCart = async (req, res) => {
     if (cartItemIndex > -1) {
       const newQuantity = tourist.cart[cartItemIndex].quantity + quantityToAdd;
       if (newQuantity > product.quantity) {
-        return res.status(400).json({ message: `Only ${product.quantity} units of ${product.name} are available` });
+        return res.status(400).json({
+          message: `Only ${product.quantity} units of ${product.name} are available`,
+        });
       }
       tourist.cart[cartItemIndex].quantity = newQuantity;
     } else {
@@ -431,7 +432,9 @@ const changeCartItemQuantity = async (req, res) => {
 
     // Check if the requested quantity is available
     if (product.quantity < quantity) {
-      return res.status(400).json({ message: `Only ${product.quantity} units of ${product.name} are available` });
+      return res.status(400).json({
+        message: `Only ${product.quantity} units of ${product.name} are available`,
+      });
     }
 
     const cartItemIndex = tourist.cart.findIndex(
@@ -457,6 +460,7 @@ const processPayment = async (totalAmount, touristId, paymentMethod) => {
     if (paymentMethod === "wallet") {
       // Wallet payment
       if (tourist.wallet < totalAmount) {
+        console.log("Insufficient wallet balance");
         return { success: false, message: "Insufficient wallet balance" };
       }
 
@@ -470,6 +474,19 @@ const processPayment = async (totalAmount, touristId, paymentMethod) => {
       // Update badge
       updateBadge(tourist);
       await tourist.save();
+      console.log("Payment successful using wallet");
+      const postPaymentResult = await postPaymentSuccess(
+        tourist._id,
+        totalAmount
+      );
+      if (!postPaymentResult.success) {
+        console.log(
+          "Post-payment processing failed",
+          postPaymentResult.message
+        );
+      } else {
+        console.log("Post-payment processing successful");
+      }
 
       return { success: true, message: "Payment successful using wallet" };
     } else if (paymentMethod === "card") {
@@ -483,12 +500,14 @@ const processPayment = async (totalAmount, touristId, paymentMethod) => {
             allow_redirects: "never",
           },
         });
+        console.log("Payment processing successful");
         return {
           success: true,
           clientSecret: paymentIntent.client_secret,
           message: "Payment processing successful",
         };
       } catch (error) {
+        console.log("Payment processing failed", error.message);
         return {
           success: false,
           message: "Payment processing failed",
@@ -496,9 +515,11 @@ const processPayment = async (totalAmount, touristId, paymentMethod) => {
         };
       }
     } else {
+      console.log("Invalid payment method");
       return { success: false, message: "Invalid payment method" };
     }
   } catch (error) {
+    console.log("Payment processing failed", error.message);
     return { success: false, message: error.message };
   }
 };
@@ -552,93 +573,53 @@ const checkoutOrder = async (req, res) => {
         totalAmount,
       });
     }
+    if (paymentResult.success) {
+      return res
+        .status(200)
+        .json({ message: paymentResult.message, totalAmount });
+    }
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
-const testOutOfStockNotification = async (req, res) => {
+
+const postPaymentSuccess = async (touristId, totalAmount) => {
   try {
-    const { adminId } = req.body;
-
-    // Create a notification for the specified admin
-    if (adminId) {
-      const admin = await Admin.findById(adminId);
-      if (!admin) {
-        return res.status(404).json({ message: 'Admin not found' });
-      }
-      const message = `This is a test notification for out of stock products.`;
-      await createNotification(adminId, message, 'admin');
-    } else {
-      // Create a notification for all admins if no specific adminId is provided
-      const adminUsers = await Admin.find({});
-      const message = `This is a test notification for out of stock products.`;
-
-      for (const admin of adminUsers) {
-        await createNotification(admin._id, message, 'admin');
-      }
-    }
-
-    // Optionally, create a test notification for a seller
-    // if (sellerId) {
-    //   const seller = await Seller.findById(sellerId).populate('userId');
-    //   if (!seller) {
-    //     return res.status(404).json({ message: 'Seller not found' });
-    //   }
-    //   const sellerMessage = `This is a test notification for your out of stock product.`;
-    //   await createNotification(seller.userId._id, sellerMessage, 'seller');
-    // }
-
-    res.status(200).json({ message: "Test notifications created for admin and seller users" });
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-const cartPaymentSuccess = async (req, res) => {
-  try {
-    const { paymentIntentId, totalAmount } = req.body;
-    const authHeader = req.header("Authorization");
-    if (!authHeader) {
-      return res.status(401).json({ message: "Authorization header missing" });
-    }
-    const token = authHeader.replace("Bearer ", "");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
     const tourist = await touristModel
-      .findOne({ _id: decoded.id })
+      .findOne({ _id: touristId })
       .populate("cart.product");
     if (!tourist) {
-      return res.status(404).json({ message: "Tourist not found" });
+      return { success: false, message: "Tourist not found" };
     }
-    // Validate the payment with Stripe
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-    if (paymentIntent.status !== "succeeded") {
-      return res.status(400).json({ message: "Payment not successful" });
-    }
+
     // Perform post-payment actions
-      // Reduce product quantity after successful payment
-      for (const item of tourist.cart) {
-        const product = item.product;
-        product.quantity -= item.quantity;
-        if (product.quantity < 0) {
-          return res.status(400).json({ message: `Insufficient stock for product: ${product.name}` });
+    // Reduce product quantity after successful payment
+    for (const item of tourist.cart) {
+      const product = item.product;
+      product.quantity -= item.quantity;
+      if (product.quantity < 0) {
+        return {
+          success: false,
+          message: `Insufficient stock for product: ${product.name}`,
+        };
+      }
+      if (product.quantity === 0) {
+        // Create a notification for the admin
+        const adminUsers = await Admin.find({});
+        const message = `The product ${product.name} is out of stock.`;
+
+        for (const admin of adminUsers) {
+          await createNotification(admin._id, message, "admin");
         }
-        if (product.quantity === 0) {
-          // Create a notification for the admin
-          const adminUsers = await Admin.find({});
-          const message = `The product ${product.name} is out of stock.`;
-      
-          for (const admin of adminUsers) {
-            await createNotification(admin._id, message, 'admin');
-          }
-      
-          // Create a notification for the seller
-          const seller = await Seller.findById(product.seller);
-          if (seller) {
-            const sellerMessage = `Your product ${product.name} is out of stock.`;
-            await createNotification(seller.userId, sellerMessage, 'seller');
-          }
+
+        // Create a notification for the seller
+        const seller = await Seller.findById(product.seller);
+        if (seller) {
+          const sellerMessage = `Your product ${product.name} is out of stock.`;
+          await createNotification(seller.userId, sellerMessage, "seller");
         }
       }
+    }
     // Save the order to order history
     const order = {
       items: tourist.cart.map((item) => ({
@@ -655,12 +636,86 @@ const cartPaymentSuccess = async (req, res) => {
     tourist.cart = [];
     await tourist.save();
 
-    res.status(200).json({ message: "Order checked out successfully", order });
+    return {
+      success: true,
+      message: "Order checked out successfully",
+      order,
+    };
+  } catch (error) {
+    return {
+      message: error.message,
+    };
+  }
+};
+const cardPaymentSuccess = async (req, res) => {
+  try {
+    const { paymentIntentId, totalAmount } = req.body;
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const tourist = await touristModel
+      .findOne({ _id: decoded.id })
+      .populate("cart.product");
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    // Validate the payment with Stripe
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    if (paymentIntent.status !== "succeeded") {
+      return res.status(400).json({ message: "Payment not successful" });
+    }
+    // Perform post-payment actions
+    await postPaymentSuccess(tourist._id, totalAmount);
+    return res
+      .status(200)
+      .json({ message: "Order checked out successfully", order });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
+const testOutOfStockNotification = async (req, res) => {
+  try {
+    const { adminId } = req.body;
 
+    // Create a notification for the specified admin
+    if (adminId) {
+      const admin = await Admin.findById(adminId);
+      if (!admin) {
+        return res.status(404).json({ message: "Admin not found" });
+      }
+      const message = `This is a test notification for out of stock products.`;
+      await createNotification(adminId, message, "admin");
+    } else {
+      // Create a notification for all admins if no specific adminId is provided
+      const adminUsers = await Admin.find({});
+      const message = `This is a test notification for out of stock products.`;
+
+      for (const admin of adminUsers) {
+        await createNotification(admin._id, message, "admin");
+      }
+    }
+
+    // Optionally, create a test notification for a seller
+    // if (sellerId) {
+    //   const seller = await Seller.findById(sellerId).populate('userId');
+    //   if (!seller) {
+    //     return res.status(404).json({ message: 'Seller not found' });
+    //   }
+    //   const sellerMessage = `This is a test notification for your out of stock product.`;
+    //   await createNotification(seller.userId._id, sellerMessage, 'seller');
+    // }
+
+    res.status(200).json({
+      message: "Test notifications created for admin and seller users",
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 //view all ordrs
 const viewAllOrders = async (req, res) => {
   try {
@@ -890,9 +945,9 @@ const usePromoCode = async (req, res) => {
     const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-   
-
-    const tourist = await touristModel.findById(touristId).populate('cart.product');
+    const tourist = await touristModel
+      .findById(touristId)
+      .populate("cart.product");
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
     }
@@ -903,12 +958,12 @@ const usePromoCode = async (req, res) => {
     }
 
     let totalAmount = 0;
-    tourist.cart.forEach(item => {
+    tourist.cart.forEach((item) => {
       totalAmount += item.product.price * item.quantity;
     });
 
     const discount = promo.discount;
-    const newTotalAmount = totalAmount - (totalAmount * (discount / 100));
+    const newTotalAmount = totalAmount - totalAmount * (discount / 100);
 
     res.status(200).json({ discount, newTotalAmount });
   } catch (error) {
@@ -926,10 +981,8 @@ const receiveBirthdayPromo = async (req, res) => {
     const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    
-
     const tourist = await touristModel.findById(touristId);
-    console.log(tourist); 
+    console.log(tourist);
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
     }
@@ -942,32 +995,39 @@ const receiveBirthdayPromo = async (req, res) => {
     const today = new Date();
     const birthDate = new Date(tourist.DOB);
 
-    if (today.getDate() === birthDate.getDate() && today.getMonth() === birthDate.getMonth()) {
+    if (
+      today.getDate() === birthDate.getDate() &&
+      today.getMonth() === birthDate.getMonth()
+    ) {
       // Send email
       const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        service: "gmail",
         auth: {
           user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS
-        }
+          pass: process.env.EMAIL_PASS,
+        },
       });
 
       const mailOptions = {
         from: process.env.EMAIL_USER,
         to: user.email,
-        subject: 'Happy Birthday!',
-        text: 'Happy Birthday! Enjoy a special discount on your next purchase.'
+        subject: "Happy Birthday!",
+        text: "Happy Birthday! Enjoy a special discount on your next purchase.",
       };
 
       transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
           return res.status(500).json({ message: error.message });
         } else {
-          return res.status(200).json({ message: 'Birthday email sent successfully' });
+          return res
+            .status(200)
+            .json({ message: "Birthday email sent successfully" });
         }
       });
     } else {
-      return res.status(200).json({ message: 'Today is not the tourist\'s birthday' });
+      return res
+        .status(200)
+        .json({ message: "Today is not the tourist's birthday" });
     }
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -988,7 +1048,7 @@ module.exports = {
   removeProductFromCart,
   changeCartItemQuantity,
   checkoutOrder,
-  cartPaymentSuccess,
+  cardPaymentSuccess,
   viewAllOrders,
   viewOrder,
   cancelOrder,
@@ -999,5 +1059,5 @@ module.exports = {
   deliveryAddresses,
   usePromoCode,
   receiveBirthdayPromo,
-  testOutOfStockNotification
+  testOutOfStockNotification,
 };

@@ -7,31 +7,32 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const stripePromise = loadStripe(
   "pk_test_51QO30DGDvVcCb4JsAoGHQPZ25L3OMnkYdumgaiFqy1u4KBIlZcIKtWgzB8aa8irQKBiXYmft4W6USa0Iv970BdhM00oUWcviEg"
-); // Add your Stripe public key here
-import { useNavigate } from "react-router-dom";
+);
 
 const CartCheckout = ({ totalAmount }) => {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const stripe = useStripe();
   const elements = useElements();
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
 
-  // Calculate the total amount
   const handleConfirmOrder = async () => {
     setError(null);
     setLoading(true);
+    setSuccess(false);
 
     try {
       switch (paymentMethod) {
         case "Wallet":
           await axios.post(
-            "/api/tourist/cart/checkout",
+            "http://localhost:8000/api/tourist/cart/checkout",
             { paymentMethod: "wallet" },
             {
               headers: {
@@ -40,11 +41,12 @@ const CartCheckout = ({ totalAmount }) => {
             }
           );
           alert("Payment successful using wallet");
+          setSuccess(true);
           break;
 
         case "Card":
           const { data } = await axios.post(
-            "/api/tourist/cart/checkout",
+            "http://localhost:8000/api/tourist/cart/checkout",
             { paymentMethod: "card" },
             {
               headers: {
@@ -54,6 +56,9 @@ const CartCheckout = ({ totalAmount }) => {
           );
 
           const cardElement = elements.getElement(CardElement);
+          if (!cardElement) {
+            throw new Error("CardElement not found");
+          }
           const { paymentIntent, error } = await stripe.confirmCardPayment(
             data.clientSecret,
             {
@@ -62,9 +67,9 @@ const CartCheckout = ({ totalAmount }) => {
           );
 
           if (error) throw new Error(error.message);
-
+          console.log(paymentIntent);
           await axios.post(
-            "/api/tourist/cart/paymentSuccess",
+            "http://localhost:8000/api/tourist/cart/paymentSuccess",
             { paymentIntentId: paymentIntent.id, totalAmount },
             {
               headers: {
@@ -74,10 +79,12 @@ const CartCheckout = ({ totalAmount }) => {
           );
 
           alert("Payment successful using card");
+          setSuccess(true);
           break;
 
         case "COD":
           alert("Order placed using Cash on Delivery");
+          setSuccess(true);
           break;
 
         default:
@@ -111,7 +118,6 @@ const CartCheckout = ({ totalAmount }) => {
             Choose a Payment Method
           </h2>
           <div className="space-y-4">
-            {/* Card Payment Option */}
             <div
               className={`border p-4 rounded-md cursor-pointer ${
                 paymentMethod === "Card"
@@ -121,16 +127,7 @@ const CartCheckout = ({ totalAmount }) => {
               onClick={() => setPaymentMethod("Card")}
             >
               <h3 className="font-bold">Card Payment</h3>
-              {paymentMethod === "Card" && (
-                <div className="mt-2">
-                  <Elements stripe={stripePromise}>
-                    <CardElement className="border p-2 rounded-md" />
-                  </Elements>
-                </div>
-              )}
             </div>
-
-            {/* Wallet Payment Option */}
             <div
               className={`border p-4 rounded-md cursor-pointer ${
                 paymentMethod === "Wallet"
@@ -141,8 +138,6 @@ const CartCheckout = ({ totalAmount }) => {
             >
               <h3 className="font-bold">Wallet Payment</h3>
             </div>
-
-            {/* Cash on Delivery Option */}
             <div
               className={`border p-4 rounded-md cursor-pointer ${
                 paymentMethod === "COD"
@@ -156,16 +151,33 @@ const CartCheckout = ({ totalAmount }) => {
           </div>
         </div>
 
-        {/* Confirm Button */}
+        {/* Render CardElement Below Payment Options */}
+        {paymentMethod === "Card" && (
+          <div className="mt-4">
+            <CardElement className="border p-2 rounded-md" />
+          </div>
+        )}
+
+        {/* Confirm Payment Button */}
         <div className="mt-6">
           <button
             className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
             onClick={handleConfirmOrder}
             disabled={loading}
           >
-            {loading ? "Processing..." : "Confirm Order"}
+            Confirm Payment
           </button>
+          {loading && (
+            <p className="text-center mt-2 text-gray-500">Processing...</p>
+          )}
         </div>
+
+        {/* Success Message */}
+        {success && (
+          <div className="mt-4 text-green-500 text-center">
+            Payment Confirmed! Thank you for your order.
+          </div>
+        )}
 
         {/* Error Message */}
         {error && <div className="mt-4 text-red-500 text-center">{error}</div>}

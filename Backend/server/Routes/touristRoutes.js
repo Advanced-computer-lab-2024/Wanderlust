@@ -13,7 +13,7 @@ const {
   removeProductFromCart,
   changeCartItemQuantity,
   checkoutOrder,
-  cartPaymentSuccess,
+  cardPaymentSuccess,
   viewAllOrders,
   viewOrder,
   cancelOrder,
@@ -24,7 +24,7 @@ const {
   deliveryAddresses,
   usePromoCode,
   receiveBirthdayPromo,
-  testOutOfStockNotification
+  testOutOfStockNotification,
 } = require("../Controllers/touristController");
 
 const { authenticateUser } = require("../Controllers/authController");
@@ -64,14 +64,18 @@ router.post(
   "/cart/paymentSuccess",
   authenticateUser,
   tourist,
-  cartPaymentSuccess
+  cardPaymentSuccess
 );
 router.get("/viewAllOrders", authenticateUser, tourist, viewAllOrders);
 router.get("/viewOrder/:orderId", authenticateUser, tourist, viewOrder);
-router.delete("/cancelOrder/:touristId/:orderId", authenticateUser, tourist, cancelOrder);
+router.delete(
+  "/cancelOrder/:touristId/:orderId",
+  authenticateUser,
+  tourist,
+  cancelOrder
+);
 router.put("/updatePointsOnPayment", updatePointsOnPayment);
-router.post('/testOutOfStockNotification', testOutOfStockNotification);
-
+router.post("/testOutOfStockNotification", testOutOfStockNotification);
 
 //addresses
 router.post(
@@ -93,6 +97,16 @@ router.put(
   updateDeliveryAddress
 );
 router.get("/deliveryAddresses", authenticateUser, tourist, deliveryAddresses);
-router.post("/usePromoCode/:touristId", authenticateUser, tourist, usePromoCode);
-router.post("/receiveBirthdayPromo/:touristId", authenticateUser, tourist, receiveBirthdayPromo);
+router.post(
+  "/usePromoCode/:touristId",
+  authenticateUser,
+  tourist,
+  usePromoCode
+);
+router.post(
+  "/receiveBirthdayPromo/:touristId",
+  authenticateUser,
+  tourist,
+  receiveBirthdayPromo
+);
 module.exports = router;
