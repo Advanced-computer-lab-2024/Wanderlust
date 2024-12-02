@@ -4,6 +4,7 @@ const locationsModel = require("../Models/Locations");
 const activityModel = require("../Models/Activity");
 const itineraryModel = require("../Models/Itinerary");
 const Notification = require('../Models/Notification'); 
+const Seller = require('../Models/Seller');
 const { createNotification } = require('./NotificationController');
 
 const Admin = require('../Models/Admin'); 
@@ -556,19 +557,37 @@ const checkoutOrder = async (req, res) => {
 };
 const testOutOfStockNotification = async (req, res) => {
   try {
-    // Create a notification for the admin
-    const adminUsers = await Admin.find({});
-    const message = `This is a test notification for out of stock products.`;
+    const { adminId, sellerId } = req.body;
 
-    for (const admin of adminUsers) {
-      const notification = new Notification({
-        userId: admin._id,
-        message,
-      });
-      await notification.save();
+    // Create a notification for the specified admin
+    if (adminId) {
+      const admin = await Admin.findById(adminId);
+      if (!admin) {
+        return res.status(404).json({ message: 'Admin not found' });
+      }
+      const message = `This is a test notification for out of stock products.`;
+      await createNotification(adminId, message, 'admin');
+    } else {
+      // Create a notification for all admins if no specific adminId is provided
+      const adminUsers = await Admin.find({});
+      const message = `This is a test notification for out of stock products.`;
+
+      for (const admin of adminUsers) {
+        await createNotification(admin._id, message, 'admin');
+      }
     }
 
-    res.status(200).json({ message: "Test notifications created for admin users" });
+    // Optionally, create a test notification for a seller
+    if (sellerId) {
+      const seller = await Seller.findById(sellerId).populate('userId');
+      if (!seller) {
+        return res.status(404).json({ message: 'Seller not found' });
+      }
+      const sellerMessage = `This is a test notification for your out of stock product.`;
+      await createNotification(seller.userId._id, sellerMessage, 'seller');
+    }
+
+    res.status(200).json({ message: "Test notifications created for admin and seller users" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -608,7 +627,14 @@ const cartPaymentSuccess = async (req, res) => {
           const message = `The product ${product.name} is out of stock.`;
       
           for (const admin of adminUsers) {
-            await createNotification(admin._id, message);
+            await createNotification(admin._id, message, 'admin');
+          }
+      
+          // Create a notification for the seller
+          const seller = await Seller.findById(product.seller);
+          if (seller) {
+            const sellerMessage = `Your product ${product.name} is out of stock.`;
+            await createNotification(seller.userId, sellerMessage, 'seller');
           }
         }
       }
