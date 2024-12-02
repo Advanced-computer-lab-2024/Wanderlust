@@ -151,6 +151,7 @@ const redeemPoints = async (req, res) => {
     }
 
     const tourist = await touristModel.findOne({ userId: user._id });
+
     if (!tourist) {
       return res.status(404).json({ error: "Tourist not found" });
     }

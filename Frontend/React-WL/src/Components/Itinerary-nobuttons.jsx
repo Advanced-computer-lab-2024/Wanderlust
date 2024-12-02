@@ -4,7 +4,9 @@ import Card from '../Components/Card';
 import MultiRangeSlider from "multi-range-slider-react";
 import Activities from './Activities';
 import { Calendar, MapPin, Globe, DollarSign, Users, Check, Star } from 'lucide-react';
+
 import Activity from './Activity';
+
 const Itinerary = ({guestMode}) => {
   const [itinerary, setItinerary] = useState([]);
   const [loading, setLoading] = useState(true);
