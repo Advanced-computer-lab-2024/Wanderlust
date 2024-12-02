@@ -3,6 +3,7 @@ const touristModel = require("../Models/Tourist");
 const locationsModel = require("../Models/Locations");
 const activityModel = require("../Models/Activity");
 const itineraryModel = require("../Models/Itinerary");
+const productModel = require("../Models/Products");
 const Notification = require("../Models/Notification");
 const Seller = require("../Models/Seller");
 const { createNotification } = require("./NotificationController");
@@ -468,12 +469,6 @@ const processPayment = async (totalAmount, touristId, paymentMethod) => {
       tourist.wallet -= totalAmount;
       await tourist.save();
 
-      // Update points on payment
-      await updatePointsOnPayment(touristId, totalAmount);
-
-      // Update badge
-      updateBadge(tourist);
-      await tourist.save();
       console.log("Payment successful using wallet");
       const postPaymentResult = await postPaymentSuccess(
         tourist._id,
@@ -591,18 +586,27 @@ const postPaymentSuccess = async (touristId, totalAmount) => {
     if (!tourist) {
       return { success: false, message: "Tourist not found" };
     }
+    // Update points on payment
+    await updatePointsOnPayment(touristId, totalAmount);
+
+    // Update badge
+    updateBadge(tourist);
+    await tourist.save();
 
     // Perform post-payment actions
     // Reduce product quantity after successful payment
     for (const item of tourist.cart) {
-      const product = item.product;
+      const product = await productModel.findById(item.product);
+
       product.quantity -= item.quantity;
+
       if (product.quantity < 0) {
         return {
           success: false,
           message: `Insufficient stock for product: ${product.name}`,
         };
       }
+      await product.save();
       if (product.quantity === 0) {
         // Create a notification for the admin
         const adminUsers = await Admin.find({});

@@ -368,9 +368,15 @@ const rateActivity = async (req, res) => {
 
 const bookActivity = async (req, res) => {
   try {
-    const { activityId, paymentMethod, userId } = req.body;
+    const { activityId, paymentMethod } = req.body;
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const tourist = await touristModel.findOne({ userId: userId });
+    const tourist = await touristModel.findOne({ _id: decoded.id });
 
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
@@ -400,6 +406,17 @@ const bookActivity = async (req, res) => {
       // Deduct from wallet and update booking
       tourist.wallet -= activity.price;
       await tourist.save();
+
+      console.log("Payment successful using wallet");
+      await postPaymentSuccess(activityId, tourist._id);
+      if (!postPaymentSuccess.success) {
+        console.log(
+          "Post-payment processing failed",
+          postPaymentSuccess.message
+        );
+      } else {
+        console.log("Post-payment processing successful");
+      }
       return res.json({ message: "Payment successful using wallet" });
     } else if (paymentMethod === "card") {
       // Stripe payment
@@ -412,6 +429,8 @@ const bookActivity = async (req, res) => {
             allow_redirects: "never",
           },
         });
+        console.log("Payment processing successful");
+
         return res.json({
           clientSecret: paymentIntent.client_secret,
           message: "Payment processing successful",
@@ -426,13 +445,57 @@ const bookActivity = async (req, res) => {
     }
   } catch (error) {
     console.error("Error booking activity:", error);
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
-const paymentSuccess = async (req, res) => {
+const postPaymentSuccess = async (activityId, touristId) => {
   try {
-    const { userId, activityId, paymentIntentId } = req.body;
-    const tourist = await touristModel.findOne({ userId: userId });
+    const tourist = await touristModel.findOne({ _id: touristId });
+
+    if (!tourist) {
+      return { success: false, message: "Tourist not found" };
+    }
+
+    const activity = await Activity.findById(activityId);
+    if (!activity) {
+      return { success: false, message: "Activity not found" };
+    }
+
+    // Perform post-payment actions
+    const booking = new Booking({
+      userId: tourist.userId,
+      activityId: activityId,
+    });
+    await booking.save();
+    // Update points on payment
+    await updatePointsOnPayment(tourist._id, activity.price);
+
+    // Update badge
+    updateBadge(tourist);
+    await tourist.save();
+    // Send confirmation email
+    await sendConfirmationEmail(userId, activityId);
+    await updatePointsOnPayment(tourist._id, activity.price);
+
+    return { success: true, message: "Post-payment actions completed" };
+  } catch (error) {
+    console.error("Error handling payment success:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+const cardPaymentSuccess = async (req, res) => {
+  try {
+    const { activityId, paymentIntentId } = req.body;
+
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id });
 
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
@@ -449,17 +512,16 @@ const paymentSuccess = async (req, res) => {
     }
 
     // Perform post-payment actions
-    const booking = new Booking({ userId, activityId });
-    await booking.save();
-
-    // Send confirmation email
-    await sendConfirmationEmail(userId, activityId);
-
-    await updatePointsOnPayment(tourist._id, activity.price);
-    return res.status(200).json({ message: "Post-payment actions completed" });
+    await postPaymentSuccess(activityId, tourist._id);
+    if (!postPaymentSuccess.success) {
+      console.log("Post-payment processing failed", postPaymentSuccess.message);
+    } else {
+      console.log("Post-payment processing successful");
+    }
+    return res.status(200).json({ message: "Payment successful using card" });
   } catch (error) {
     console.error("Error handling payment success:", error);
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -516,7 +578,9 @@ const saveActivity = async (req, res) => {
 
     return res.status(200).json({ message: "Activity saved successfully" });
   } catch (error) {
-    return res.status(500).json({ message: "Error saving activity", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Error saving activity", error: error.message });
   }
 };
 
@@ -529,12 +593,16 @@ const unsaveActivity = async (req, res) => {
       return res.status(404).json({ message: "Tourist not found" });
     }
 
-    tourist.savedActivities = tourist.savedActivities.filter(id => id.toString() !== activityId);
+    tourist.savedActivities = tourist.savedActivities.filter(
+      (id) => id.toString() !== activityId
+    );
     await tourist.save();
 
     return res.status(200).json({ message: "Activity unsaved successfully" });
   } catch (error) {
-    return res.status(500).json({ message: "Error unsaving activity", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Error unsaving activity", error: error.message });
   }
 };
 
@@ -543,8 +611,8 @@ const getSavedActivities = async (req, res) => {
 
   try {
     const tourist = await touristModel.findById(touristId).populate({
-      path: 'savedActivities',
-      populate: { path: 'category tags' }
+      path: "savedActivities",
+      populate: { path: "category tags" },
     });
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
@@ -553,7 +621,10 @@ const getSavedActivities = async (req, res) => {
     return res.status(200).json(tourist.savedActivities);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Error retrieving saved activities", error: error.message });
+    return res.status(500).json({
+      message: "Error retrieving saved activities",
+      error: error.message,
+    });
   }
 };
 
@@ -571,10 +642,15 @@ const requestNotification = async (req, res) => {
       await tourist.save();
     }
 
-    return res.status(200).json({ message: "Notification request saved successfully" });
+    return res
+      .status(200)
+      .json({ message: "Notification request saved successfully" });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Error saving notification request", error: error.message });
+    return res.status(500).json({
+      message: "Error saving notification request",
+      error: error.message,
+    });
   }
 };
 
@@ -593,10 +669,10 @@ module.exports = {
   sendActivityLinkViaEmail,
   rateActivity,
   bookActivity,
-  paymentSuccess,
+  cardPaymentSuccess,
   cancelActivityBooking,
   saveActivity,
   unsaveActivity,
   getSavedActivities,
-  requestNotification
+  requestNotification,
 };

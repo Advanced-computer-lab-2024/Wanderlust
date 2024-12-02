@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
   CardElement,
@@ -8,129 +7,159 @@ import {
 } from "@stripe/react-stripe-js";
 import axios from "axios";
 
-const stripePromise = loadStripe(
-  "pk_test_51QO30DGDvVcCb4JsAoGHQPZ25L3OMnkYdumgaiFqy1u4KBIlZcIKtWgzB8aa8irQKBiXYmft4W6USa0Iv970BdhM00oUWcviEg"
-); // Add your Stripe public key here
-
 const BookingActivity = ({ activityId, price }) => {
-  const [paymentMethod, setPaymentMethod] = useState("wallet");
-  const [clientSecret, setClientSecret] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(null);
 
   const stripe = useStripe();
   const elements = useElements();
+
   const handlePayment = async () => {
-    const userId = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:8000/api/admin/getLoggedInInfo",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-            },
-          }
-        );
-        console.log(response.data);
-        return response.data; // Assuming response.data contains the user ID
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-      }
-    };
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
 
-    const userIdValue = await userId();
-
-    if (paymentMethod === "wallet") {
-      // Wallet Payment
-      try {
-        const response = await axios.post(
-          "/api/activity/bookActivity",
-          {
-            activityId,
-            paymentMethod: "wallet",
-            userId: userIdValue,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-            },
-          }
-        );
-        alert(response.data.message);
-      } catch (error) {
-        alert(error.response.data.message);
-      }
-    } else if (paymentMethod === "card") {
-      // Card Payment
-      try {
-        const response = await axios.post(
-          "/api/activity/bookActivity",
-          {
-            activityId,
-            paymentMethod: "card",
-            userId: userIdValue,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-            },
-          }
-        );
-
-        if (response.data.clientSecret) {
-          setClientSecret(response.data.clientSecret); // Save clientSecret to state
-          const cardElement = elements.getElement(CardElement);
-          const { paymentIntent, error } = await stripe.confirmCardPayment(
-            clientSecret,
+    try {
+      switch (paymentMethod) {
+        case "wallet":
+          await axios.post(
+            "http://localhost:8000/api/activity/bookActivity",
+            { activityId, paymentMethod: "wallet" },
             {
-              payment_method: {
-                card: cardElement,
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+              },
+            }
+          );
+          alert("Payment successful using wallet");
+          setSuccess(true);
+          break;
+
+        case "card":
+          const { data } = await axios.post(
+            "http://localhost:8000/api/activity/bookActivity",
+            { activityId, paymentMethod: "card" },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
               },
             }
           );
 
-          if (error) {
-            alert(error.message);
-          } else if (paymentIntent.status === "succeeded") {
-            await axios.post(
-              "/api/activity/paymentSuccess",
-              {
-                userId: userIdValue,
-                activityId,
-                paymentIntentId: paymentIntent.id,
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-                },
-              }
-            );
-            alert("Booking confirmed and actions completed!");
+          const cardElement = elements.getElement(CardElement);
+          if (!cardElement) {
+            throw new Error("CardElement not found");
           }
-        }
-      } catch (error) {
-        console.error(error.message);
-        alert("Failed to initiate card payment");
+
+          const { paymentIntent, error } = await stripe.confirmCardPayment(
+            data.clientSecret,
+            {
+              payment_method: { card: cardElement },
+            }
+          );
+
+          if (error) throw new Error(error.message);
+
+          await axios.post(
+            "http://localhost:8000/api/activity/paymentSuccess",
+            { activityId, paymentIntentId: paymentIntent.id },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+              },
+            }
+          );
+          alert("Booking confirmed and actions completed!");
+          setSuccess(true);
+          break;
+
+        default:
+          throw new Error("Please select a valid payment method");
       }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h2>Choose Payment Method</h2>
-      <select
-        value={paymentMethod}
-        onChange={(e) => setPaymentMethod(e.target.value)}
-      >
-        <option value="wallet">Wallet</option>
-        <option value="card">Card</option>
-      </select>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-lg w-96 max-w-full p-6 relative">
+        <h1 className="text-center text-2xl font-bold text-gray-800 mb-4">
+          Book Activity
+        </h1>
 
-      {paymentMethod === "card" && (
-        <Elements stripe={stripePromise}>
-          <CardElement />
-        </Elements>
-      )}
+        {/* Total Amount Section */}
+        <div className="mb-6">
+          <p className="text-lg font-semibold text-gray-700">
+            Activity Price:{" "}
+            <span className="text-green-600">${price.toFixed(2)}</span>
+          </p>
+        </div>
 
-      <button onClick={handlePayment}>Pay {price} USD</button>
+        {/* Payment Method Section */}
+        <div>
+          <h2 className="text-lg font-semibold text-gray-700 mb-3">
+            Choose a Payment Method
+          </h2>
+          <div className="space-y-4">
+            <div
+              className={`border p-4 rounded-md cursor-pointer ${
+                paymentMethod === "card"
+                  ? "bg-blue-100 border-blue-500"
+                  : "border-gray-300"
+              }`}
+              onClick={() => setPaymentMethod("card")}
+            >
+              <h3 className="font-bold">Card Payment</h3>
+            </div>
+            <div
+              className={`border p-4 rounded-md cursor-pointer ${
+                paymentMethod === "wallet"
+                  ? "bg-blue-100 border-blue-500"
+                  : "border-gray-300"
+              }`}
+              onClick={() => setPaymentMethod("wallet")}
+            >
+              <h3 className="font-bold">Wallet Payment</h3>
+            </div>
+          </div>
+        </div>
+
+        {/* Render CardElement Below Payment Options */}
+        {paymentMethod === "card" && (
+          <div className="mt-4">
+            <CardElement className="border p-2 rounded-md" />
+          </div>
+        )}
+
+        {/* Confirm Payment Button */}
+        <div className="mt-6">
+          <button
+            className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            onClick={handlePayment}
+            disabled={loading}
+          >
+            Confirm Payment
+          </button>
+          {loading && (
+            <p className="text-center mt-2 text-gray-500">Processing...</p>
+          )}
+        </div>
+
+        {/* Success Message */}
+        {success && (
+          <div className="mt-4 text-green-500 text-center">
+            Payment Confirmed! Thank you for booking.
+          </div>
+        )}
+
+        {/* Error Message */}
+        {error && <div className="mt-4 text-red-500 text-center">{error}</div>}
+      </div>
     </div>
   );
 };
