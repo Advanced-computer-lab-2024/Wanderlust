@@ -45,6 +45,10 @@ import AdminManageItinerary from "./Pages/AdminManageItinerary";
 import AdminViewNotifications from "./Pages/AdminViewNotifications";
 import TouristOrdersPage from "./Pages/Tourist/TouristOrdersPage";
 import OrderDetailsPage from "./Pages/Tourist/OrderDetailsPage";
+import SalesReportTourGuide from "./Pages/Tourguide/SalesReportTourGuide";
+import SalesReportAdvertiser from "./Pages/Advertiser/SalesReportAdvertiser";
+import SalesReportSeller from "./Pages/Seller/SalesReportSeller";
+
 import Guide from './Components/Guide'; // Import the Guide component
 import './App.css';
 
@@ -96,15 +100,18 @@ const App = () => {
         <Route path="/Tgprofile" element={<Tgprofile />} />
         <Route path="/ItineraryTourguide" element={<ItineraryTourguidePage />} />
         <Route path="/ActivityTourguide" element={<ActivityTourguidePage />} />
+        <Route path="/SalesReportTourGuide" element={<SalesReportTourGuide />} />
 
         {/* Seller Routes */}
         <Route path="/SellerProfile" element={<SellerProfilePage />} />
         <Route path="/SellerProducts" element={<SellerProductsPage />} />
         <Route path="/MySellerProducts" element={<SellerMyProductsPage />} />
+        <Route path="/SalesReportSeller" element={<SalesReportSeller />} />
 
         {/* Advertiser Routes */}
         <Route path="/AdvertiserProfile" element={<AdvertiserProfilePage />} />
         <Route path="/AdvertiserActivities" element={<AdvertiserActivitiesPage />} />
+        <Route path="/SalesReportAdvertiser" element={<SalesReportAdvertiser />} />
 
         {/* Tourism Governor Routes */}
         <Route path="/TourismGovernorProfile" element={<TourismGovernorProfilePage />} />

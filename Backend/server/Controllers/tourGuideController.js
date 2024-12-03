@@ -1,5 +1,6 @@
 const tourGuideModel = require("../Models/tourGuide.js");
 const { default: mongoose, get } = require("mongoose");
+const Itinerary = require("../Models/Itinerary");
 const User = require("../Models/user");
 const jwt = require('jsonwebtoken');
 const createTourGuideProfile = async (req, res) => {
@@ -140,19 +141,31 @@ const rateTourGuide = async (req, res) => {
 const getSalesReport = async (req, res) => {
   const { tourGuideId } = req.params;
 
-  try {
-    const activities = await Activity.find({ tourGuideId });
+  if (!mongoose.Types.ObjectId.isValid(tourGuideId)) {
+    return res.status(400).json({ message: "Invalid tour guide ID." });
+  }
 
-    if (!activities.length) {
-      return res.status(404).json({ message: "No activities found for this tour guide." });
+  try {
+    // Find itineraries created by the tour guide
+    const itineraries = await Itinerary.find({ creator: tourGuideId, isActive: true });
+
+    if (!itineraries.length) {
+      return res.status(404).json({ message: "No itineraries found for this tour guide." });
     }
 
-    const totalRevenue = activities.reduce((sum, activity) => sum + activity.revenue, 0);
+    // Calculate total revenue from itineraries
+    const totalRevenue = itineraries.reduce((sum, itinerary) => sum + itinerary.price, 0);
 
-    res.status(200).json({ totalRevenue, activities });
+    res.status(200).json({
+      totalRevenue,
+      currency: "USD", // Replace with actual currency if applicable
+      numberOfItineraries: itineraries.length,
+      itineraries,
+      generatedAt: new Date().toISOString(),
+    });
   } catch (error) {
     console.error("Error fetching sales report:", error);
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: "Failed to fetch sales report. Please try again later." });
   }
 };
 
