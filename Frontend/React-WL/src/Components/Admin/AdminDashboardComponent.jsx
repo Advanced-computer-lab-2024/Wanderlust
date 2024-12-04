@@ -61,6 +61,9 @@ const AdminDashboardComponent = () => {
     const handleViewNotifications = () => {
         navigate('/viewnotifications');
       };
+    const handleCreatePromoCode = () => {
+        navigate('/createpromocode');
+      };
     return (
         <div className="p-4">
             <div className="mb-4">
@@ -116,6 +119,11 @@ const AdminDashboardComponent = () => {
                     <h2 className='text-gray-800 font-semibold'>Manage Itineraries</h2>
                     <p>View and manage all Itineraries.</p>
                     <button className="btn btn-primary" onClick={handleManageItinerary}>View Itineraries</button>
+                </div>
+                <div className="flex-fill border rounded p-4 shadow-sm" style={{ flex: '1 1 calc(33.333% - 20px)' }}>
+                    <h2 className='text-gray-800 font-semibold'>Create Promocode</h2>
+                    <p>View and create promo codes.</p>
+                    <button className="btn btn-primary" onClick={handleCreatePromoCode}>Create Promocode</button>
                 </div>
                 <div className="flex-fill border rounded p-4 shadow-sm" style={{ flex: '1 1 calc(33.333% - 20px)' }}>
           <h2 className='text-gray-800 font-semibold'>View Notifications</h2>

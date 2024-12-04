@@ -48,7 +48,7 @@ import OrderDetailsPage from "./Pages/Tourist/OrderDetailsPage";
 import SalesReportTourGuide from "./Pages/Tourguide/SalesReportTourGuide";
 import SalesReportAdvertiser from "./Pages/Advertiser/SalesReportAdvertiser";
 import SalesReportSeller from "./Pages/Seller/SalesReportSeller";
-
+import AdminCreatePromocodePage from "./Pages/AdminCreatePromocodePage";
 import Guide from './Components/Guide'; // Import the Guide component
 import './App.css';
 
@@ -74,6 +74,7 @@ const App = () => {
         <Route path="/AdminManageItinerary" element={<AdminManageItinerary />} />
         <Route path="/complaint" element={<Complaint />} />
         <Route path="/viewnotifications" element={<AdminViewNotifications />} />
+        <Route path="/createpromocode" element={<AdminCreatePromocodePage />} />
 
         {/* Tourist Routes */}
         <Route path="/ItineraryTourist" element={<ItineraryTourist />} />
