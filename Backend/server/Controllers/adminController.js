@@ -143,26 +143,35 @@ const generateRandomCode = (length) => {
 };
 const createPromoCode = async (req, res) => {
   try {
-    const { discount } = req.body;
+    const { code, discount } = req.body;
 
-    // Generate a random promo code
-    const code = generateRandomCode(10);
-
-    // Set the expiry date to one month from the creation date
-    const expiryDate = new Date();
-    expiryDate.setMonth(expiryDate.getMonth() + 1);
-
-    // Check if the promo code already exists
-    const existingPromoCode = await PromoCode.findOne({ code });
-    if (existingPromoCode) {
-      return res.status(400).json({ message: "Promo code already exists" });
+    if (!code || !discount) {
+      return res.status(400).json({ message: 'Code and discount are required' });
     }
 
-    const newPromoCode = new PromoCode({ code, discount, expiryDate });
-    await newPromoCode.save();
-    res.status(201).json({ message: "Promo code created successfully", promoCode: newPromoCode });
+    const expiryDate = new Date(new Date().getFullYear(), 11, 31); // Set expiry date to the end of the current year
+
+    const existingPromoCode = await PromoCode.findOne({ code });
+    if (existingPromoCode) {
+      // Update the expiry date and discount if the promo code has expired
+      if (existingPromoCode.expiryDate < new Date()) {
+        existingPromoCode.expiryDate = expiryDate;
+        existingPromoCode.discount = discount;
+        await existingPromoCode.save();
+      }
+    } else {
+      // Create a new promo code if it doesn't exist
+      const newPromoCode = new PromoCode({
+        code,
+        discount,
+        expiryDate,
+      });
+      await newPromoCode.save();
+    }
+
+    res.status(201).json({ message: 'Promo code created/updated successfully' });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 // helper get all usernames on system and account type

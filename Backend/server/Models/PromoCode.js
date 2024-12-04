@@ -15,6 +15,12 @@ const promoCodeSchema = new Schema({
     type: Date,
     required: true,
   },
+  usedBy: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tourist",
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,
