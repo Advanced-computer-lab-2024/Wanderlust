@@ -971,13 +971,7 @@ const usePromoCode = async (req, res) => {
 const receiveBirthdayPromo = async (req, res) => {
   try {
     const { touristId } = req.params;
-    const authHeader = req.header("Authorization");
-    if (!authHeader) {
-      return res.status(401).json({ message: "Authorization header missing" });
-    }
-    const token = authHeader.replace("Bearer ", "");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
+  
     const tourist = await touristModel.findById(touristId);
     console.log(tourist);
     if (!tourist) {
@@ -997,9 +991,9 @@ const receiveBirthdayPromo = async (req, res) => {
       today.getMonth() === birthDate.getMonth()
     ) {
       // Send email
-      const title = `Happy Birthday ${tourist.name}!`;
+      const title = `Happy Birthday ${user.username}!`;
       const message = "Happy Birthday! Enjoy a special discount on your next purchase. To celebrate your birthday, we are offering you a 20% discount on all products. Use the promo code BDAY20 at checkout to redeem your discount. This promo code is valid for 24 hours only.";
-      await sendTouristMail(user.email, user.name, title, message);
+      await sendTouristMail(user.email, user.username, title, message);
 
       return res.status(200).json({ message: "Birthday email sent successfully" });
     } else {
