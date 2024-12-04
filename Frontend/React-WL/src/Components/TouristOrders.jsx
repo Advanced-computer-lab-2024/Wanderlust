@@ -5,9 +5,11 @@ const TouristOrders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [wallet, setWallet] = useState(0);
 
     useEffect(() => {
         fetchOrders();
+        fetchTouristProfile();
     }, []);
 
     const fetchOrders = async () => {
@@ -24,6 +26,42 @@ const TouristOrders = () => {
             setError(error.message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchTouristProfile = async () => {
+        try {
+            const token = localStorage.getItem('jwtToken');
+            const response = await axios.get('http://localhost:8000/api/tourist/getTourist', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setWallet(response.data.wallet); // Assuming the API response contains the wallet balance
+        } catch (error) {
+            console.error('Failed to fetch tourist profile:', error.message);
+        }
+    };
+
+    const cancelOrder = async (orderId) => {
+        const confirmCancel = window.confirm("Are you sure you want to cancel this order?");
+        if (!confirmCancel) return;
+
+        try {
+            const token = localStorage.getItem('jwtToken');
+            const decoded = JSON.parse(atob(token.split('.')[1])); // Decode JWT token to get user info
+            const touristId = decoded.id;
+
+            await axios.delete(`http://localhost:8000/api/tourist/cancelOrder/${touristId}/${orderId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            alert('Order canceled successfully');
+            fetchOrders(); // Refresh orders after cancellation
+            fetchTouristProfile(); // Refresh wallet balance after cancellation
+        } catch (error) {
+            alert('Failed to cancel order: ' + error.message);
         }
     };
 
@@ -53,6 +91,12 @@ const TouristOrders = () => {
                             onClick={() => window.location.href = `/OrderDetails/${order._id}`}
                         >
                             View Details
+                        </button>
+                        <button
+                            className="mt-2 ml-4 text-red-500 hover:underline"
+                            onClick={() => cancelOrder(order._id)}
+                        >
+                            Cancel Order
                         </button>
                     </div>
                 ))
