@@ -6,7 +6,7 @@ const itineraryModel = require("../Models/Itinerary");
 const productModel = require("../Models/Products");
 const Notification = require("../Models/Notification");
 const Seller = require("../Models/Seller");
-const { createNotification } = require("./NotificationController");
+const { createNotification, sendTouristMail } = require("./NotificationController");
 
 const Admin = require("../Models/Admin");
 
@@ -941,7 +941,7 @@ const deliveryAddresses = async (req, res) => {
 
 const usePromoCode = async (req, res) => {
   try {
-    const { promoCode, touristId } = req.body;
+    const { promoCodeId, touristId, orderAmount } = req.body;
     const authHeader = req.header("Authorization");
     if (!authHeader) {
       return res.status(401).json({ message: "Authorization header missing" });
@@ -949,25 +949,18 @@ const usePromoCode = async (req, res) => {
     const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const tourist = await touristModel
-      .findById(touristId)
-      .populate("cart.product");
+    const tourist = await touristModel.findById(touristId);
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
     }
 
-    const promo = await PromoCode.findOne({ code: promoCode });
+    const promo = await PromoCode.findById(promoCodeId);
     if (!promo) {
       return res.status(404).json({ message: "Promo code not found" });
     }
 
-    let totalAmount = 0;
-    tourist.cart.forEach((item) => {
-      totalAmount += item.product.price * item.quantity;
-    });
-
     const discount = promo.discount;
-    const newTotalAmount = totalAmount - totalAmount * (discount / 100);
+    const newTotalAmount = orderAmount - orderAmount * (discount / 100);
 
     res.status(200).json({ discount, newTotalAmount });
   } catch (error) {
@@ -1004,34 +997,13 @@ const receiveBirthdayPromo = async (req, res) => {
       today.getMonth() === birthDate.getMonth()
     ) {
       // Send email
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      });
+      const title = `Happy Birthday ${tourist.name}!`;
+      const message = "Happy Birthday! Enjoy a special discount on your next purchase. To celebrate your birthday, we are offering you a 20% discount on all products. Use the promo code BDAY20 at checkout to redeem your discount. This promo code is valid for 24 hours only.";
+      await sendTouristMail(user.email, user.name, title, message);
 
-      const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: user.email,
-        subject: "Happy Birthday!",
-        text: "Happy Birthday! Enjoy a special discount on your next purchase.",
-      };
-
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          return res.status(500).json({ message: error.message });
-        } else {
-          return res
-            .status(200)
-            .json({ message: "Birthday email sent successfully" });
-        }
-      });
+      return res.status(200).json({ message: "Birthday email sent successfully" });
     } else {
-      return res
-        .status(200)
-        .json({ message: "Today is not the tourist's birthday" });
+      return res.status(200).json({ message: "Today is not the tourist's birthday" });
     }
   } catch (error) {
     return res.status(500).json({ message: error.message });

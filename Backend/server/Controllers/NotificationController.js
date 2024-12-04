@@ -113,7 +113,25 @@ const sendReceipt = async (email, name, eventName, amount) => {
   }
 };
 
+const sendTouristMail = async (email, name, title, message) => {
+  try {
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: title,
+      text: `Dear ${name},\n\n${message}\n\nBest regards,`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("Email sent successfully.");
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return { error: "Failed to send email." };
+  }
+};
+
 module.exports = {
   createNotification,
   sendReceipt,
+  sendTouristMail,
 };
