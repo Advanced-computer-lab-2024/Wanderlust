@@ -1,5 +1,8 @@
 {
   "dependencies": {
+    "@stripe/react-stripe-js": "^3.0.0",
+    "@stripe/stripe-js": "^5.2.0",
+    "intro.js": "^7.2.0",
     "react-router-dom": "^6.27.0"
   }
 }
