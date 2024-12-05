@@ -174,6 +174,14 @@ const createPromoCode = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+const getPromoCodes = async (req, res) => {
+  try {
+    const promoCodes = await PromoCode.find({}, 'code discount expiryDate');
+    res.status(200).json(promoCodes);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
 // helper get all usernames on system and account type
 const getAllUserDetails = async (req, res) => {
   try {
@@ -308,5 +316,6 @@ module.exports = {
   approvePendingUser,
   getUserStatistics,
   createPromoCode,
-  getNotifications
+  getNotifications,
+  getPromoCodes,
 };
