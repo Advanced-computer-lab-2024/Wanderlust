@@ -6,7 +6,7 @@ const itineraryModel = require("../Models/Itinerary");
 const productModel = require("../Models/Products");
 const Notification = require("../Models/Notification");
 const Seller = require("../Models/Seller");
-const { createNotification, sendTouristMail } = require("./NotificationController");
+const { createNotification, sendTouristMail, createSystemNotification } = require("./NotificationController");
 
 const Admin = require("../Models/Admin");
 
@@ -995,7 +995,10 @@ const receiveBirthdayPromo = async (req, res) => {
       const message = "Happy Birthday! Enjoy a special discount on your next purchase. To celebrate your birthday, we are offering you a 20% discount on all products. Use the promo code BDAY20 at checkout to redeem your discount. This promo code is valid for 24 hours only.";
       await sendTouristMail(user.email, user.username, title, message);
 
-      return res.status(200).json({ message: "Birthday email sent successfully" });
+      // Create notification
+      await createSystemNotification(user._id, message);
+
+      return res.status(200).json({ message: "Birthday email and notification sent successfully" });
     } else {
       return res.status(200).json({ message: "Today is not the tourist's birthday" });
     }

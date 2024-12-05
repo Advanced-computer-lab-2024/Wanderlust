@@ -29,6 +29,7 @@ const {
 
 const { authenticateUser } = require("../Controllers/authController");
 const tourist = require("../Middleware/touristMiddleware");
+const { createSystemNotification } = require("../Controllers/NotificationController");
 
 const router = express.Router();
 
@@ -109,4 +110,6 @@ router.post(
   tourist,
   receiveBirthdayPromo
 );
+router.post("/createSystemNotification", createSystemNotification);
+
 module.exports = router;

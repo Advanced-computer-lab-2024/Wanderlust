@@ -59,6 +59,19 @@ const createNotification = async (userId, message, userType = "admin") => {
   }
 };
 
+const createSystemNotification = async (userId, message) => {
+  try {
+    const notification = new Notification({
+      userId,
+      message,
+    });
+    await notification.save();
+    console.log("Notification created successfully.");
+  } catch (error) {
+    console.error("Error creating notification:", error);
+  }
+};
+
 const sendReceipt = async (email, name, eventName, amount) => {
   try {
     // Step 1: Create a temporary file in a custom directory
@@ -121,7 +134,7 @@ const sendTouristMail = async (email, name, title, message) => {
       subject: title,
       text: `Dear ${name},\n\n${message}\n\nBest regards,`,
     };
-
+ 
     await transporter.sendMail(mailOptions);
     console.log("Email sent successfully.");
   } catch (error) {
@@ -134,4 +147,5 @@ module.exports = {
   createNotification,
   sendReceipt,
   sendTouristMail,
+  createSystemNotification, // Add the renamed method to exports
 };
