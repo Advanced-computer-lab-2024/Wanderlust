@@ -3,6 +3,7 @@ const { default: mongoose, get } = require("mongoose");
 const Itinerary = require("../Models/Itinerary");
 const User = require("../Models/user");
 const jwt = require('jsonwebtoken');
+const { createSystemNotification, sendMail } = require("./NotificationController");
 const createTourGuideProfile = async (req, res) => {
   const { userId } = req.params;
   const { YOE, previousWork } = req.body;
@@ -253,6 +254,43 @@ const filterTouristReportByMonth = async (req, res) => {
   }
 };
 
+const checkForFlagged = async (req, res) => {
+  const { tourGuideId } = req.params;
+
+  try {
+    const itineraries = await Itinerary.find({ creator: tourGuideId });
+
+    if (!itineraries.length) {
+      return res.status(404).json({ message: "No itineraries found for this tour guide." });
+    }
+
+    const tourGuide = await tourGuideModel.findById(tourGuideId);
+    if (!tourGuide) {
+      return res.status(404).json({ message: "Tour guide not found" });
+    }
+
+    const user = await User.findById(tourGuide.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    for (const itinerary of itineraries) {
+      if (itinerary.flagged) {
+        const message = `Your itinerary "${itinerary.title}" has been flagged and removed from the website.`;
+        await createSystemNotification(tourGuideId, message);
+        await sendMail(user.email, user.username, "Itinerary Flagged", message);
+        itinerary.isActive = false;
+        await itinerary.save();
+      }
+    }
+
+    res.status(200).json({ message: "Flagged itineraries processed successfully." });
+  } catch (error) {
+    console.error("Error checking for flagged itineraries:", error);
+    res.status(500).json({ error: "Failed to check for flagged itineraries. Please try again later." });
+  }
+};
+
 module.exports = {
   createTourGuideProfile,
   getTourGuide,
@@ -263,5 +301,6 @@ module.exports = {
   filterSalesReport,
   getTouristReport,
   filterTouristReportByMonth,
+  checkForFlagged,
     
 };

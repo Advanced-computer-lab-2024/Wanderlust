@@ -126,7 +126,7 @@ const sendReceipt = async (email, name, eventName, amount) => {
   }
 };
 
-const sendTouristMail = async (email, name, title, message) => {
+const sendMail = async (email, name, title, message) => {
   try {
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -146,6 +146,6 @@ const sendTouristMail = async (email, name, title, message) => {
 module.exports = {
   createNotification,
   sendReceipt,
-  sendTouristMail,
+  sendMail,
   createSystemNotification, // Add the renamed method to exports
 };

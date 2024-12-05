@@ -11,7 +11,7 @@ const {
   filterSalesReport,
   getTouristReport,
   filterTouristReportByMonth,
-  
+  checkForFlagged,
 } = require("../Controllers/tourGuideController");
 
 router.put("/createtgprofile/:userId", createTourGuideProfile);
@@ -23,7 +23,6 @@ router.get("/salesreport/:tourGuideId", getSalesReport);
 router.get("/salesreport/filter", filterSalesReport);
 router.get("/touristreport/:tourGuideId", getTouristReport);
 router.get("/touristreport/filter/:tourGuideId", filterTouristReportByMonth);
-
-
+router.get("/checkflagged/:tourGuideId", checkForFlagged);
 
 module.exports = router;
