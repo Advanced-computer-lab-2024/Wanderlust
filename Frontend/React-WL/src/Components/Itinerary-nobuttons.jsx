@@ -425,7 +425,7 @@ const ItineraryDetails = ({ item }) => (
     <DetailItem icon={<Users size={18} />} label="Accessibility" value={item.accessibility} />
     <DetailItem icon={<MapPin size={18} />} label="Pickup Location" value={item.pickupLocation} />
     <DetailItem icon={<MapPin size={18} />} label="Dropoff Location" value={item.dropoffLocation} />
-    <DetailItem icon={<Check size={18} />} label="Booking Open" value={item.bookingOpen ? "Yes" : "No"} />
+    <DetailItem icon={<Check size={18} />} label="Booking Open" value={item.isActive ? "Yes" : "No"} />
     <DetailItem icon={<Star size={18} />} label="Rating" value={item.rating} />
 
   </div>

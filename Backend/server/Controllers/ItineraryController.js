@@ -351,6 +351,13 @@ const cancelItineraryBooking = async (req, res) => {
   const { bookingId } = req.params; // Get the booking ID from the request params
 
   try {
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
     const booking = await Booking.findById(bookingId);
 
     if (!booking) {
@@ -364,12 +371,22 @@ const cancelItineraryBooking = async (req, res) => {
 
     const timeDifference = itineraryTime - currentTime; // in milliseconds
     const hoursDifference = timeDifference / (1000 * 60 * 60); // convert to hours
+    // console.log("Current time", currentTime);
+    // console.log("Itinerary time", itineraryTime);
+    // console.log("hoursDifference", hoursDifference);
 
     if (hoursDifference < 48) {
+      console.log("here");
       return res.status(400).json({
         message: `Cannot cancel booking less than 48 hours before the itinerary, hoursDifference=${hoursDifference}`,
       });
     }
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+    tourist.wallet += itinerary.price;
+    await tourist.save();
 
     // If it's more than 48 hours, proceed to cancel the booking
     await Booking.deleteOne({ _id: bookingId });

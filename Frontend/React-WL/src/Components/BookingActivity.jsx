@@ -37,7 +37,7 @@ const BookingActivity = ({ activityId, price }) => {
           setSuccess(true);
           break;
 
-        case "card":
+        case "card": {
           const { data } = await axios.post(
             "http://localhost:8000/api/activity/bookActivity",
             { activityId, paymentMethod: "card" },
@@ -74,6 +74,7 @@ const BookingActivity = ({ activityId, price }) => {
           alert("Booking confirmed and actions completed!");
           setSuccess(true);
           break;
+        }
 
         default:
           throw new Error("Please select a valid payment method");
@@ -96,7 +97,7 @@ const BookingActivity = ({ activityId, price }) => {
         <div className="mb-6">
           <p className="text-lg font-semibold text-gray-700">
             Activity Price:{" "}
-            <span className="text-green-600">${price.toFixed(2)}</span>
+            <span className="text-green-600">${price}</span>
           </p>
         </div>
 
