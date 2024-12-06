@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
     extend: {
+      colors: {
+        'custom': 'rgb(0,59,149)',
+      },
       fontFamily: {      
         sans: ['Roboto', 'sans-serif'],
       },
