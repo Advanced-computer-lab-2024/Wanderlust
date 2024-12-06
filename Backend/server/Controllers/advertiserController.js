@@ -202,6 +202,43 @@ const filterTouristReportByMonth = async (req, res) => {
   }
 };
 
+const checkForFlagged = async (req, res) => {
+  const { advertiserId } = req.params;
+
+  try {
+    const activities = await Activity.find({advertiserId: advertiserId });
+
+    if (!activities.length) {
+      return res.status(404).json({ message: "No activities found for this advertiser." });
+    }
+
+    const advertiser = await Advertiser.findById(advertiserId);
+    if (!advertiser) {
+      return res.status(404).json({ message: "Advertiser not found" });
+    }
+
+    const user = await User.findById(advertiser.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    for (const activity of activities) {
+      if (activity.flagged) {
+        const message = `Your activity "${activity.name}" has been flagged and removed from the website.`;
+        await createSystemNotification(advertiserId, message);
+        await sendMail(user.email, user.username, "Activity Flagged", message);
+        activity.isActive = false;
+        await activity.save();
+      }
+    }
+
+    res.status(200).json({ message: "Flagged activities processed successfully." });
+  } catch (error) {
+    console.error("Error checking for flagged activities:", error);
+    res.status(500).json({ error: "Failed to check for flagged activities. Please try again later." });
+  }
+};
+
 module.exports = {
   createAdvertiser,
   getAdvertiser,
@@ -209,8 +246,9 @@ module.exports = {
   updateAdvertiser,
   getSalesReport,
   filterSalesReport,
-  getTouristReport
-
+  getTouristReport,
+  filterTouristReportByMonth,
+  checkForFlagged
 };
 
 // const deleteAdvertiser = async (req, res) => {
