@@ -9,20 +9,30 @@ const Guide = () => {
             steps: [
                 {
                     element: '#userIdInput',
-                    intro: 'Enter your User ID to get started.'
+                    intro: 'Welcome to your step-by-step guide to have the ultimate vacation'
                 },
                 {
                     element: '#destinationInput',
-                    intro: 'Enter the destination of your vacation.'
+                    intro: 'In the home tab you where you land when you first visit,it’s designed to give you a warm welcome and help you easily find what you’re looking for.'
                 },
                 {
                     element: '#getGuideButton',
-                    intro: 'Click this button to view your vacation guide.'
+                    intro: 'The Itineraries page is where you can explore various travel plans and packages to help you organize your trips and make the most out of your visit.'
                 },
                 {
                     element: '#resultDiv',
-                    intro: 'Here you will see the step-by-step guide for your vacation.'
+                    intro: 'The Activities page is where you can discover and explore various fun and exciting things to do during your visit.'
+                },
+                {
+                  element: '#resultDiv',
+                  intro: 'The Locations page is your gateway to discovering amazing places to visit and explore on your trip!'
+                },
+                {
+                  element: '#resultDiv',
+                  intro: 'And now you are ready for your next trip! Click Done to start!'
                 }
+
+
             ],
             showStepNumbers: false, // Hide step numbers
             scrollToElement: true // Scroll to elements as needed

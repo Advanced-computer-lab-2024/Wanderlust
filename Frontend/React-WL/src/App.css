@@ -5,6 +5,33 @@
   text-align: center;
 } */
 
+.help-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #007BFF; /* Blue background */
+  color: white;
+  font-size: 24px; /* Adjust size as needed */
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  outline: none;
+  transition: background-color 0.3s;
+}
+
+.help-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+
+
+
 .logo {
   height: 6em;
   padding: 1.5em;

@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Navbar from "./Components/Navbar";
 import HomePage from "./Pages/HomePage";
 import RegisterPage from "./Pages/RegisterPage";
 import LoginPage from "./Pages/LoginPage";
-// import Tourguide from './Pages/Tourguide';
 import Itinerary from "./Pages/Guest/Itinerary";
 import AdminDashboard from "./Pages/AdminDashboard";
 import AddAdminPage from "./Pages/AddAdminPage";
@@ -15,7 +14,6 @@ import AdminManageActivitiesPage from "./Pages/AdminManageActivitiesPage";
 import AdminManagePreferenceTagsPage from "./Pages/AdminManagePreferenceTagsPage";
 import AdminManageComplaintsPage from "./Pages/AdminManageComplaintsPage";
 import ActivitiesGuest from "./Pages/Guest/ActivitiesGuest";
-// import Tourist from './Pages/Tourist';
 import ItineraryTourist from "./Pages/Tourist/ItineraryTourist";
 import LocationTourist from "./Pages/Tourist/LocationTourist";
 import ActivityTourist from "./Pages/Tourist/ActivityTourist";
@@ -49,13 +47,28 @@ import SalesReportTourGuide from "./Pages/Tourguide/SalesReportTourGuide";
 import SalesReportAdvertiser from "./Pages/Advertiser/SalesReportAdvertiser";
 import SalesReportSeller from "./Pages/Seller/SalesReportSeller";
 import AdminCreatePromocodePage from "./Pages/AdminCreatePromocodePage";
-import Guide from './Components/Guide'; // Import the Guide component
+import Guide from './Components/Guide'; 
 import './App.css';
 
+
 const App = () => {
+  const [showGuide, setShowGuide] = useState(false);
+
+  const handleShowGuide = () => {
+    // Toggle the guide visibility each time the button is clicked
+    setShowGuide((prevState) => !prevState);
+  };
+
   return (
     <Router>
-      {/* <Guide />  */}
+      {/* Help button */}
+      <div className="help-container">
+        <button onClick={handleShowGuide} className="help-button">
+          ?
+        </button>
+      </div>
+      
+      {showGuide && <Guide />}
       {/* <Navbar />  */}
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -123,4 +136,3 @@ const App = () => {
 };
 
 export default App;
- 
