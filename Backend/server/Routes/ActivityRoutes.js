@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { authenticateUser } = require("../Controllers/authController");
+const admin = require('../Middleware/adminMiddleware');
 const {
   createActivity,
   getActivity,
@@ -22,6 +23,8 @@ const {
   getSavedActivities,
   requestNotification,
   cardPaymentSuccess,
+  flagActivity,
+  unflagActivity,
 } = require("../Controllers/activityController");
 
 router.post("/createActivity", authenticateUser, createActivity);
@@ -44,5 +47,10 @@ router.post("/saveActivity", saveActivity);
 router.post("/unsaveActivity", unsaveActivity);
 router.get("/savedActivities/:touristId", getSavedActivities);
 router.post("/requestNotification", requestNotification);
+//flag an activity
+router.put("/activity/:id/flag", authenticateUser, admin, flagActivity);
+//unflag an activity
+router.put("/activity/:id/unflag", authenticateUser, admin, unflagActivity);
+
 
 module.exports = router;

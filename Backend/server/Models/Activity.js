@@ -88,6 +88,10 @@ const ActivitySchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Advertiser',
     required: false,
+  },
+  flagged: {
+    type: Boolean,
+    default: false
   }
 });
 

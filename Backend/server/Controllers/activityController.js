@@ -674,6 +674,42 @@ const requestNotification = async (req, res) => {
   }
 };
 
+// flag an activity as inappropriate (admin onlyFlag)
+const flagActivity = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const activity = await Activity.findById(id);
+    if (!activity) {
+      return res.status(404).json({ message: "Activity not found" });
+    }
+
+    activity.flagged = true;
+    await activity.save();
+    res.status(200).json({ message: "Activity flagged successfully", activity });
+  } catch (error) {
+    console.error("Error flagging activity:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+//unflag an activity as inappropriate (admin only)
+const unflagActivity = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const activity = await Activity.findById(id);
+    if (!activity) {
+      return res.status(404).json({ message: "Activity not found" });
+    }
+
+    activity.flagged = false;
+    await activity.save();
+    res.status(200).json({ message: "Activity unflagged successfully", activity });
+  } catch (error) {
+    console.error("Error unflagging activity:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 module.exports = {
   createActivity,
   getActivity,
@@ -695,4 +731,6 @@ module.exports = {
   unsaveActivity,
   getSavedActivities,
   requestNotification,
+  flagActivity,
+  unflagActivity,
 };
