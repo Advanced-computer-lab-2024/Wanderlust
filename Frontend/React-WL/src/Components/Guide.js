@@ -13,19 +13,19 @@ const Guide = () => {
                 },
                 {
                     element: '#destinationInput',
-                    intro: 'In the home tab you where you land when you first visit,it’s designed to give you a warm welcome and help you easily find what you’re looking for.'
+                    intro: 'Click the Home tab above to return to the main page, where you can get an overview of all the amazing features and explore what is new.'
                 },
                 {
                     element: '#getGuideButton',
-                    intro: 'The Itineraries page is where you can explore various travel plans and packages to help you organize your trips and make the most out of your visit.'
+                    intro: 'Visit the Itineraries tab to browse and find the best travel plans for your next adventure.'
                 },
                 {
                     element: '#resultDiv',
-                    intro: 'The Activities page is where you can discover and explore various fun and exciting things to do during your visit.'
+                    intro: 'Click the Activities tab to explore fun and exciting things to do during your trip.'
                 },
                 {
                   element: '#resultDiv',
-                  intro: 'The Locations page is your gateway to discovering amazing places to visit and explore on your trip!'
+                  intro: 'Click on Locations to browse detailed information about various destinations and find the perfect spot for your next adventure.'
                 },
                 {
                   element: '#resultDiv',
