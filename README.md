@@ -261,12 +261,37 @@ export default CreatePromocode;
 ## API References
 ### User Routes
 - `POST /signup`: User signup
+- `POST /login`: User login
 ### Location Routes
 - `POST /createLocation`: Create a new location
 - `GET /getLocations`: Get all locations
 - `PUT /updateLocation/:id`: Update a location by ID
 - `DELETE /deleteLocation/:id`: Delete a location by ID
 - `GET /getLocation/:id`: Get a location by ID
+### Tourist Routes
+- `GET /getTourist` : Get tourist details
+- `POST /createTourist/`:userId: Create a tourist
+- `PUT /updateTourist/`:username: Update tourist details
+- `GET /viewAll`: View all tourists
+- `PUT /redeemPoints/`:username: Redeem points
+- `PUT /addProductToWishlist/`:productId: Add product to wishlist
+- `GET /getWishlist`: Get wishlist
+- `DELETE /removeProductFromWishlist/`:productId: Remove product from wishlist
+- `PUT /addProductToCart/`:productId: Add product to cart
+- `DELETE /removeFromCart/`:productId: Remove product from cart
+- `PUT /cart/changeQuantity/`:productId: Change cart item quantity
+- `POST /cart/checkout`: Checkout order
+- `POST /cart/paymentSuccess`: Card payment success
+- `GET /viewAllOrders`: View all orders
+- `GET /viewOrder/:orderId`: View order details
+- `DELETE /cancelOrder/:touristId/`:orderId: Cancel order
+- `POST /addDeliveryAddress`: Add delivery address
+- `DELETE /removeDeliveryAddress/:addressId`: Remove delivery address
+- `PUT /updateDeliveryAddress/:addressId`: Update delivery address
+- `GET /deliveryAddresses`: Get delivery addresses
+- `POST /usePromoCode/:touristId`: Use promo code
+- `POST /receiveBirthdayPromo/:touristId`: Receive birthday promo
+- `POST /createSystemNotification`: Create system notification
 
 ## Tests
 Testing is done using Postman for manual API testing.
