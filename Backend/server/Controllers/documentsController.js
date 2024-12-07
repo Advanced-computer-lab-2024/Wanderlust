@@ -3,6 +3,7 @@ const TourGuide = require("../Models/tourGuide");
 const Advertiser = require("../Models/Advertiser");
 const Seller = require("../Models/Seller");
 const Product = require("../Models/Products");
+const Activity = require("../Models/Activity");
 
 // documentController.js
 
@@ -119,6 +120,35 @@ const uploadProductImage = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+const uploadActivityPhoto = async (req, res) => {
+  try {
+    const { activityId } = req.params;
+
+    const result = await new Promise((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream(
+          { folder: "Activities", resource_type: "image" },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        )
+        .end(req.file.buffer);
+    });
+
+    const activity = await Activity.findOne({ _id: activityId });
+    if (!activity) return res.status(404).send("Activity not found");
+
+    activity.picture = result.secure_url;
+    await activity.save();
+
+    res.status(200).json({ message: "Photo uploaded successfully", activity });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Retrieve documents for a user
 const getDocuments = async (req, res) => {
   try {
@@ -209,5 +239,6 @@ module.exports = {
   uploadDocument,
   uploadImage,
   uploadProductImage,
+  uploadActivityPhoto,
   getDocuments,
 };

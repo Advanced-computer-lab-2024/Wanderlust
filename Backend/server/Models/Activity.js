@@ -92,6 +92,12 @@ const ActivitySchema = new Schema({
   flagged: {
     type: Boolean,
     default: false
+  },
+  picture: {
+    type: String,
+  },
+  description: {
+    type: String,
   }
 });
 

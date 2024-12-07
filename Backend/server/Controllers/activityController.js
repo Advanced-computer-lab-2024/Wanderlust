@@ -25,6 +25,8 @@ const createActivity = async (req, res) => {
     tags,
     specialDiscounts,
     bookingOpen,
+    picture,
+    description
   } = req.body;
   try {
     const token = req.headers.authorization.split(" ")[1];
@@ -44,6 +46,8 @@ const createActivity = async (req, res) => {
       specialDiscounts,
       bookingOpen,
       advertiserId, // Automatically include advertiserId
+      picture,
+      description
     });
     const populatedActivity = await Activity.findById(activity._id)
       .populate("category")
@@ -124,6 +128,7 @@ const updateActivity = async (req, res) => {
     tags,
     specialDiscounts,
     bookingOpen,
+    picture,
   } = req.body;
 
   try {
@@ -147,6 +152,8 @@ const updateActivity = async (req, res) => {
         tags,
         specialDiscounts,
         bookingOpen,
+        description,
+        picture,
       },
       { new: true, runValidators: true }
     );
