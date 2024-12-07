@@ -14,7 +14,9 @@ const createLocation = async (req, res) => {
       pictures,
       location,
       openingHours,
-      ticketPrices,
+      ticketPricesNatives,
+      ticketPricesForeigners,
+      ticketPricesStudents,
       tags,
     } = req.body; // Destructure the required fields from request body
     const token = req.headers.authorization.split(' ')[1];
@@ -27,7 +29,7 @@ const createLocation = async (req, res) => {
       pictures,
       location,
       openingHours,
-      ticketPrices,
+      ticketPrices: [ticketPricesNatives, ticketPricesForeigners, ticketPricesStudents],
       tags,
       creator: creatorId,
     }); // Create a new location document

@@ -11,7 +11,9 @@ const TourismGovernorLocations = () => {
     pictures: '',
     location: '',
     openingHours: '',
-    ticketPrices: '',
+    ticketPricesNatives: '',
+    ticketPricesForeigners: '',
+    ticketPricesStudents: '',
     tags: [],
   });
   const [tagForm, setTagForm] = useState({ name: '' });
@@ -253,12 +255,31 @@ const TourismGovernorLocations = () => {
               required
               className="border p-2 mb-4 w-full rounded"
             />
+
             <input
               type="number"
-              name="ticketPrices"
-              value={locationForm.ticketPrices}
+              name="ticketPricesNatives"
+              value={locationForm.ticketPricesNatives}
               onChange={handleAddLocationChange}
-              placeholder="Ticket Prices"
+              placeholder="Ticket Prices for Natives"
+              required
+              className="border p-2 mb-4 w-full rounded"
+            />
+            <input
+              type="number"
+              name="ticketPricesForeigners"
+              value={locationForm.ticketPricesForeigners}
+              onChange={handleAddLocationChange}
+              placeholder="Ticket Prices for Foreigners"
+              required
+              className="border p-2 mb-4 w-full rounded"
+            />
+            <input
+              type="number"
+              name="ticketPricesStudents"
+              value={locationForm.ticketPricesStudents}
+              onChange={handleAddLocationChange}
+              placeholder="Ticket Prices for Students"
               required
               className="border p-2 mb-4 w-full rounded"
             />
