@@ -167,28 +167,37 @@ const TourismGovernorLocations = () => {
 
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#f4f4f4', padding: '20px' }}>
-      <h1 className="text-3xl font-bold text-indigo-500 mb-6 text-center">Manage Locations</h1>
-      <button
-        onClick={() => setLocationFormVisible(!isLocationFormVisible)}
-        className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
-      >
-        Add Location
-      </button>
-      <button
-        onClick={() => setTagFormVisible(!isTagFormVisible)}
-        className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
-      >
-        Create Tag
-      </button>
+      <h1 className="text-3xl font-bold text-custom mb-6 text-center">Manage Historical Places</h1>
+      <div className="flex justify-center space-x-4 mb-6">
+        <button
+          onClick={() => setLocationFormVisible(!isLocationFormVisible)}
+          className="bg-custom hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+        >
+          Create Historical Place
+        </button>
+        <button
+          onClick={() => setTagFormVisible(!isTagFormVisible)}
+          className="bg-custom hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+        >
+          Create Tag
+        </button>
+      </div>
 
       {isTagFormVisible && (
-        <div className="form-container">
-          <h2>Add New Tag</h2>
+        <div className="form-container bg-white p-6 rounded-lg shadow-md mb-6">
+          <h2 className="text-custom text-2xl font-bold mb-4">Add New Tag</h2>
           <form onSubmit={handleSubmitTag}>
-            <input type="text" value={tagForm.name} onChange={handleTagChange} placeholder="Tag" required />
+            <input
+              type="text"
+              value={tagForm.name}
+              onChange={handleTagChange}
+              placeholder="Tag"
+              required
+              className="border p-2 mb-4 w-full rounded"
+            />
             <button
               type="submit"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+              className="bg-custom hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
             >
               Add Tag
             </button>
@@ -197,26 +206,80 @@ const TourismGovernorLocations = () => {
       )}
 
       {isLocationFormVisible && (
-        <div className="form-container">
-          
+        <div className="form-container bg-white p-6 rounded-lg shadow-md mb-6">
+          <h2 className=" text-custom text-2xl font-bold mb-4">Add New Historical Place</h2>
           <form onSubmit={handleSubmitLocation}>
-            <input type="text" name="name" value={locationForm.name} onChange={handleAddLocationChange} placeholder="Name" required />
-            <input type="text" name="description" value={locationForm.description} onChange={handleAddLocationChange} placeholder="Description" required />
-            <input type="text" name="pictures" value={locationForm.pictures} onChange={handleAddLocationChange} placeholder="Picture URL" />
-            <input type="text" name="location" value={locationForm.location} onChange={handleAddLocationChange} placeholder="Location (Google Maps URL)" required />
-            <input type="text" name="openingHours" value={locationForm.openingHours} onChange={handleAddLocationChange} placeholder="Opening Hours" required />
-            <input type="number" name="ticketPrices" value={locationForm.ticketPrices} onChange={handleAddLocationChange} placeholder="Ticket Prices" required />
-            <label>Tags (Select Multiple):</label>
-            <select multiple value={locationForm.tags} onChange={handleLocationTagsChange}>
+            <input
+              type="text"
+              name="name"
+              value={locationForm.name}
+              onChange={handleAddLocationChange}
+              placeholder="Name"
+              required
+              className="border p-2 mb-4 w-full rounded"
+            />
+            <input
+              type="text"
+              name="description"
+              value={locationForm.description}
+              onChange={handleAddLocationChange}
+              placeholder="Description"
+              required
+              className="border p-2 mb-4 w-full rounded"
+            />
+            <input
+              type="text"
+              name="pictures"
+              value={locationForm.pictures}
+              onChange={handleAddLocationChange}
+              placeholder="Picture URL"
+              className="border p-2 mb-4 w-full rounded"
+            />
+            <input
+              type="text"
+              name="location"
+              value={locationForm.location}
+              onChange={handleAddLocationChange}
+              placeholder="Location (Google Maps URL)"
+              required
+              className="border p-2 mb-4 w-full rounded"
+            />
+            <input
+              type="text"
+              name="openingHours"
+              value={locationForm.openingHours}
+              onChange={handleAddLocationChange}
+              placeholder="Opening Hours"
+              required
+              className="border p-2 mb-4 w-full rounded"
+            />
+            <input
+              type="number"
+              name="ticketPrices"
+              value={locationForm.ticketPrices}
+              onChange={handleAddLocationChange}
+              placeholder="Ticket Prices"
+              required
+              className="border p-2 mb-4 w-full rounded"
+            />
+            <label className="block mb-2">Tags (Select Multiple):</label>
+            <select
+              multiple
+              value={locationForm.tags}
+              onChange={handleLocationTagsChange}
+              className="border p-2 mb-4 w-full rounded"
+            >
               {tags.map((tag) => (
-                <option key={tag._id} value={tag._id}>{tag.name}</option>
+                <option key={tag._id} value={tag._id}>
+                  {tag.name}
+                </option>
               ))}
             </select>
             <button
               type="submit"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+              className="bg-custom hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
             >
-              Add Location
+              Add Historical Place
             </button>
           </form>
         </div>
@@ -225,20 +288,23 @@ const TourismGovernorLocations = () => {
       <div id="LocationContainer">
         {locations.length > 0 ? (
           locations.map((location) => (
-            <div key={location._id} className="location" style={{ background: 'white', padding: '15px', margin: '10px 0', borderRadius: '5px', boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)' }}>
-              <h3>{location.name}</h3>
-              <p>{location.description}</p>
-              <p>{location.openingHours}</p>
-              <p>{location.ticketPrices}</p>
-              <div>
+            <div
+              key={location._id}
+              className="location bg-white p-6 rounded-lg shadow-md mb-6"
+            >
+              <h3 className="text-xl font-bold mb-2">{location.name}</h3>
+              <p className="mb-2">{location.description}</p>
+              <p className="mb-2">{location.openingHours}</p>
+              <p className="mb-2">{location.ticketPrices}</p>
+              <div className="flex space-x-4">
                 <button
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                  className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
                   onClick={() => handleDeleteLocation(location._id)}
                 >
                   Delete
                 </button>
                 <button
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                  className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
                   onClick={() => handleUpdateLocation(location._id)}
                 >
                   Update
@@ -247,20 +313,61 @@ const TourismGovernorLocations = () => {
             </div>
           ))
         ) : (
-          <p>No locations available.</p>
+          <p className="text-center text-gray-500">No locations available.</p>
         )}
       </div>
 
       {isUpdateFormVisible && (
-        <div className="update-form-container">
-          <h2>Update Location</h2>
+        <div className="update-form-container bg-white p-6 rounded-lg shadow-md mb-6">
+          <h2 className="text-2xl font-bold mb-4">Update Location</h2>
           <form onSubmit={handleUpdateSubmit}>
-            <input type="text" name="name" value={updateLocation.name} onChange={(e) => setUpdateLocation({ ...updateLocation, name: e.target.value })} required />
-            <input type="text" name="description" value={updateLocation.description} onChange={(e) => setUpdateLocation({ ...updateLocation, description: e.target.value })} required />
-            <input type="text" name="pictures" value={updateLocation.pictures} onChange={(e) => setUpdateLocation({ ...updateLocation, pictures: e.target.value })} />
-            <input type="text" name="location" value={updateLocation.location} onChange={(e) => setUpdateLocation({ ...updateLocation, location: e.target.value })} required />
-            <input type="text" name="openingHours" value={updateLocation.openingHours} onChange={(e) => setUpdateLocation({ ...updateLocation, openingHours: e.target.value })} required />
-            <input type="number" name="ticketPrices" value={updateLocation.ticketPrices} onChange={(e) => setUpdateLocation({ ...updateLocation, ticketPrices: e.target.value })} required />
+            <input
+              type="text"
+              name="name"
+              value={updateLocation.name}
+              onChange={(e) => setUpdateLocation({ ...updateLocation, name: e.target.value })}
+              required
+              className="border p-2 mb-4 w-full rounded"
+            />
+            <input
+              type="text"
+              name="description"
+              value={updateLocation.description}
+              onChange={(e) => setUpdateLocation({ ...updateLocation, description: e.target.value })}
+              required
+              className="border p-2 mb-4 w-full rounded"
+            />
+            <input
+              type="text"
+              name="pictures"
+              value={updateLocation.pictures}
+              onChange={(e) => setUpdateLocation({ ...updateLocation, pictures: e.target.value })}
+              className="border p-2 mb-4 w-full rounded"
+            />
+            <input
+              type="text"
+              name="location"
+              value={updateLocation.location}
+              onChange={(e) => setUpdateLocation({ ...updateLocation, location: e.target.value })}
+              required
+              className="border p-2 mb-4 w-full rounded"
+            />
+            <input
+              type="text"
+              name="openingHours"
+              value={updateLocation.openingHours}
+              onChange={(e) => setUpdateLocation({ ...updateLocation, openingHours: e.target.value })}
+              required
+              className="border p-2 mb-4 w-full rounded"
+            />
+            <input
+              type="number"
+              name="ticketPrices"
+              value={updateLocation.ticketPrices}
+              onChange={(e) => setUpdateLocation({ ...updateLocation, ticketPrices: e.target.value })}
+              required
+              className="border p-2 mb-4 w-full rounded"
+            />
             <button
               type="submit"
               className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
