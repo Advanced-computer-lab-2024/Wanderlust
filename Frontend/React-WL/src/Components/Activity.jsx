@@ -19,6 +19,7 @@ const Activity = ({
   const [detailsVisible, setDetailsVisible] = useState(false);
   const [currency, setCurrency] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
     const fetchCurrency = async () => {
@@ -66,6 +67,60 @@ const Activity = ({
     setDetailsVisible(!detailsVisible);
   };
 
+  const handleSaveActivity = async () => {
+    const token = localStorage.getItem('jwtToken'); // Retrieve the token from local storage
+    if (!token) {
+      console.error('No token found. Please log in.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        'http://localhost:8000/api/activity/saveActivity',
+        { activityId: activity._id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.status === 200) {
+        setIsSaved(true);
+        console.log('Activity saved successfully');
+      } else {
+        console.error('Failed to save activity');
+      }
+    } catch (error) {
+      console.error('Error saving activity:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+const handleUnsaveActivity = async () => {
+    const token = localStorage.getItem('jwtToken'); // Retrieve the token from local storage
+    if (!token) {
+      console.error('No token found. Please log in.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        'http://localhost:8000/api/activity/unsaveActivity',
+        { activityId: activity._id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.status === 200) {
+        setIsSaved(false);
+        console.log('Activity unsaved successfully');
+      } else {
+        console.error('Failed to unsave activity');
+      }
+    } catch (error) {
+      console.error('Error unsaving activity:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="bg-white rounded-xl shadow-md relative flex p-2">
       {/* Display activity picture */}
@@ -103,6 +158,12 @@ const Activity = ({
                   {getCurrencyIcon(currency)}{activity.price}
                 </h3>
               )}
+              <button
+                onClick={isSaved ? handleUnsaveActivity : handleSaveActivity}
+                className="bg-custom text-white font-semibold py-1 px-2 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105 flex items-center text-xs"
+              >
+                {isSaved ? 'Unsave Activity' : 'Save Activity'}
+              </button>
               {showBookButton && ( // Added showBookButton logic
                 <button
                   onClick={handleBookActivity}
