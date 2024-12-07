@@ -11,6 +11,7 @@ const Activity = ({
   activity,
   showUpdateButton = true,
   showDeleteButton = true,
+  showBookButton = true, // Added showBookButton
   onUpdate,
   onDelete,
 }) => {
@@ -69,7 +70,7 @@ const Activity = ({
     <div className="bg-white rounded-xl shadow-md relative flex p-2">
       {/* Display activity picture */}
       {activity.picture && (
-        <div className="w-1/3 p-1">
+        <div className="w-1/3 p-1 flex items-center">
           <img src={activity.picture} alt={activity.name} className="w-full h-32 object-contain rounded-md" />
         </div>
       )}
@@ -85,30 +86,12 @@ const Activity = ({
                 More Details
               </a>
             </div>
+          </div>
+          <div className="flex justify-between items-start mt-2">
             <Box sx={{ '& > legend': { mt: 1 }, paddingTop: 2 }}>
               <Typography component="legend" sx={{ color: 'black', fontSize: '1rem' }}>Rating</Typography>
               <Rating name="read-only" value={activity.rating || 0} readOnly sx={{ color: 'gold', fontSize: '1.5rem' }} />
             </Box>
-          </div>
-          <div className="flex justify-between items-start mt-2">
-            <div className="flex space-x-1">
-              {showUpdateButton && (
-                <button
-                  onClick={() => onUpdate(activity.id)}
-                  className="custom hover:bg-indigo-600 text-white font-semibold py-1 px-2 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105 flex items-center text-xs"
-                >
-                  <Edit3 className="mr-1" size={12} /> Update
-                </button>
-              )}
-              {showDeleteButton && (
-                <button
-                  onClick={() => onDelete(activity.id)}
-                  className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105 flex items-center text-xs"
-                >
-                  <Trash2 className="mr-1" size={12} /> Delete
-                </button>
-              )}
-            </div>
             <div className="text-right pr-4 mt-2">
               {!loading && (
                 <h3 className="custom text-lg font-semibold mb-1">
@@ -120,12 +103,14 @@ const Activity = ({
                   {getCurrencyIcon(currency)}{activity.price}
                 </h3>
               )}
-              <button
-                onClick={handleBookActivity}
-                className="bg-custom text-white px-3 py-2 rounded-md text-sm mt-1"
-              >
-                Book Activity
-              </button>
+              {showBookButton && ( // Added showBookButton logic
+                <button
+                  onClick={handleBookActivity}
+                  className="bg-custom text-white px-3 py-2 rounded-md text-sm mt-1"
+                >
+                  Book Activity
+                </button>
+              )}
             </div>
           </div>
         </div>
