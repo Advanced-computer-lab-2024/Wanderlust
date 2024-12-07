@@ -660,7 +660,82 @@ const rateItinerary = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+// Save itinerary
+const saveItinerary = async (req, res) => {
+  try {
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+    const tourist = await touristModel.findById(decoded.id);
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    if (!tourist.savedItineraries.includes(req.body.itineraryId)) {
+      tourist.savedItineraries.push(req.body.itineraryId);
+      await tourist.save();
+    }
+
+    return res.status(200).json({ message: "Itinerary saved successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Error saving itinerary", error: error.message });
+  }
+};
+// Unsave itinerary
+const unsaveItinerary = async (req, res) => {
+  try {
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findById(decoded.id);
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    tourist.savedItineraries = tourist.savedItineraries.filter(
+      (id) => id.toString() !== req.body.itineraryId
+    );
+    await tourist.save();
+
+    return res.status(200).json({ message: "Itinerary unsaved successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Error unsaving itinerary", error: error.message });
+  }
+};
+// Get saved itineraries
+const getSavedItineraries = async (req, res) => {
+  try {
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findById(decoded.id).populate({
+      path: "savedItineraries",
+      populate: { path: "category tags" },
+    });
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    return res.status(200).json(tourist.savedItineraries);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error retrieving saved itineraries",
+      error: error.message,
+    });
+  }
+};
 module.exports = {
   createItinerary,
   getItinerary,
@@ -680,4 +755,7 @@ module.exports = {
   flagItinerary,
   unflagItinerary,
   rateItinerary,
+  saveItinerary,
+  unsaveItinerary,
+  getSavedItineraries
 };

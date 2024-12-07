@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import logo from '../assets/Images/Wl-Logog.png';
-import {ShoppingCart, Heart , Bell, ReceiptText} from 'lucide-react';
+import {ShoppingCart, Heart , Bell, ReceiptText, Bookmark} from 'lucide-react';
 
 const Navbar = ({ t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12  }) => {
   const location = useLocation();
@@ -58,7 +58,12 @@ const Navbar = ({ t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, p1, p2, p3,
                     <Link to={p7} className={getLinkClass(p7)}>{t7}</Link>
                   )}
                   {t8 && p8 && (
-                    <Link to={p8} className={getLinkClass(p8)}>{t8}</Link>
+                    <Link
+                      to={p8}
+                      className={`${getLinkClass(p8)} flex items-center px-2 transition duration-300 hover:text-gray-300`}
+                    >
+                      <Bookmark size={24} />
+                    </Link>
                   )}
                   {t9 && p9 && (
                     t9 === "OrderHistory" ? (

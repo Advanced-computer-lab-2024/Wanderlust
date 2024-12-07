@@ -586,54 +586,65 @@ const cancelActivityBooking = async (req, res) => {
 
 //bookmarking activities
 const saveActivity = async (req, res) => {
-  const { touristId, activityId } = req.body;
-
   try {
-    const tourist = await touristModel.findById(touristId);
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findById(decoded.id);
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
     }
 
-    if (!tourist.savedActivities.includes(activityId)) {
-      tourist.savedActivities.push(activityId);
+    if (!tourist.savedActivities.includes(req.body.activityId)) {
+      tourist.savedActivities.push(req.body.activityId);
       await tourist.save();
     }
 
     return res.status(200).json({ message: "Activity saved successfully" });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Error saving activity", error: error.message });
+    return res.status(500).json({ message: "Error saving activity", error: error.message });
   }
 };
 
 const unsaveActivity = async (req, res) => {
-  const { touristId, activityId } = req.body;
-
   try {
-    const tourist = await touristModel.findById(touristId);
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findById(decoded.id);
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
     }
 
     tourist.savedActivities = tourist.savedActivities.filter(
-      (id) => id.toString() !== activityId
+      (id) => id.toString() !== req.body.activityId
     );
     await tourist.save();
 
     return res.status(200).json({ message: "Activity unsaved successfully" });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Error unsaving activity", error: error.message });
+    return res.status(500).json({ message: "Error unsaving activity", error: error.message });
   }
 };
 
 const getSavedActivities = async (req, res) => {
-  const { touristId } = req.params;
-
   try {
-    const tourist = await touristModel.findById(touristId).populate({
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findById(decoded.id).populate({
       path: "savedActivities",
       populate: { path: "category tags" },
     });
@@ -643,7 +654,6 @@ const getSavedActivities = async (req, res) => {
 
     return res.status(200).json(tourist.savedActivities);
   } catch (error) {
-    console.error(error);
     return res.status(500).json({
       message: "Error retrieving saved activities",
       error: error.message,
@@ -652,13 +662,20 @@ const getSavedActivities = async (req, res) => {
 };
 
 const requestNotification = async (req, res) => {
-  const { touristId, activityId } = req.body;
-
   try {
-    const tourist = await touristModel.findById(touristId);
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findById(decoded.id);
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
     }
+
+    const { activityId } = req.body;
 
     if (!tourist.notificationRequests.includes(activityId)) {
       tourist.notificationRequests.push(activityId);
@@ -717,6 +734,35 @@ const unflagActivity = async (req, res) => {
   }
 };
 
+const handleBookingSuccess = async (req, res) => {
+  try {
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findById(decoded.id);
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+    const { activityId } = req.body;
+    // Add activity to notification requests if not already present
+    if (!tourist.notificationRequests.includes(activityId)) {
+      tourist.notificationRequests.push(activityId);
+      await tourist.save();
+    }
+    return res.status(200).json({ message: "Booking successful and notification request saved" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Error handling booking success",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createActivity,
   getActivity,
@@ -740,4 +786,5 @@ module.exports = {
   requestNotification,
   flagActivity,
   unflagActivity,
+  handleBookingSuccess
 };
