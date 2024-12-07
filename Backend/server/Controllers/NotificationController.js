@@ -49,6 +49,7 @@ const createNotification = async (userId, message, userType = "admin") => {
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
+        throw new Error(error);
         console.error("Error sending email:", error);
       } else {
         console.log("Email sent:", info.response);
@@ -134,7 +135,7 @@ const sendMail = async (email, name, title, message) => {
       subject: title,
       text: `Dear ${name},\n\n${message}\n\nBest regards,`,
     };
- 
+
     await transporter.sendMail(mailOptions);
     console.log("Email sent successfully.");
   } catch (error) {

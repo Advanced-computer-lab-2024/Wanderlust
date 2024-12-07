@@ -5,6 +5,9 @@ const Activity = require("../Models/Activity");
 const PreferenceTagModel = require("../Models/PreferenceTag");
 const Booking = require("../Models/Booking");
 const User = require("../Models/user");
+const { updatePointsOnPayment, updateBadge } = require("./touristController");
+const { sendReceipt } = require("./NotificationController");
+
 const touristModel = require("../Models/Tourist"); // Add this line to import touristModel
 const jwt = require("jsonwebtoken");
 
@@ -282,9 +285,16 @@ const filterItinerariesByPref = async (req, res) => {
 };
 const bookItinerary = async (req, res) => {
   try {
-    const { itineraryId, paymentMethod, userId } = req.body;
+    const { itineraryId, paymentMethod } = req.body;
 
-    const tourist = await touristModel.findOne({ userId: userId });
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id });
 
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
@@ -295,16 +305,15 @@ const bookItinerary = async (req, res) => {
       return res.status(404).json({ message: "Itinerary not found" });
     }
 
-    const oldbooking = await Booking.findOne({
+    const oldBooking = await Booking.findOne({
       userId: tourist.userId,
       itineraryId,
     });
-    if (oldbooking) {
+    if (oldBooking) {
       return res
         .status(400)
         .json({ message: "User has already booked this itinerary" });
     }
-    let booking = new Booking({ userId: tourist.userId, itineraryId });
 
     if (paymentMethod === "wallet") {
       // Wallet payment
@@ -312,10 +321,23 @@ const bookItinerary = async (req, res) => {
         return res.status(400).json({ message: "Insufficient wallet balance" });
       }
 
-      // Deduct from wallet and update booking
+      // Deduct from wallet and perform post-payment actions
       tourist.wallet -= itinerary.price;
       await tourist.save();
-      await booking.save();
+
+      console.log("Payment successful using wallet");
+      const postPaymentResult = await postPaymentSuccess(
+        itineraryId,
+        tourist._id
+      );
+      if (!postPaymentResult.success) {
+        console.log(
+          "Post-payment processing failed",
+          postPaymentResult.message
+        );
+      } else {
+        console.log("Post-payment processing successful");
+      }
       return res.json({ message: "Payment successful using wallet" });
     } else if (paymentMethod === "card") {
       // Stripe payment
@@ -328,10 +350,10 @@ const bookItinerary = async (req, res) => {
             allow_redirects: "never",
           },
         });
-        await booking.save();
+        console.log("Payment processing successful");
         return res.json({
           clientSecret: paymentIntent.client_secret,
-          paymentIntentId: paymentIntent.id,
+          message: "Payment processing successful",
         });
       } catch (error) {
         return res
@@ -343,7 +365,96 @@ const bookItinerary = async (req, res) => {
     }
   } catch (error) {
     console.error("Error booking itinerary:", error);
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// Reusing postPaymentSuccess with modifications for itineraries
+const postPaymentSuccess = async (itineraryId, touristId) => {
+  try {
+    const tourist = await touristModel.findOne({ _id: touristId });
+
+    if (!tourist) {
+      return { success: false, message: "Tourist not found" };
+    }
+
+    const itinerary = await Itinerary.findById(itineraryId);
+    if (!itinerary) {
+      return { success: false, message: "Itinerary not found" };
+    }
+
+    // Perform post-payment actions
+    const booking = new Booking({
+      userId: tourist.userId,
+      itineraryId: itineraryId,
+    });
+    await booking.save();
+
+    // Update points on payment
+    await updatePointsOnPayment(tourist._id, itinerary.price);
+
+    // Update badge
+    updateBadge(tourist);
+    await tourist.save();
+
+    // Send confirmation email
+    await sendReceipt(
+      tourist.email,
+      tourist.name,
+      itinerary.name,
+      itinerary.price
+    );
+
+    return { success: true, message: "Post-payment actions completed" };
+  } catch (error) {
+    console.error("Error handling payment success:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+// Card payment success handler for itineraries
+const cardPaymentSuccess = async (req, res) => {
+  try {
+    const { itineraryId, paymentIntentId } = req.body;
+
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    const itinerary = await Itinerary.findById(itineraryId);
+    if (!itinerary) {
+      return res.status(404).json({ message: "Itinerary not found" });
+    }
+
+    // Validate the payment with Stripe
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    if (paymentIntent.status !== "succeeded") {
+      return res.status(400).json({ message: "Payment not successful" });
+    }
+
+    // Perform post-payment actions
+    const postPaymentResult = await postPaymentSuccess(
+      itineraryId,
+      tourist._id
+    );
+    if (!postPaymentResult.success) {
+      console.log("Post-payment processing failed", postPaymentResult.message);
+    } else {
+      console.log("Post-payment processing successful");
+    }
+    return res.status(200).json({ message: "Payment successful using card" });
+  } catch (error) {
+    console.error("Error handling payment success:", error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -561,6 +672,7 @@ module.exports = {
   filterItinerairies,
   filterItinerariesByPref,
   bookItinerary,
+  cardPaymentSuccess,
   cancelItineraryBooking,
   addComment,
   activateDeactivateItinerary,

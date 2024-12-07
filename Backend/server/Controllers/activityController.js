@@ -6,7 +6,7 @@ const Booking = require("../Models/Booking.js");
 const User = require("../Models/user");
 const { convertCurrency } = require("./currencyConverter");
 const touristModel = require("../Models/Tourist");
-const { updatePointsOnPayment } = require("./touristController");
+const { updatePointsOnPayment, updateBadge } = require("./touristController");
 const { sendReceipt } = require("./NotificationController");
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Use your Stripe Secret Key
@@ -26,7 +26,7 @@ const createActivity = async (req, res) => {
     specialDiscounts,
     bookingOpen,
     picture,
-    description
+    description,
   } = req.body;
   try {
     const token = req.headers.authorization.split(" ")[1];
@@ -47,7 +47,7 @@ const createActivity = async (req, res) => {
       bookingOpen,
       advertiserId, // Automatically include advertiserId
       picture,
-      description
+      description,
     });
     const populatedActivity = await Activity.findById(activity._id)
       .populate("category")
@@ -486,7 +486,6 @@ const postPaymentSuccess = async (activityId, touristId) => {
       activity.name,
       activity.price
     );
-    await updatePointsOnPayment(tourist._id, activity.price);
 
     return { success: true, message: "Post-payment actions completed" };
   } catch (error) {
@@ -537,7 +536,6 @@ const cardPaymentSuccess = async (req, res) => {
 };
 
 const cancelActivityBooking = async (req, res) => {
-
   const { bookingId } = req.params; // Get the booking ID from the request params
 
   try {
@@ -690,7 +688,9 @@ const flagActivity = async (req, res) => {
 
     activity.flagged = true;
     await activity.save();
-    res.status(200).json({ message: "Activity flagged successfully", activity });
+    res
+      .status(200)
+      .json({ message: "Activity flagged successfully", activity });
   } catch (error) {
     console.error("Error flagging activity:", error);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -708,7 +708,9 @@ const unflagActivity = async (req, res) => {
 
     activity.flagged = false;
     await activity.save();
-    res.status(200).json({ message: "Activity unflagged successfully", activity });
+    res
+      .status(200)
+      .json({ message: "Activity unflagged successfully", activity });
   } catch (error) {
     console.error("Error unflagging activity:", error);
     res.status(500).json({ message: "Server error", error: error.message });

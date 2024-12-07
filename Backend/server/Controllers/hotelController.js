@@ -140,9 +140,9 @@ const getHotelOffers = async (cityCode, checkInDate, checkOutDate, guests) => {
 };
 
 const bookHotel = async (req, res) => {
-  const { hotelId } = req.body;
-  if (!hotelId) {
-    return res.status(400).json({ message: "hotelId are required" });
+  const { offerId } = req.body;
+  if (!offerId) {
+    return res.status(400).json({ message: "offerId are required" });
   }
   const token = await generateAccessToken();
 
@@ -159,7 +159,7 @@ const bookHotel = async (req, res) => {
     }
 
     const response = await axios.get(
-      `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-hotels?hotelIds=${hotelId}`,
+      `https://test.api.amadeus.com/v3/shopping/hotel-offers/${offerId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -167,9 +167,8 @@ const bookHotel = async (req, res) => {
       }
     );
     // Retrieve the first hotel object that matches the hotel ID
-    const hotelData = response.data?.data?.find(
-      (hotel) => hotel.hotelId === hotelId
-    );
+    const offerData = response.data?.data?.hotel;
+
     if (!hotelData) {
       return res.status(404).json({ message: "Hotel not found" });
     }

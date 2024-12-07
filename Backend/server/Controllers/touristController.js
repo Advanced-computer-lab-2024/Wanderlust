@@ -6,7 +6,11 @@ const itineraryModel = require("../Models/Itinerary");
 const productModel = require("../Models/Products");
 const Notification = require("../Models/Notification");
 const Seller = require("../Models/Seller");
-const { createNotification, sendMail, createSystemNotification } = require("./NotificationController");
+const {
+  createNotification,
+  sendMail,
+  createSystemNotification,
+} = require("./NotificationController");
 
 const Admin = require("../Models/Admin");
 
@@ -971,7 +975,7 @@ const usePromoCode = async (req, res) => {
 const receiveBirthdayPromo = async (req, res) => {
   try {
     const { touristId } = req.params;
-  
+
     const tourist = await touristModel.findById(touristId);
     console.log(tourist);
     if (!tourist) {
@@ -992,15 +996,20 @@ const receiveBirthdayPromo = async (req, res) => {
     ) {
       // Send email
       const title = `Happy Birthday ${user.username}!`;
-      const message = "Happy Birthday! Enjoy a special discount on your next purchase. To celebrate your birthday, we are offering you a 20% discount on all products. Use the promo code Birthday20 at checkout to redeem your discount. This promo code is valid for 24 hours only.";
+      const message =
+        "Happy Birthday! Enjoy a special discount on your next purchase. To celebrate your birthday, we are offering you a 20% discount on all products. Use the promo code Birthday20 at checkout to redeem your discount. This promo code is valid for 24 hours only.";
       await sendMail(user.email, user.username, title, message);
 
       // Create notification
       await createSystemNotification(user._id, message);
 
-      return res.status(200).json({ message: "Birthday email and notification sent successfully" });
+      return res
+        .status(200)
+        .json({ message: "Birthday email and notification sent successfully" });
     } else {
-      return res.status(200).json({ message: "Today is not the tourist's birthday" });
+      return res
+        .status(200)
+        .json({ message: "Today is not the tourist's birthday" });
     }
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -1014,6 +1023,7 @@ module.exports = {
   viewAll,
   redeemPoints,
   updatePointsOnPayment,
+  updateBadge,
   addProductToWishlist,
   getWishlist,
   removeProductFromWishlist,

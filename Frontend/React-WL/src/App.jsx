@@ -18,6 +18,7 @@ import ItineraryTourist from "./Pages/Tourist/ItineraryTourist";
 import LocationTourist from "./Pages/Tourist/LocationTourist";
 import ActivityTourist from "./Pages/Tourist/ActivityTourist";
 import BookingActivityPage from "./Pages/Tourist/BookingActivityPage";
+import BookingItineraryPage from "./Pages/Tourist/BookingItineraryPage";
 import ProductTourist from "./Pages/Tourist/ProductTourist";
 import Tgprofile from "./Pages/Tourguide/Tgprofile";
 import Complaint from "./Components/Admin/Complaint";
@@ -47,9 +48,8 @@ import SalesReportTourGuide from "./Pages/Tourguide/SalesReportTourGuide";
 import SalesReportAdvertiser from "./Pages/Advertiser/SalesReportAdvertiser";
 import SalesReportSeller from "./Pages/Seller/SalesReportSeller";
 import AdminCreatePromocodePage from "./Pages/AdminCreatePromocodePage";
-import Guide from './Components/Guide'; 
-import './App.css';
-
+import Guide from "./Components/Guide";
+import "./App.css";
 
 const App = () => {
   const [showGuide, setShowGuide] = useState(false);
@@ -67,7 +67,7 @@ const App = () => {
           ?
         </button>
       </div>
-      
+
       {showGuide && <Guide />}
       {/* <Navbar />  */}
       <Routes>
@@ -76,15 +76,30 @@ const App = () => {
         {/* Admin Routes */}
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/addadmin" element={<AddAdminPage />} />
-        <Route path="/addtourismgovernor" element={<AddTourismGovernorPage />} />
+        <Route
+          path="/addtourismgovernor"
+          element={<AddTourismGovernorPage />}
+        />
         <Route path="/viewusers" element={<AdminViewUsersPage />} />
         <Route path="/manageproducts" element={<AdminManageProductsPage />} />
-        <Route path="/manageactivities" element={<AdminManageActivitiesPage />} />
-        <Route path="/managepreferencetags" element={<AdminManagePreferenceTagsPage />} />
-        <Route path="/managecomplaints" element={<AdminManageComplaintsPage />} />
+        <Route
+          path="/manageactivities"
+          element={<AdminManageActivitiesPage />}
+        />
+        <Route
+          path="/managepreferencetags"
+          element={<AdminManagePreferenceTagsPage />}
+        />
+        <Route
+          path="/managecomplaints"
+          element={<AdminManageComplaintsPage />}
+        />
         <Route path="/viewpendingdocuments" element={<AdminViewDocuments />} />
         <Route path="/AdminUpdatePassword" element={<AdminUpdatePassword />} />
-        <Route path="/AdminManageItinerary" element={<AdminManageItinerary />} />
+        <Route
+          path="/AdminManageItinerary"
+          element={<AdminManageItinerary />}
+        />
         <Route path="/complaint" element={<Complaint />} />
         <Route path="/viewnotifications" element={<AdminViewNotifications />} />
         <Route path="/createpromocode" element={<AdminCreatePromocodePage />} />
@@ -94,6 +109,10 @@ const App = () => {
         <Route path="/LocationTourist" element={<LocationTourist />} />
         <Route path="/ActivityTourist" element={<ActivityTourist />} />
         <Route path="/BookingActivityPage" element={<BookingActivityPage />} />
+        <Route
+          path="/BookingItineraryPage"
+          element={<BookingItineraryPage />}
+        />
         <Route path="/ProductTourist" element={<ProductTourist />} />
         <Route path="/ComplaintsTourist" element={<ComplaintsTouristPage />} />
         <Route path="/TouristProfile" element={<TouristProfilePage />} />
@@ -112,9 +131,15 @@ const App = () => {
 
         {/* Tourguide Routes */}
         <Route path="/Tgprofile" element={<Tgprofile />} />
-        <Route path="/ItineraryTourguide" element={<ItineraryTourguidePage />} />
+        <Route
+          path="/ItineraryTourguide"
+          element={<ItineraryTourguidePage />}
+        />
         <Route path="/ActivityTourguide" element={<ActivityTourguidePage />} />
-        <Route path="/SalesReportTourGuide" element={<SalesReportTourGuide />} />
+        <Route
+          path="/SalesReportTourGuide"
+          element={<SalesReportTourGuide />}
+        />
 
         {/* Seller Routes */}
         <Route path="/SellerProfile" element={<SellerProfilePage />} />
@@ -124,12 +149,24 @@ const App = () => {
 
         {/* Advertiser Routes */}
         <Route path="/AdvertiserProfile" element={<AdvertiserProfilePage />} />
-        <Route path="/AdvertiserActivities" element={<AdvertiserActivitiesPage />} />
-        <Route path="/SalesReportAdvertiser" element={<SalesReportAdvertiser />} />
+        <Route
+          path="/AdvertiserActivities"
+          element={<AdvertiserActivitiesPage />}
+        />
+        <Route
+          path="/SalesReportAdvertiser"
+          element={<SalesReportAdvertiser />}
+        />
 
         {/* Tourism Governor Routes */}
-        <Route path="/TourismGovernorProfile" element={<TourismGovernorProfilePage />} />
-        <Route path="/TourismGovernorLocations" element={<TourismGovernorLocationsPage />} />
+        <Route
+          path="/TourismGovernorProfile"
+          element={<TourismGovernorProfilePage />}
+        />
+        <Route
+          path="/TourismGovernorLocations"
+          element={<TourismGovernorLocationsPage />}
+        />
       </Routes>
     </Router>
   );
