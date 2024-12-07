@@ -292,6 +292,61 @@ export default CreatePromocode;
 - `POST /usePromoCode/:touristId`: Use promo code
 - `POST /receiveBirthdayPromo/:touristId`: Receive birthday promo
 - `POST /createSystemNotification`: Create system notification
+### Product Routes
+- `POST /addProduct`: Add a new product
+- `PUT /updateProductByName`: Update product by name
+- `GET /searchProductByName`: Search product by name
+- `GET /filterProductsByPrice`: Filter products by price
+- `GET /sortedByRating`: Get products sorted by rating
+- `GET /viewAllProducts`: View all products
+- `GET /viewAvailableProducts`: View available products
+- `DELETE /deleteproduct`: Delete product by name
+- `PUT /archiveProduct`: Archive product
+- `PUT /unarchiveProduct`: Unarchive product
+- `POST /product/rate:` Rate a product
+- `GET /product/:productId/details`: View product details
+- `POST /product/sale`: Add sale to product
+### Activity Routes
+- `POST /createActivity`: Create a new activity
+- `GET /getActivity`: Get all activities
+- `GET /getActivityGuest`: Get activities for guests
+- `GET /getActivityById`: Get activity by ID
+- `PUT /updateActivity`: Update an activity
+- `DELETE /deleteActivity`: Delete an activity
+- `GET /filterActivities`: Filter activities
+- `GET /sortActivities`: Sort activities
+- `GET /searchActivity`: Search activities
+- `GET /activities`: Get activities by category name
+- `GET /share/:activityId`: Generate shareable link
+- `POST /shareMail/`:activityId/email: Send activity link via email
+- `POST /rate/:activityId`: Rate an activity
+- `POST /bookActivity`: Book an activity
+- `POST /paymentSuccess`: Card payment success
+- `DELETE /cancelActivityBooking/`:bookingId: Cancel activity booking
+- `POST /saveActivity`: Save an activity
+- `POST /unsaveActivity`: Unsave an activity
+- `GET /savedActivities/:touristId`: Get saved activities
+- `POST /requestNotification`: Request notification
+- `PUT /activity/:id/flag`: Flag an activity
+- `PUT /activity/:id/unflag`: Unflag an activity
+### Admin Routes
+- `POST /addTourismGovernor`: Add tourism governor
+- `DELETE /delete`: Delete account
+- `GET /usernames`: Get all user details
+- `POST /create`: Create admin
+- `GET /pendingUsers`: Get pending users
+- `PUT /approvePendingUser/`:userId: Approve pending user
+- `GET /profile`: Get admin details
+- `GET /userStatistics`: Get user statistics
+- `POST /createPromoCode`: Create promo code
+- `GET /getNotifications`: Get notifications
+- `GET /promoCodes`: Get promo codes
+- `POST /login`: Admin login
+- `POST /updatepassword`: Update admin password
+- `GET /getLoggedInUser`: Get logged-in user
+- `GET /getLoggedInInfo`: Get logged-in info
+- `POST /acceptTerms`: Accept terms
+- `GET /requestDeleteAccount`: Request to delete account
 
 ## Tests
 Testing is done using Postman for manual API testing.
@@ -308,13 +363,60 @@ Testing is done using Postman for manual API testing.
    cd ../frontend/react-wl/src
    npm run dev
    ```
+
 3. Open your browser and navigate to `http://localhost:8000` for the backend and `http://localhost:3000` for the frontend.
+
+## Authors
+
+- Amgad Tahoun
+- Nada Tamer
+- Yousef Abdelhamid
+- Khaled Essam
+- Khaled Mostafa
+- Amr Hesham
+- Amr Khaled
+- Ali Mousa
+- Shahd Hesham
+- Shahd Elfeky
 
 ## Contribute
 
+1. Fork the repository.
+2. Clone the forked repository to your local machine.
+```bash
+git clone https://github.com/your-username/Wanderlust.git
+```
+3. Create a new branch for your feature or bug fix.
+```bash
+git checkout -b feature/your-feature-name
+```
+4. Make your changes and commit them with clear and descriptive messages.
+```bash
+git commit -m "Add feature: your feature name"
+```
+5.Push your changes to your forked repository.
+```bash
+git push origin feature/your-feature-name
+```
+6. Open a pull request in the original repository, describing the changes and linking to any relevant issues.
+   
 ## Credits
 
+[Lucid React](https://lucide.dev/guide/packages/lucide-react)
+
+[Material UI](https://mui.com)
+
+
 ## License
+
+[App Exchange](app.exchangerate-api.com)
+
+[Amadeus](https://amadeus.com/en)
+
+[Stripe](https://stripe.com)
+
+[Cloudinary](https://cloudinary.com)
+
 
 
 ---
