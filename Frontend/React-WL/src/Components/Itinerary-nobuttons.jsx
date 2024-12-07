@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import MultiRangeSlider from "multi-range-slider-react";
+import Rating from '@mui/material/Rating'; // Ensure Rating component is imported
 import Activities from './Activities';
 import { Calendar, MapPin, Globe, DollarSign, Users, Check, Star, Search } from 'lucide-react';
 import Card from '../Components/Card';
@@ -48,9 +49,11 @@ const Itinerary = ({ guestMode }) => {
       try {
         console.log("guestMode:", guestMode);
 
+
         const user = await getTouristId();
         let id = 1; // Default to guest mode
         let currency = "EGP"; // Default currency if not found in user
+
 
         if (!guestMode) {
           id = user._id;
@@ -60,17 +63,21 @@ const Itinerary = ({ guestMode }) => {
           settouristId(id); // Set touristId to 1 in guest mode
         }
 
+
         // Define itinerary URL based on guestMode and currency
         const itineraryUrl = id === 1
           ? "http://localhost:8000/api/itinerary/getItineraryGuest"
           : `http://localhost:8000/api/itinerary/getItinerary?currency=${currency}`;
+
 
         // Fetch itineraries based on the URL
         const itineraryResponse = await axios.get(itineraryUrl, {
           headers: id !== 1 ? { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` } : undefined
         });
 
+
         let itineraryData = itineraryResponse.data;
+
 
         // Fetch bookings for the current tourist if not in guest mode
         if (!guestMode) {
@@ -81,6 +88,7 @@ const Itinerary = ({ guestMode }) => {
           });
           const userIdValue = userIdResponse.data?._id;
 
+
           const bookingsResponse = await axios.get("http://localhost:8000/api/bookings/getBooking", {
             params: { userId: userIdValue },
             headers: {
@@ -88,8 +96,10 @@ const Itinerary = ({ guestMode }) => {
             },
           });
 
+
           const bookings = Array.isArray(bookingsResponse.data) ? bookingsResponse.data : [];
           const bookedItineraryIds = bookings.map((booking) => booking.itineraryId?._id);
+
 
           // Filter itineraries based on bookings
           itineraryData = itineraryData.filter(
@@ -97,8 +107,10 @@ const Itinerary = ({ guestMode }) => {
           );
         }
 
+
         // Update itinerary state with either filtered or fetched data
         setItinerary(itineraryData);
+
 
       } catch (error) {
         console.error("Error fetching itineraries or bookings:", error);
@@ -107,6 +119,7 @@ const Itinerary = ({ guestMode }) => {
       }
     };
 
+
     fetchData();
   }, [guestMode]);
 
@@ -114,6 +127,7 @@ const Itinerary = ({ guestMode }) => {
     set_minValue(e.minValue);
     set_maxValue(e.maxValue);
   };
+
 
   const onFilter = () => {
     var date = document.getElementById("date").value;
@@ -325,38 +339,88 @@ const Itinerary = ({ guestMode }) => {
         </div>
       </div>
     </section>
+
   );
 };
 
-const ItineraryItem = ({ item }) => (
-  <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
-    <div className="p-6">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h2 className="text-2xl font-semibold mb-2 text-indigo-600">{item.title}</h2>
-          <p className="text-gray-600 text-sm flex items-center">
-            <Calendar className="mr-2" size={16} />
-            {new Date(item.timeline.start).toISOString().split("T")[0]} - {new Date(item.timeline.end).toISOString().split("T")[0]}
-          </p>
-        </div>
-      </div>
-      <ItineraryDetails item={item} />
-      <ItineraryActivities activities={item.activities} />
-      <ItinerarySection title="Locations" items={item.locations} icon={<MapPin size={18} />} />
-      <ItinerarySection title="Available Dates" items={item.availableDates} icon={<Calendar size={18} />} />
-    </div>
-  </div>
-);
+const ItineraryItem = ({ item, onUpdate, onDelete, showBookingOpen = false }) => { // Added showBookingOpen with default false
+  const handleBookItinerary = async () => {
+    try {
 
-const ItineraryDetails = ({ item }) => (
+      const userId = async () => {
+        try {
+          const response = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            },
+          });
+          console.log(response.data);
+          return response.data; // Assuming response.data contains the user ID
+        } catch (error) {
+          console.error("Error fetching user info:", error);
+        }
+      };
+      
+      const userIdValue = await userId();
+
+
+      const response = await axios.post("http://localhost:8000/api/itinerary/bookItinerary", {
+        itineraryId: item._id,
+        userId: userIdValue,
+      });
+
+      if (response.status === 201) {
+        alert("Booking successful!");
+      }
+    } catch (error) {
+      console.error("Error booking itinerary:", error);
+      alert("Error booking itinerary");
+    }
+  };
+
+  const averageRating = item.ratings.length > 0
+    ? item.ratings.reduce((sum, rating) => sum + rating.rating, 0) / item.ratings.length
+    : 0;
+
+  return (
+    <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
+      <div className="p-6">
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h2 className="text-2xl font-semibold mb-2 text-indigo-600">{item.title}</h2>
+            <p className="text-gray-600 text-sm flex items-center">
+              <Calendar className="mr-2" size={16} />
+              {new Date(item.timeline.start).toLocaleDateString()} - {new Date(item.timeline.end).toLocaleDateString()} {/* Only show dates */}
+            </p>
+          </div>
+        </div>
+        <ItineraryDetails item={item} showBookingOpen={showBookingOpen} /> {/* Passed showBookingOpen */}
+        <ItineraryActivities activities={item.activities} />
+        <ItinerarySection title="Locations" items={item.locations} icon={<MapPin size={18} />} />
+        <ItinerarySection title="Available Dates" items={item.availableDates.map(date => new Date(date).toLocaleDateString())} icon={<Calendar size={18} />} /> {/* Only show dates */}
+        {/* Add Book Itinerary button here */}
+        <button
+          onClick={handleBookItinerary}
+          className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg mt-4 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+        >
+          Book Itinerary
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const ItineraryDetails = ({ item, showBookingOpen }) => ( // Added showBookingOpen
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4 mb-6">
     <DetailItem icon={<DollarSign size={18} />} label="Price" value={item.price} />
     <DetailItem icon={<Globe size={18} />} label="Language of Tour" value={item.languageOfTour} />
-    <DetailItem icon={<Users size={18} />} label="Accessibility" value={item.accessibility} />
     <DetailItem icon={<MapPin size={18} />} label="Pickup Location" value={item.pickupLocation} />
     <DetailItem icon={<MapPin size={18} />} label="Dropoff Location" value={item.dropoffLocation} />
-    <DetailItem icon={<Check size={18} />} label="Booking Open" value={item.isActive ? "Yes" : "No"} />
-    <DetailItem icon={<Star size={18} />} label="Rating" value={item.rating} />
+    {showBookingOpen && <DetailItem icon={<Check size={18} />} label="Booking Open" value={item.isActive ? "Yes" : "No"} />} {/* Conditionally render */}
+    <div className="flex items-center">
+      <DetailItem icon={<Star size={18} />} label="Rating" value={item.rating} />
+      <Rating name="read-only" value={item.rating} readOnly sx={{ color: 'gold', fontSize: '1.5rem', marginLeft: '0.5rem' }} />
+    </div>
   </div>
 );
 
@@ -376,7 +440,7 @@ const ItineraryActivities = ({ activities }) => (
       <Users className="mr-2" size={20} />
       Activities
     </h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="flex flex-col gap-4"> {/* Changed to flex-col */}
       {activities.map((activity) => (
         <div key={activity.id} className="bg-gray-50 rounded-lg p-3 hover:shadow-md transition duration-300">
           <Activity activity={activity} showDeleteButton={false} showUpdateButton={false} />
