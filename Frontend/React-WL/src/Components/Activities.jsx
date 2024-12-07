@@ -3,7 +3,7 @@ import Activity from './Activity';
 import MultiRangeSlider from "multi-range-slider-react";
 import axios from 'axios';
 import CreateActivityForm from './CreateActivityForm';
-
+import { Search } from 'lucide-react';
 const Activities = ({ guestMode, showCreateButton = true, showUpdateButton = true, showDeleteButton = true, onCreate }) => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -225,7 +225,25 @@ const Activities = ({ guestMode, showCreateButton = true, showUpdateButton = tru
     
     <section className="bg-blue-50 px-4 py-10">
       <div className="container mx-auto flex flex-col lg:flex-row">
-        <div className="bg-white rounded-xl shadow-md p-6 lg:w-1/3 mb-6 lg:mb-0 lg:mr-6">
+        <div className="bg-white rounded-xl shadow-md p-6 lg:w-1/3 mb-6 lg:mb-0 lg:mr-6 mt-10">
+        <div className="mb-4">
+          <label htmlFor="sortBy" className="text-gray-700 font-semibold mb-1 block">Sort by:</label>
+          <select id="sortBy" className="border border-gray-300 p-2 rounded-lg w-full mb-2">
+            <option value="price">Price</option>
+            <option value="rating">Rating</option>
+          </select>
+          <label htmlFor="orderBy" className="text-gray-700 font-semibold mb-1 block">Order:</label>
+          <select id="orderBy" className="border border-gray-300 p-2 rounded-lg w-full mb-2">
+            <option value="1">Ascending</option>
+            <option value="-1">Descending</option>
+          </select>
+          <button
+            onClick={sortActivity}
+            className="bg-custom hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg w-full shadow-sm transition duration-300 ease-in-out transform hover:scale-105 mt-3"
+          >
+            Sort
+          </button>
+        </div>
           <div className="mb-4">
             <div className="Slider mb-6">
               <div className="sliderleft mb-4">
@@ -245,10 +263,10 @@ const Activities = ({ guestMode, showCreateButton = true, showUpdateButton = tru
               </div>
               <div className="slidertext flex justify-between">
                 <p className="minValue text-gray-700">
-                  Min Value: <span className="text-indigo-500 font-semibold">${minValue}</span>
+                  Min Value: <span className="text-custom font-semibold">${minValue}</span>
                 </p>
                 <p className="maxValue text-gray-700">
-                  Max Value: <span className="text-indigo-500 font-semibold">${maxValue}</span>
+                  Max Value: <span className="text-custom font-semibold">${maxValue}</span>
                 </p>
               </div>
             </div>
@@ -280,62 +298,41 @@ const Activities = ({ guestMode, showCreateButton = true, showUpdateButton = tru
             <div className="filterButtonDiv mb-4">
               <button
                 onClick={filterActivity}
-                className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg w-full shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+                className="bg-custom hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg w-full shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
               >
                 Filter
-              </button>
-            </div>
-            <div className="mb-4">
-              <input
-                type="text"
-                id="searchInput"
-                placeholder="Search for Activity..."
-                className="border border-gray-300 p-2 rounded-lg w-full mb-2"
-              />
-              <button
-                onClick={searchActivity}
-                className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg w-full shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
-              >
-                Search
-              </button>
-            </div>
-            <div className="mb-4">
-              <label htmlFor="sortBy" className="text-gray-700 font-semibold mb-1 block">Sort by:</label>
-              <select id="sortBy" className="border border-gray-300 p-2 rounded-lg w-full mb-2">
-                <option value="price">Price</option>
-                <option value="rating">Rating</option>
-              </select>
-              <label htmlFor="orderBy" className="text-gray-700 font-semibold mb-1 block">Order:</label>
-              <select id="orderBy" className="border border-gray-300 p-2 rounded-lg w-full mb-2">
-                <option value="1">Ascending</option>
-                <option value="-1">Descending</option>
-              </select>
-              <button
-                onClick={sortActivity}
-                className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg w-full shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
-              >
-                Sort
               </button>
             </div>
           </div>
         </div>
         <div className="flex-1">
-          <h2 className="text-3xl font-bold text-indigo-500 mb-6 text-center">
+          <h2 className="text-3xl font-bold text-custom mb-6 text-center">
             Browse Activities
           </h2>
-
-          {/* Create Activity Button */}
-          {showCreateButton && (
-  <div className="flex justify-center mb-6">
-    <button
-      onClick={handleCreateActivity}
-      className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
-    >
-      Create Activity
-    </button>
-  </div>
-)}
-
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center space-x-1">
+              <input
+                type="text"
+                id="searchInput"
+                placeholder="Search for Activity..."
+                className="border border-gray-300 p-2 w-80 rounded-lg " // Changed width to w-80
+              />
+              <button
+                onClick={searchActivity}
+                className="bg-custom hover:bg-indigo-600 text-white font-semibold py-2.5 px-3 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
+              >
+                <Search size={16} />
+              </button>
+            </div>
+            {showCreateButton && (
+              <button
+                onClick={handleCreateActivity}
+                className="bg-custom hover:bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+              >
+                Create Activity
+              </button>
+            )}
+          </div>
           <div className="flex flex-col space-y-6">
             {activities.length > 0 ? (
               activities.map((activity) => (
