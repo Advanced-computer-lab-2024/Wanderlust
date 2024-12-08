@@ -61,7 +61,29 @@ const getLocations = async (req, res) => {
     const convertedLocations = await Promise.all(
       locations.map(async (item) => {
         const convertedItem = item.toObject(); // Convert Mongoose document to plain JavaScript object
-        convertedItem.ticketPrices = await convertCurrency(convertedItem.ticketPrices, currency); // Convert ticket price to selected currency
+        if (convertedItem.ticketPrices) {
+          // Ensure ticket prices are numbers
+          const ticketPricesNatives = Number(convertedItem.ticketPrices[0]);
+          const ticketPricesForeigners = Number(convertedItem.ticketPrices[1]);
+          const ticketPricesStudents = Number(convertedItem.ticketPrices[2]);
+
+          // Check if conversion is valid
+          if (!isNaN(ticketPricesNatives) && !isNaN(ticketPricesForeigners) && !isNaN(ticketPricesStudents)) {
+            // Convert each ticket price to the selected currency
+            convertedItem.ticketPrices = {
+              natives: await convertCurrency(ticketPricesNatives, currency),
+              foreigners: await convertCurrency(ticketPricesForeigners, currency),
+              students: await convertCurrency(ticketPricesStudents, currency),
+            };
+          } else {
+            // Handle invalid ticket prices
+            convertedItem.ticketPrices = {
+              natives: "Invalid price",
+              foreigners: "Invalid price",
+              students: "Invalid price",
+            };
+          }
+        }
         return convertedItem;
       })
     );
