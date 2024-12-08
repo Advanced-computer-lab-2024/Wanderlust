@@ -19,6 +19,7 @@
     "@stripe/stripe-js": "^5.2.0",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
+    "carousel": "^0.0.3",
     "google-map-react": "^2.2.1",
     "intro.js": "^7.2.0",
     "lucide-react": "^0.453.0",
@@ -28,8 +29,11 @@
     "react-icons": "^5.4.0",
     "react-modal": "^3.16.1",
     "react-router-dom": "^6.27.0",
+    "react-slick": "^0.30.2",
     "react-spinner": "^0.2.7",
     "react-wl": "file:",
+    "slick": "^1.12.2",
+    "slick-carousel": "^1.8.1",
     "styled-components": "^6.1.13"
   },
   "devDependencies": {
