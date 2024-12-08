@@ -7,7 +7,7 @@ const ItineraryTourist = () => {
     <>
     
     <TouristNavBar  />
-    <Itineraries guestMode={false} showBookButton={false} showBookmark={false} showCreateButton={false} showDeleteButton={false} showUpdateButton={false}/>
+    <Itineraries guestMode={false} showBookButton={false} showBookmark={true} showCreateButton={false} showDeleteButton={false} showUpdateButton={false}/>
     
 
    
