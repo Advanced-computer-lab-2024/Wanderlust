@@ -36,7 +36,7 @@ const CreatePromocode = () => {
   return (
     <div className="container mt-4 w-75">
       <h1 className='text-2xl font-bold mb-6 text-center'>Create Promo Code</h1>
-      <form onSubmit={handleCreatePromoCode}>
+      <form className='card' onSubmit={handleCreatePromoCode}>
         <div className="mb-3">
           <label htmlFor="code" className="form-label">Promo Code</label>
           <input
@@ -62,8 +62,8 @@ const CreatePromocode = () => {
         <button type="submit" className="btn btn-primary">Create Promo Code</button>
       </form>
 
-      <h2 className="mt-4">Existing Promo Codes</h2>
-      <table className="table">
+      <h2 className="my-4 fw-bold">Existing Promo Codes</h2>
+      <table className="table rounded border">
         <thead>
           <tr>
             <th scope="col">Code</th>
