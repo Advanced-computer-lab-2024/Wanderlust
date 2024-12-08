@@ -7,7 +7,7 @@ const ActivitiesGuest = () => {
     <>
       <GuestNavbar />
 
-      <Activities guestMode={true} showCreateButton={false} showUpdateButton={false} showDeleteButton={false} />
+      <Activities guestMode={true} showCreateButton={false} showUpdateButton={false} showDeleteButton={false} showBookButton={false} showBookmark={false} />
 
     </>
   )

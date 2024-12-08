@@ -13,7 +13,9 @@ const Home = () => {
       <Hero />
       <Activities showCreateButton={false}
           showUpdateButton={false}
-          showDeleteButton={false} />
+          showDeleteButton={false}
+          showBookButton={false}
+          showBookmark={false} />
   </>
   )
 }

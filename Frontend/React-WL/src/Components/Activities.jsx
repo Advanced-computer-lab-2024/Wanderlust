@@ -4,7 +4,16 @@ import MultiRangeSlider from "multi-range-slider-react";
 import axios from 'axios';
 import CreateActivityForm from './CreateActivityForm';
 import { Search } from 'lucide-react';
-const Activities = ({ guestMode, showCreateButton = true, showUpdateButton = true, showDeleteButton = true, onCreate }) => {
+
+const Activities = ({ 
+  guestMode, 
+  showCreateButton = true, 
+  showUpdateButton = true, 
+  showDeleteButton = true, 
+  showBookButton = true, // Added showBookButton
+  showBookmark = true, // Added showBookmark
+  onCreate 
+}) => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [minValue, set_minValue] = useState(1);
@@ -341,6 +350,8 @@ const Activities = ({ guestMode, showCreateButton = true, showUpdateButton = tru
                   activity={activity}
                   showUpdateButton={showUpdateButton} // Set visibility flags based on props
                   showDeleteButton={showDeleteButton}
+                  showBookButton={showBookButton} // Pass showBookButton prop
+                  showBookmark={showBookmark} // Pass showBookmark prop
                   onUpdate={() => console.log(`Updating activity ${activity.id}`)}
                   onDelete={() => console.log(`Deleting activity ${activity.id}`)}
                 />

@@ -12,6 +12,7 @@ const Activity = ({
   showUpdateButton = true,
   showDeleteButton = true,
   showBookButton = true, // Added showBookButton
+  showBookmark = true, // Added showBookmark
   onUpdate,
   onDelete,
 }) => {
@@ -192,12 +193,14 @@ const handleUnsaveActivity = async () => {
                     Book Activity
                   </button>
                 )}
-                <button
-                  onClick={isSaved ? handleUnsaveActivity : handleSaveActivity}
-                  className="bg-custom text-white font-semibold py-1 px-2 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:bg-blue-600 flex items-center text-xs"
-                >
-                  {isSaved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
-                </button>
+                {showBookmark && ( // Added showBookmark logic
+                  <button
+                    onClick={isSaved ? handleUnsaveActivity : handleSaveActivity}
+                    className="bg-custom text-white font-semibold py-1 px-2 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:bg-blue-600 flex items-center text-xs"
+                  >
+                    {isSaved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+                  </button>
+                )}
               </div>
             </div>
           </div>

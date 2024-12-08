@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Activity from './Activity';
 import MultiRangeSlider from "multi-range-slider-react";
 import Activities from "./Activities";
 import { useNavigate } from "react-router-dom";
@@ -14,10 +15,9 @@ import {
   Search,
 } from "lucide-react";
 import Card from "../Components/Card";
-import Activity from "./Activity";
 import Rating from "@mui/material/Rating"; // Ensure Rating component is imported
 
-const Itinerary = ({ guestMode }) => {
+const Itinerary = ({ guestMode, showCreateButton = true, showUpdateButton = true, showDeleteButton = true, showBookButton = true, showBookmark = true }) => {
   const [itinerary, setItinerary] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -76,17 +76,15 @@ const Itinerary = ({ guestMode }) => {
         }
 
         // Define itinerary URL based on guestMode and currency
-        const itineraryUrl =
-          id === 1
-            ? "http://localhost:8000/api/itinerary/getItineraryGuest"
-            : `http://localhost:8000/api/itinerary/getItinerary?currency=${currency}`;
+        const itineraryUrl = id === 1
+          ? "http://localhost:8000/api/itinerary/getItineraryGuest"
+          : `http://localhost:8000/api/itinerary/getItinerary?currency=${currency}`;
 
         // Fetch itineraries based on the URL
         const itineraryResponse = await axios.get(itineraryUrl, {
-          headers:
-            id !== 1
-              ? { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
-              : undefined,
+          headers: id !== 1
+            ? { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
+            : undefined,
         });
 
         let itineraryData = itineraryResponse.data;
@@ -266,8 +264,7 @@ const Itinerary = ({ guestMode }) => {
                   barInnerColor="#4338ca"
                   onInput={(e) => {
                     handleInput(e);
-                  }}
-                />
+                  } } />
               </div>
               <div className="slidertext flex justify-between">
                 <p className="minValue text-gray-700">
@@ -290,8 +287,7 @@ const Itinerary = ({ guestMode }) => {
               <input
                 id="date"
                 type="date"
-                className="border border-gray-300 p-2 rounded-lg w-full"
-              />
+                className="border border-gray-300 p-2 rounded-lg w-full" />
             </div>
             <div className="Datediv mb-4">
               <label
@@ -357,8 +353,7 @@ const Itinerary = ({ guestMode }) => {
                 type="text"
                 id="searchInput"
                 placeholder="Search for Itinerary..."
-                className="border border-gray-300 p-2 w-80 rounded-lg"
-              />
+                className="border border-gray-300 p-2 w-80 rounded-lg" />
               <button
                 onClick={searchItinerary}
                 className="bg-custom hover:bg-blue-600 text-white font-semibold py-2.5 px-3 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
@@ -370,7 +365,14 @@ const Itinerary = ({ guestMode }) => {
           <div className="flex flex-col space-y-6">
             {itinerary.length > 0 ? (
               itinerary.map((item) => (
-                <ItineraryItem key={item._id} item={item} />
+                <ItineraryItem 
+                  key={item._id} 
+                  item={item} 
+                  showBookButton={showBookButton} 
+                  showUpdateButton={showUpdateButton} 
+                  showDeleteButton={showDeleteButton} 
+                  showBookmark={showBookmark} // Added showBookmark
+                />
               ))
             ) : (
               <div className="text-center py-8">
@@ -385,9 +387,9 @@ const Itinerary = ({ guestMode }) => {
       </div>
     </section>
   );
-};
+}
 
-const ItineraryItem = ({ item, onUpdate, onDelete }) => {
+const ItineraryItem = ({ item, showBookButton, showUpdateButton, showDeleteButton, showBookmark, onUpdate, onDelete }) => {
   const navigate = useNavigate();
 
   const handleBookItinerary = async () => {
@@ -410,8 +412,8 @@ const ItineraryItem = ({ item, onUpdate, onDelete }) => {
             </p>
           </div>
         </div>
-        <ItineraryDetails item={item} />
-        <ItineraryActivities activities={item.activities} />
+        <ItineraryDetails item={item} showBookingOpen={showBookButton} />
+        <ItineraryActivities activities={item.activities} showUpdateButton={showUpdateButton} showDeleteButton={showDeleteButton} showBookButton={showBookButton} showBookmark={showBookmark} />
         <ItinerarySection
           title="Locations"
           items={item.locations}
@@ -424,12 +426,14 @@ const ItineraryItem = ({ item, onUpdate, onDelete }) => {
         />
 
         {/* Add Book Itinerary button here */}
-        <button
-          onClick={handleBookItinerary}
-          className="bg-custom hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg mt-4 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
-        >
-          Book Itinerary
-        </button>
+        {showBookButton && (
+          <button
+            onClick={handleBookItinerary}
+            className="bg-custom hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg mt-4 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            Book Itinerary
+          </button>
+        )}
       </div>
     </div>
   );
@@ -493,15 +497,13 @@ const DetailItem = ({ icon, label, value }) => (
   </div>
 );
 
-const ItineraryActivities = ({ activities }) => (
+const ItineraryActivities = ({ activities, showUpdateButton, showDeleteButton, showBookButton, showBookmark }) => (
   <div className="mb-6">
     <h3 className="text-lg font-semibold mb-3 text-blue-600 border-b border-indigo-100 pb-1 flex items-center">
       <Users className="mr-2" size={20} />
       Activities
     </h3>
     <div className="flex flex-col gap-4">
-      {" "}
-      {/* Changed to flex-col */}
       {activities.map((activity) => (
         <div
           key={activity.id}
@@ -509,9 +511,10 @@ const ItineraryActivities = ({ activities }) => (
         >
           <Activity
             activity={activity}
-            showDeleteButton={false}
-            showUpdateButton={false}
-            showBookButton={false} // Set showBookButton to false
+            showDeleteButton={showDeleteButton}
+            showUpdateButton={showUpdateButton}
+            showBookButton={showBookButton}
+            showBookmark={showBookmark}
           />
         </div>
       ))}
