@@ -1,0 +1,58 @@
+.what-to-expect-footer {
+    background-color: #01478e; /* Dark blue background, similar to Booking.com */
+    color: #fff; /* White text */
+    padding: 60px 30px; /* Increased padding for spacing */
+    border-top: 4px solid #01478e; /* Darker blue border for emphasis */
+    text-align: center; /* Center the header */
+  }
+  
+  .what-to-expect-footer h2 {
+    font-weight: bold;
+    font-size: 2.5rem; /* Larger header size */
+    margin-bottom: 40px; /* Space below the heading */
+    color: #fff; /* Ensure header text is white */
+  }
+  
+  .footer-partitions {
+    display: flex;
+    justify-content: space-around; /* Distribute items with space around */
+    flex-wrap: nowrap; /* Keep items in the same line */
+    overflow-x: auto; /* Add horizontal scroll if needed */
+  }
+  
+  .footer-partition {
+    background-color: transparent; /* Transparent background to match the footer */
+    color: #fff; /* White text */
+    padding: 30px; /* Increased padding */
+    border: 2px solid #fff; /* White border */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex-basis: 22%; /* Adjust width for each partition */
+    margin: 15px; /* Larger margin */
+    text-align: center; /* Center text in each partition */
+  }
+  
+  .footer-partition h3 {
+    margin-bottom: 15px; /* Space below the subheading */
+    font-size: 1.75rem; /* Larger subheading size */
+    color: #fff; /* Ensure subheading is white */
+  }
+  
+  .footer-partition p {
+    font-size: 1.2rem; /* Larger paragraph size */
+    color: #fff; /* Ensure paragraph text is white */
+  }
+  
+  .footer-partition img {
+    max-width: 80px; /* Larger icon size */
+    display: block; /* Center the icon */
+    margin: 0 auto 15px; /* Center horizontally and add more space below */
+  }
+  
+  /* Responsive design for smaller screens */
+  @media (max-width: 768px) {
+    .footer-partition {
+      flex-basis: 100%; /* Full width on smaller screens */
+    }
+  }
+  
