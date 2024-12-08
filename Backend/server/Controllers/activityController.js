@@ -414,7 +414,7 @@ const bookActivity = async (req, res) => {
       await tourist.save();
 
       console.log("Payment successful using wallet");
-      await postPaymentSuccess(activityId, tourist._id);
+      await postPaymentSuccess(activityId, tourist._id,price);
       if (!postPaymentSuccess.success) {
         console.log(
           "Post-payment processing failed",
@@ -454,7 +454,7 @@ const bookActivity = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-const postPaymentSuccess = async (activityId, touristId) => {
+const postPaymentSuccess = async (activityId, touristId,price) => {
   try {
     const tourist = await touristModel.findOne({ _id: touristId });
 

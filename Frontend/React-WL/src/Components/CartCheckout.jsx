@@ -24,7 +24,7 @@ const CartCheckout = ({ totalAmount }) => {
         case "Wallet":
           await axios.post(
             "http://localhost:8000/api/tourist/cart/checkout",
-            { paymentMethod: "wallet" },
+            { paymentMethod: "wallet", totalAmount },
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
@@ -37,7 +37,7 @@ const CartCheckout = ({ totalAmount }) => {
         case "Card":
           const { data } = await axios.post(
             "http://localhost:8000/api/tourist/cart/checkout",
-            { paymentMethod: "card" },
+            { paymentMethod: "card", totalAmount },
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,

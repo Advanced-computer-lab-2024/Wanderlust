@@ -61,12 +61,44 @@ Our project adheres to a set of coding standards to ensure consistency, readabil
 By adhering to these coding standards, we ensure that our codebase remains clean, efficient, and easy to understand for all contributors.
 
 ## Screenshots
+
 <details>
 <summary>Landing Page</summary>
   
   ![Home Page](screenshots/HomePage.png)
   
 </details>
+
+<details>
+  
+<summary>Sign Up</summary>
+  
+  ![Signup Page](screenshots/signup.png)
+  
+</details>
+
+<details>
+<summary>Login</summary>
+  
+  ![Login Page](screenshots/login.png)
+  
+</details>
+
+<details>
+  
+<summary>Cart</summary>
+  
+  ![Cart](screenshots/cart.png)
+  
+</details>
+
+<details>
+<summary>Locations</summary>
+  
+  ![Locations Page](screenshots/locations.png)
+  
+</details>
+
 
 ## Tech/Framework Used
 Our project leverages a modern tech stack to deliver a seamless and efficient experience for users. The following technologies and frameworks are used:
@@ -442,17 +474,17 @@ We welcome contributions to Wanderlust! Follow the steps below to contribute:
    cd Wanderlust
    ```
 3. **Create a new branch for your feature or bug fix.**
-  ```bash
-  git checkout -b feature/your-feature-name
-  ```
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
 4. **Make your changes and commit them with clear and descriptive messages.**
-  ```bash
-  git commit -m "Add feature: your feature name"
-  ```
-5.**Push your changes to your forked repository.**
-  ```bash
-  git push origin feature/your-feature-name
-  ```
+   ```bash
+   git commit -m "Add feature: your feature name"
+   ```
+5. **Push your changes to your forked repository.**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
 6. **Open a pull request in the original repository, describing the changes and linking to any relevant issues.**
    
 ## Credits
@@ -470,6 +502,8 @@ Wanderlust leverages various third-party services and libraries to enhance funct
 - [MongoDB Atlas](https://www.mongodb.com/docs/atlas/) - Cloud database service.
 
 - [Stripe Web Elements](https://stripe.com/docs/payments/elements) - Payment processing integration.
+
+- [Slick](https://react-slick.neostack.com/)
 
 ## License
 

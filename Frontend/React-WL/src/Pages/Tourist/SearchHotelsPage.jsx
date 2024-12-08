@@ -1,11 +1,10 @@
-import BookingsTourist from "../../Components/BookingsTourist";
 import TouristNavBar from "../../Components/NavBars/TouristNavBar";
-import TouristCart from "../../Components/TouristCart";
+import SearchHotels from "../../Components/SearchHotels";
 const TouristCartPage = () => {
   return (
     <>
       <TouristNavBar />
-      <TouristCart />
+      <SearchHotels />
       <div className="bg-custom text-white py-4 shadow-inner text-center ">
         <p>
           &copy; {new Date().getFullYear()} Wanderlust. All Rights Reserved.
