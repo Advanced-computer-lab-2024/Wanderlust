@@ -67,7 +67,7 @@ const FlagItinerary = () => {
   return (
     <div className="container py-4">
       <div className="mb-4">
-        <h1>Itineraries</h1>
+        <h1 className='text-2xl font-bold mb-6'>Itineraries</h1>
       </div>
       <div className="d-flex flex-wrap gap-3">
         {itineraries.map(itinerary => (

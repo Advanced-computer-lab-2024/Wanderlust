@@ -28,8 +28,8 @@ const ViewNotifications = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h1 className="mb-4">Notifications</h1>
+    <div className="container mt-4 w-75">
+      <h1 className="mb-4 text-2xl font-bold mb-6 text-center">Notifications</h1>
       <ul className="list-group">
         {notifications.map(notification => (
           <li key={notification._id} className="list-group-item">

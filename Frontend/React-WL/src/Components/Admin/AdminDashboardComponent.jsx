@@ -86,9 +86,9 @@ const AdminDashboardComponent = () => {
                     <button className="btn btn-primary" onClick={handleManageProducts}>Go to Products</button>
                 </div>
                 <div className="flex-fill border rounded p-4 shadow-sm" style={{ flex: '1 1 calc(33.333% - 20px)' }}>
-                    <h2 className='text-gray-800 font-semibold'>Manage Activities</h2>
+                    <h2 className='text-gray-800 font-semibold'>Manage Activity Categories</h2>
                     <p>View and manage all activity categories.</p>
-                    <button className="btn btn-primary" onClick={handleManageActivities}>Manage Activities</button>
+                    <button className="btn btn-primary" onClick={handleManageActivities}>Manage Activity Categories</button>
                 </div>
                 <div className="flex-fill border rounded p-4 shadow-sm" style={{ flex: '1 1 calc(33.333% - 20px)' }}>
                     <h2 className='text-gray-800 font-semibold'>Add Admin</h2>
