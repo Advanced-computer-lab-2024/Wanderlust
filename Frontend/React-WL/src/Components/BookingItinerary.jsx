@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Elements,
   CardElement,
@@ -6,27 +6,85 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import axios from "axios";
+import ErrorPopupComponent from "./ErrorPopupComponent";
+import { useNavigate } from "react-router-dom";
+
+const fetchPromoCodeId = async (input) => {
+  try {
+    const response = await axios.post(
+      "http://localhost:8000/api/tourist/getPromoCodeId",
+      { code: input },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+        },
+      }
+    );
+    return response.data.promoCodeId;
+  } catch (err) {
+    console.error("Error fetching promo code:", err);
+    return null;
+  }
+};
 
 const BookingItinerary = ({ itineraryId, price }) => {
+  const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState("");
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
+  const [promoCode, setPromoCode] = useState("");
+  const [discountedPrice, setDiscountedPrice] = useState(null);
+  const [redeemSuccess, setRedeemSuccess] = useState(false);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const stripe = useStripe();
   const elements = useElements();
 
+  useEffect(() => {
+    setLoading(false); // Set loading to false once the component is mounted
+  }, []);
+
+  const handleRedeem = async () => {
+    const promoId = await fetchPromoCodeId(promoCode);
+    if (promoId) {
+      try {
+        const response = await axios.post(
+          "http://localhost:8000/api/tourist/usePromoCode",
+          { promoCodeId: promoId, orderAmount: price },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            },
+          }
+        );
+        const { discount, newTotalAmount } = response.data;
+        setDiscountedPrice(newTotalAmount.toFixed(2));
+        setRedeemSuccess(true);
+      } catch (error) {
+        setErrorMessage("Failed to apply promo code");
+        setShowErrorPopup(true);
+      }
+    } else {
+      setErrorMessage("Invalid promo code");
+      setShowErrorPopup(true);
+    }
+  };
+
   const handlePayment = async () => {
-   
     setError(null);
     setSuccess(false);
+    setLoading(true); // Set loading to true when payment process starts
+
+    const finalPrice = redeemSuccess ? discountedPrice : price;
 
     try {
       switch (paymentMethod) {
         case "wallet":
           await axios.post(
             "http://localhost:8000/api/itinerary/bookItinerary",
-            { itineraryId, paymentMethod: "wallet" },
+            { itineraryId, paymentMethod: "wallet", price: finalPrice },
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
@@ -40,7 +98,7 @@ const BookingItinerary = ({ itineraryId, price }) => {
         case "card": {
           const { data } = await axios.post(
             "http://localhost:8000/api/itinerary/bookItinerary",
-            { itineraryId, paymentMethod: "card" },
+            { itineraryId, paymentMethod: "card", price: finalPrice },
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
@@ -81,19 +139,33 @@ const BookingItinerary = ({ itineraryId, price }) => {
       }
     } catch (err) {
       setError(err.message);
+      setErrorMessage(err.message);
+      setShowErrorPopup(true);
     } finally {
-      setLoading(false);
+      setLoading(false); // Set loading to false after payment process is complete
     }
   };
-  if (loading)
+
+  if (loading) {
+    console.log("Loading state is true");
     return (
-        <div className="flex justify-center items-center h-screen">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
-        </div>
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
     );
+  }
+
+  console.log("Loading state is false, rendering component");
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-lg w-96 max-w-full p-6 relative">
+        <button
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-3xl"
+          onClick={() => navigate(-1)}
+        >
+          &times;
+        </button>
         <h1 className="text-center text-2xl font-bold text-gray-800 mb-4">
           Book Itinerary
         </h1>
@@ -101,7 +173,15 @@ const BookingItinerary = ({ itineraryId, price }) => {
         {/* Total Amount Section */}
         <div className="mb-6">
           <p className="text-lg font-semibold text-gray-700">
-            Itinerary Price: <span className="text-green-600">${price}</span>
+            Itinerary Price: 
+            {discountedPrice ? (
+              <>
+                <span className="line-through text-red-600">${Number(price).toFixed(2)}</span>
+                <span className="text-green-600"> ${discountedPrice}</span>
+              </>
+            ) : (
+              <span className="text-green-600">${Number(price).toFixed(2)}</span>
+            )}
           </p>
         </div>
 
@@ -134,6 +214,26 @@ const BookingItinerary = ({ itineraryId, price }) => {
           </div>
         </div>
 
+        {/* Promo Code Section */}
+        <div className="mt-4 flex items-center space-x-2">
+          <input
+            type="text"
+            placeholder="Enter Promo Code"
+            className="border p-2 rounded-md flex-grow"
+            value={promoCode}
+            onChange={(e) => setPromoCode(e.target.value)}
+          />
+          <button
+            className={`px-2 py-1 rounded-md text-xs ${
+              redeemSuccess ? "bg-green-500 text-white" : "bg-custom text-white"
+            }`}
+            onClick={handleRedeem}
+            disabled={redeemSuccess}
+          >
+            {redeemSuccess ? "Redeemed" : "Redeem"}
+          </button>
+        </div>
+
         {/* Render CardElement Below Payment Options */}
         {paymentMethod === "card" && (
           <div className="mt-4">
@@ -146,11 +246,15 @@ const BookingItinerary = ({ itineraryId, price }) => {
           <button
             className="bg-custom text-white px-2 py-1 rounded-md text-xs"
             onClick={handlePayment}
-          
+            disabled={loading}
           >
             Confirm Payment
           </button>
-          
+          {loading && (
+            <div className="flex justify-center items-center h-screen">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+            </div>
+          )}
         </div>
 
         {/* Success Message */}
@@ -163,6 +267,11 @@ const BookingItinerary = ({ itineraryId, price }) => {
         {/* Error Message */}
         {error && <div className="mt-4 text-red-500 text-center">{error}</div>}
       </div>
+      <ErrorPopupComponent
+        errorMessage={errorMessage}
+        show={showErrorPopup}
+        handleClose={() => setShowErrorPopup(false)}
+      />
     </div>
   );
 };

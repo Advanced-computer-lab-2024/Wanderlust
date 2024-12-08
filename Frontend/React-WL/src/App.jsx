@@ -79,30 +79,15 @@ const App = () => {
         {/* Admin Routes */}
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/addadmin" element={<AddAdminPage />} />
-        <Route
-          path="/addtourismgovernor"
-          element={<AddTourismGovernorPage />}
-        />
+        <Route path="/addtourismgovernor" element={<AddTourismGovernorPage />} />
         <Route path="/viewusers" element={<AdminViewUsersPage />} />
         <Route path="/manageproducts" element={<AdminManageProductsPage />} />
-        <Route
-          path="/manageactivities"
-          element={<AdminManageActivitiesPage />}
-        />
-        <Route
-          path="/managepreferencetags"
-          element={<AdminManagePreferenceTagsPage />}
-        />
-        <Route
-          path="/managecomplaints"
-          element={<AdminManageComplaintsPage />}
-        />
+        <Route path="/manageactivities" element={<AdminManageActivitiesPage />} />
+        <Route path="/managepreferencetags" element={<AdminManagePreferenceTagsPage />} />
+        <Route path="/managecomplaints" element={<AdminManageComplaintsPage />} />
         <Route path="/viewpendingdocuments" element={<AdminViewDocuments />} />
         <Route path="/AdminUpdatePassword" element={<AdminUpdatePassword />} />
-        <Route
-          path="/AdminManageItinerary"
-          element={<AdminManageItinerary />}
-        />
+        <Route path="/AdminManageItinerary" element={<AdminManageItinerary />} />
         <Route path="/complaint" element={<Complaint />} />
         <Route path="/viewnotifications" element={<AdminViewNotifications />} />
         <Route path="/createpromocode" element={<AdminCreatePromocodePage />} />
@@ -112,20 +97,14 @@ const App = () => {
         <Route path="/LocationTourist" element={<LocationTourist />} />
         <Route path="/ActivityTourist" element={<ActivityTourist />} />
         <Route path="/BookingActivityPage" element={<BookingActivityPage />} />
-        <Route
-          path="/BookingItineraryPage"
-          element={<BookingItineraryPage />}
-        />
+        <Route path="/BookingItineraryPage" element={<BookingItineraryPage />} />
         <Route path="/ProductTourist" element={<ProductTourist />} />
         <Route path="/ComplaintsTourist" element={<ComplaintsTouristPage />} />
         <Route path="/TouristProfile" element={<TouristProfilePage />} />
         <Route path="/BookingsTourist" element={<BookingTourist />} />
         <Route path="/TouristCart" element={<TouristCartPage />} />
         <Route path="/CartCheckoutPage" element={<CartCheckoutPage />} />
-        <Route
-          path="/PopupAddDeliveryAddress"
-          element={<PopupAddDeliveryAddress />}
-        />
+        <Route path="/PopupAddDeliveryAddress" element={<PopupAddDeliveryAddress />} />
         <Route path="/TouristWishlist" element={<TouristWishlistPage />} />
         <Route path="/TouristOrders" element={<TouristOrdersPage />} />
         <Route path="/OrderDetails/:orderId" element={<OrderDetailsPage />} />
@@ -140,15 +119,9 @@ const App = () => {
 
         {/* Tourguide Routes */}
         <Route path="/Tgprofile" element={<Tgprofile />} />
-        <Route
-          path="/ItineraryTourguide"
-          element={<ItineraryTourguidePage />}
-        />
+        <Route path="/ItineraryTourguide" element={<ItineraryTourguidePage />} />
         <Route path="/ActivityTourguide" element={<ActivityTourguidePage />} />
-        <Route
-          path="/SalesReportTourGuide"
-          element={<SalesReportTourGuide />}
-        />
+        <Route path="/SalesReportTourGuide" element={<SalesReportTourGuide />} />
 
         {/* Seller Routes */}
         <Route path="/SellerProfile" element={<SellerProfilePage />} />
@@ -158,24 +131,12 @@ const App = () => {
 
         {/* Advertiser Routes */}
         <Route path="/AdvertiserProfile" element={<AdvertiserProfilePage />} />
-        <Route
-          path="/AdvertiserActivities"
-          element={<AdvertiserActivitiesPage />}
-        />
-        <Route
-          path="/SalesReportAdvertiser"
-          element={<SalesReportAdvertiser />}
-        />
+        <Route path="/AdvertiserActivities" element={<AdvertiserActivitiesPage />} />
+        <Route path="/SalesReportAdvertiser" element={<SalesReportAdvertiser />} />
 
         {/* Tourism Governor Routes */}
-        <Route
-          path="/TourismGovernorProfile"
-          element={<TourismGovernorProfilePage />}
-        />
-        <Route
-          path="/TourismGovernorLocations"
-          element={<TourismGovernorLocationsPage />}
-        />
+        <Route path="/TourismGovernorProfile" element={<TourismGovernorProfilePage />} />
+        <Route path="/TourismGovernorLocations" element={<TourismGovernorLocationsPage />} />
       </Routes>
     </Router>
   );

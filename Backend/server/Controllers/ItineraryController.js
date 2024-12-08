@@ -285,7 +285,7 @@ const filterItinerariesByPref = async (req, res) => {
 };
 const bookItinerary = async (req, res) => {
   try {
-    const { itineraryId, paymentMethod } = req.body;
+    const { itineraryId, paymentMethod ,price} = req.body;
 
     const authHeader = req.header("Authorization");
     if (!authHeader) {
@@ -317,12 +317,12 @@ const bookItinerary = async (req, res) => {
 
     if (paymentMethod === "wallet") {
       // Wallet payment
-      if (tourist.wallet < itinerary.price) {
+      if (tourist.wallet < price) {
         return res.status(400).json({ message: "Insufficient wallet balance" });
       }
 
       // Deduct from wallet and perform post-payment actions
-      tourist.wallet -= itinerary.price;
+      tourist.wallet -= price;
       await tourist.save();
 
       console.log("Payment successful using wallet");
@@ -343,7 +343,7 @@ const bookItinerary = async (req, res) => {
       // Stripe payment
       try {
         const paymentIntent = await stripe.paymentIntents.create({
-          amount: itinerary.price * 100, // Convert to cents
+          amount: price * 100, // Convert to cents
           currency: tourist.currency,
           automatic_payment_methods: {
             enabled: true,
@@ -370,7 +370,7 @@ const bookItinerary = async (req, res) => {
 };
 
 // Reusing postPaymentSuccess with modifications for itineraries
-const postPaymentSuccess = async (itineraryId, touristId) => {
+const postPaymentSuccess = async (itineraryId, touristId,price) => {
   try {
     const tourist = await touristModel.findOne({ _id: touristId });
 
@@ -396,7 +396,7 @@ const postPaymentSuccess = async (itineraryId, touristId) => {
     }
 
     // Update points on payment
-    await updatePointsOnPayment(tourist._id, itinerary.price);
+    await updatePointsOnPayment(tourist._id, price);
 
     // Update badge
     updateBadge(tourist);
@@ -407,7 +407,7 @@ const postPaymentSuccess = async (itineraryId, touristId) => {
       tourist.email,
       tourist.name,
       itinerary.name,
-      itinerary.price
+      price
     );
 
     return { success: true, message: "Post-payment actions completed" };
