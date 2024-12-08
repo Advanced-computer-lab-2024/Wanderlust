@@ -148,6 +148,38 @@ const sendMail = async (email, name, title, message) => {
     return { error: "Failed to send email." };
   }
 };
+const createTouristNotification = async (userId, message, userType = "tourist") => {
+  try {
+    // Create the notification in the database
+    const notification = new Notification({
+      userId,
+      message,
+    });
+    await notification.save();
+
+    // Fetch the user's email based on userType
+    let userEmail;
+    if (userType === "tourist") {
+      const tourist = await Tourist.findById(userId);
+      if (!tourist) {
+        throw new Error("Tourist not found");
+      }
+      userEmail = tourist.email;
+    }
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: userEmail,
+      subject: "Upcoming Event Notification",
+      text: message,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("Email sent successfully.");
+  } catch (error) {
+    console.error("Error creating notification:", error);
+  }
+};
 
 const requestNotification = async (req, res) => {
   try {
@@ -165,117 +197,71 @@ const requestNotification = async (req, res) => {
 
     const { itineraryId, activityId } = req.body;
 
-    if (!tourist.notificationRequests.includes(itineraryId)) {
-      tourist.notificationRequests.push(itineraryId);
-    }
-
-    if (!tourist.notificationRequests.includes(activityId)) {
-      tourist.notificationRequests.push(activityId);
-    }
-
-    await tourist.save();
-
-    return res.status(200).json({ message: "Notification request saved successfully" });
-  } catch (error) {
-    console.error("Error saving notification request:", error);
-    return res.status(500).json({
-      message: "Error saving notification request",
-      error: error.message,
-    });
-  }
-};
-
-const saveNotification = async (touristId, message) => {
-  const notification = new Notification({
-    touristId,
-    message,
-  });
-
-  try {
-    await notification.save();
-    console.log('Notification saved successfully');
-  } catch (error) {
-    console.error('Error saving notification:', error);
-  }
-};
-
-const sendUpcomingActivityNotifications = async () => {
-  try {
-    const tourists = await Tourist.find({ notificationRequests: { $exists: true, $not: { $size: 0 } } }).populate('notificationRequests');
-
-    for (const tourist of tourists) {
-      for (const activity of tourist.notificationRequests) {
-        // Check if the activity is upcoming (e.g., within the next 24 hours)
-        const now = new Date();
-        const activityDate = new Date(activity.date);
-        const timeDifference = activityDate - now;
-
-        if (timeDifference > 0 && timeDifference <= 24 * 60 * 60 * 1000) {
-          // Send notification on the website
-          const message = `Reminder: Your upcoming activity ${activity.name} is scheduled for ${activity.date}.`;
-          await saveNotification(tourist._id, message);
-
-          // Send email notification
-          await sendMail(tourist.email, tourist.name, 'Upcoming Activity Reminder', message);
-        }
+    let eventName;
+    if (itineraryId) {
+      const itinerary = await Itinerary.findById(itineraryId);
+      if (!itinerary) {
+        return res.status(404).json({ message: "Itinerary not found" });
       }
-    }
-  } catch (error) {
-    console.error("Error sending notifications:", error);
-  }
-};
-
-const sendUpcomingItineraryNotifications = async () => {
-  try {
-    const tourists = await Tourist.find({ itineraries: { $exists: true, $not: { $size: 0 } } }).populate('itineraries');
-
-    for (const tourist of tourists) {
-      for (const itinerary of tourist.itineraries) {
-        // Check if the itinerary is upcoming (e.g., within the next 24 hours)
-        const now = new Date();
-        const itineraryDate = new Date(itinerary.date);
-        const timeDifference = itineraryDate - now;
-
-        if (timeDifference > 0 && timeDifference <= 24 * 60 * 60 * 1000) {
-          // Send notification on the website
-          const message = `Reminder: Your upcoming itinerary ${itinerary.name} is scheduled for ${itinerary.date}.`;
-          await saveNotification(tourist._id, message);
-
-          // Send email notification
-          await sendMail(tourist.email, tourist.name, 'Upcoming Itinerary Reminder', message);
-        }
+      eventName = itinerary.name;
+    } else if (activityId) {
+      const activity = await Activity.findById(activityId);
+      if (!activity) {
+        return res.status(404).json({ message: "Activity not found" });
       }
+      eventName = activity.name;
+    } else {
+      return res.status(400).json({ message: "No itinerary or activity ID provided" });
     }
+
+    const message = `Upcoming Event: ${eventName}`;
+    await createTouristNotification(tourist._id, message, "tourist");
+
+    res.status(200).json({ message: "Notification request processed successfully" });
   } catch (error) {
-    console.error("Error sending itinerary notifications:", error);
+    console.error("Error processing notification request:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
+
 const getNotifications = async (req, res) => {
   try {
     const authHeader = req.header("Authorization");
     if (!authHeader) {
       return res.status(401).json({ message: "Authorization header missing" });
     }
-    const token = authHeader.replace("Bearer ", "");
+
+    // Validate Bearer token format
+    if (!authHeader.startsWith("Bearer ")) {
+      return res.status(400).json({ message: "Invalid Authorization header format" });
+    }
+
+    const token = authHeader.replace("Bearer ", "").trim();
+
+    // Verify the token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const notifications = await Notification.find({ touristId: decoded.id }).populate('touristId');
-    return res.status(200).json(notifications);
+    console.log("Decoded token:", decoded);
+
+    // Fetch notifications for the user
+    const notifications = await Notification.find({ userId: decoded.id }).sort({ createdAt: -1 });
+
+    res.status(200).json(notifications);
   } catch (error) {
-    console.error("Error fetching notifications:", error);
-    return res.status(500).json({
-      message: "Error fetching notifications",
-      error: error.message,
-    });
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+    console.error("Error fetching notifications:", error.message);
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
+
+
 module.exports = {
   createNotification,
   sendReceipt,
   sendMail,
   createSystemNotification, 
-  sendUpcomingActivityNotifications,
-  sendUpcomingItineraryNotifications,
   requestNotification,
   getNotifications
 };

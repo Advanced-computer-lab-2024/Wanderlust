@@ -57,7 +57,7 @@ const TouristBookmarks = () => {
   const handleReqActivityNotification = async (activityId) => {
     try {
       const response = await axios.post(
-        'http://localhost:8000/api/tourist//request-notification',
+        'http://localhost:8000/api/tourist//requestNotification',
         { activityId },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -135,7 +135,7 @@ const TouristBookmarks = () => {
   
     try {
       const response = await axios.post(
-        'http://localhost:8000/api/tourist/request-notification',
+        'http://localhost:8000/api/tourist/requestNotification',
         { itineraryId },
         {
           headers: { Authorization: `Bearer ${token}` },
