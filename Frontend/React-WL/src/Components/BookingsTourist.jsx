@@ -4,6 +4,7 @@ import BookingCard from "./BookingCard";  // Import the BookingCard component
 
 const BookingTourist = () => {
   // Initialize bookings state as an empty array
+  const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState([]);
   const [error, setError] = useState(null);
 
@@ -22,6 +23,8 @@ const BookingTourist = () => {
             return response.data; // Assuming response.data contains the user ID
           } catch (error) {
             console.error("Error fetching user info:", error);
+          }finally {
+            setLoading(false);
           }
         };
         
@@ -49,6 +52,8 @@ const BookingTourist = () => {
       } catch (error) {
         console.error("Error fetching bookings:", error);
         setError("An error occurred while fetching your bookings.");
+      }finally {
+        setLoading(false);
       }
     };
 
@@ -60,6 +65,12 @@ const BookingTourist = () => {
     // Remove the canceled booking from the state
     setBookings((prevBookings) => prevBookings.filter((booking) => booking._id !== bookingId));
   };
+  if (loading)
+    return (
+        <div className="flex justify-center items-center h-screen">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+        </div>
+    );
 
   return (
     <div className="booking-tourist">

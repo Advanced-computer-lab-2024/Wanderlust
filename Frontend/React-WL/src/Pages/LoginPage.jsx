@@ -7,6 +7,7 @@ import GuestNavBar from "../Components/NavBars/GuestNavBar";
 
 const Login = () => {
     const [role, setRole] = useState("");
+    const [loading, setLoading] = useState(true); // Spinner state
     const navigate = useNavigate();
     const [showTerms, setShowTerms] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
@@ -197,6 +198,7 @@ const Login = () => {
                     </div>
                 </div>
             )}
+            
         </>
     );
 };

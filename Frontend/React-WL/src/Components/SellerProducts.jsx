@@ -22,6 +22,7 @@ const Seller = () => {
     const [searchName, setSearchName] = useState('');
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
+    const [loading, setLoading] = useState(true);
 const [confirmDeleteProductId, setConfirmDeleteProductId] = useState(null);
  const [selectedProduct, setSelectedProduct] = useState(null);
     useEffect(() => {
@@ -38,7 +39,9 @@ const [confirmDeleteProductId, setConfirmDeleteProductId] = useState(null);
             }
         } catch (error) {
             console.error('Error fetching products:', error);
-        }
+        }finally {
+            setLoading(false);
+          }
     };
 
     const handleInputChange = (e) => {
@@ -79,7 +82,9 @@ const [confirmDeleteProductId, setConfirmDeleteProductId] = useState(null);
             }
         } catch (error) {
             console.error('Error adding product:', error);
-        }
+        }finally {
+            setLoading(false);
+          }
     };
 
     const handleUpdateProduct = async (e) => {
@@ -99,7 +104,9 @@ const [confirmDeleteProductId, setConfirmDeleteProductId] = useState(null);
             }
         } catch (error) {
             console.error('Error updating product:', error);
-        }
+        }finally {
+            setLoading(false);
+          }
     };
 
     const deleteProduct = async (name) => {
@@ -115,7 +122,9 @@ const [confirmDeleteProductId, setConfirmDeleteProductId] = useState(null);
             }
         } catch (error) {
             console.error('Error deleting product:', error);
-        }
+        }finally {
+            setLoading(false);
+          }
     };
 
     const archiveProduct = async (name) => {
@@ -129,7 +138,9 @@ const [confirmDeleteProductId, setConfirmDeleteProductId] = useState(null);
             }
         } catch (error) {
             console.error('Error archiving product:', error);
-        }
+        }finally {
+            setLoading(false);
+          }
     };
 
     const unarchiveProduct = async (name) => {
@@ -143,7 +154,9 @@ const [confirmDeleteProductId, setConfirmDeleteProductId] = useState(null);
             }
         } catch (error) {
             console.error('Error unarchiving product:', error);
-        }
+        }finally {
+            setLoading(false);
+          }
     };
 
     const uploadProductImage = async (productId, file) => {
@@ -164,7 +177,9 @@ const [confirmDeleteProductId, setConfirmDeleteProductId] = useState(null);
             }
         } catch (error) {
             console.error('Error uploading product image:', error);
-        }
+        }finally {
+            setLoading(false);
+          }
     };
 
     const searchProducts = async () => {
@@ -182,7 +197,9 @@ const [confirmDeleteProductId, setConfirmDeleteProductId] = useState(null);
             }
         } catch (error) {
             console.error('Error searching products:', error);
-        }
+        }finally {
+            setLoading(false);
+          }
     };
 
     const filterProducts = async () => {
@@ -195,7 +212,9 @@ const [confirmDeleteProductId, setConfirmDeleteProductId] = useState(null);
             }
         } catch (error) {
             console.error('Error filtering products:', error);
-        }
+        }finally {
+            setLoading(false);
+          }
     };
     const openModal = (product) => {
         setSelectedProduct(product);
@@ -225,7 +244,12 @@ const [confirmDeleteProductId, setConfirmDeleteProductId] = useState(null);
     const toggleAddProduct = () => setAddProductOpen(!isAddProductOpen);
     const toggleUpdateProduct = () => setUpdateProductOpen(!isUpdateProductOpen);
     const toggleAvailableProducts = () => setAvailableProductsOpen(!isAvailableProductsOpen);
-
+    if (loading)
+        return (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+          </div>
+        );
     return (
         <div className="container py-4 w-75">
             <div className="mb-4">

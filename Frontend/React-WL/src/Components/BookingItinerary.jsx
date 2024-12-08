@@ -9,7 +9,7 @@ import axios from "axios";
 
 const BookingItinerary = ({ itineraryId, price }) => {
   const [paymentMethod, setPaymentMethod] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
 
@@ -17,7 +17,7 @@ const BookingItinerary = ({ itineraryId, price }) => {
   const elements = useElements();
 
   const handlePayment = async () => {
-    setLoading(true);
+   
     setError(null);
     setSuccess(false);
 
@@ -85,7 +85,12 @@ const BookingItinerary = ({ itineraryId, price }) => {
       setLoading(false);
     }
   };
-
+  if (loading)
+    return (
+        <div className="flex justify-center items-center h-screen">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+        </div>
+    );
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-lg w-96 max-w-full p-6 relative">
@@ -141,13 +146,11 @@ const BookingItinerary = ({ itineraryId, price }) => {
           <button
             className="bg-custom text-white px-2 py-1 rounded-md text-xs"
             onClick={handlePayment}
-            disabled={loading}
+          
           >
             Confirm Payment
           </button>
-          {loading && (
-            <p className="text-center mt-2 text-gray-500">Processing...</p>
-          )}
+          
         </div>
 
         {/* Success Message */}

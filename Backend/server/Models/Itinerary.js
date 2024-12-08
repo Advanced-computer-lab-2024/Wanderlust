@@ -1,4 +1,4 @@
-const { date } = require('joi');
+const { date, required } = require('joi');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -65,6 +65,11 @@ const itinerarySchema = new mongoose.Schema({
       type: Boolean,
       default: true 
     },
+    touristCount:{
+      type: Number,
+      default:0
+    },
+    
     flagged: {
       type: Boolean,
       default: false

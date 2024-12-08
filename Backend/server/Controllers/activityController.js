@@ -473,6 +473,13 @@ const postPaymentSuccess = async (activityId, touristId) => {
       activityId: activityId,
     });
     await booking.save();
+
+    if (activity) {
+      activity.touristCount += 1;
+      await activity.save();
+  }
+
+
     // Update points on payment
     await updatePointsOnPayment(tourist._id, activity.price);
 

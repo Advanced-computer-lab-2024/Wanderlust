@@ -8,6 +8,8 @@ const AdvertiserProfilePage = () => {
     <>      
       <AdvertiserNavBar /> 
       <AdvertiserProfile />
+
+  
     </>
     )
   }

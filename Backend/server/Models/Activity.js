@@ -98,7 +98,11 @@ const ActivitySchema = new Schema({
   },
   description: {
     type: String,
-  }
+  },
+  touristCount:{
+    type: Number,
+    default:0
+  },
 });
 
 // Middleware to update the updatedAt field

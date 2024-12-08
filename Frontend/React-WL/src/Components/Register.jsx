@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [role, setRole] = useState("");
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [nationalities, setNationalities] = useState([]);
   const [documents, setDocuments] = useState({
@@ -40,23 +41,25 @@ const Register = () => {
     idAdvertiserDocument: "", // Advertiser
     taxationRegistryCardAdvertiserDocument: "", // Advertiser
   });
-
+  
   //lesa tourguide m4 sha8ala w lesa seller w advertiser
 
   useEffect(() => {
     axios
       .get("https://restcountries.com/v3.1/all")
       .then((response) => {
-        // Extract the demonym (nationality) from each country
         const fetchedNationalities = response.data.map(
           (country) => country.demonyms?.eng?.m || country.name.common
         );
-        setNationalities(fetchedNationalities.sort()); // Sorting the nationalities alphabetically
+        setNationalities(fetchedNationalities.sort());
+        setLoading(false); // Set loading to false after fetching data
       })
       .catch((error) => {
         console.error("Error fetching nationalities:", error);
+        setLoading(false); // Also set loading to false in case of an error
       });
   }, []);
+  
 
   // Handle input change
   const handleInputChange = (e) => {
@@ -227,6 +230,12 @@ const Register = () => {
     alert("An error occurred during form submission. Please try again.");
   }
   };
+  if (loading)
+    return (
+        <div className="flex justify-center items-center h-screen">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+        </div>
+    );
 
   return (
     <div className="max-w-screen-lg mx-auto mt-10 p-12 flex items-center justify-between bg-gradient-to-r from-blue-400 via-purple-500 to-blue-900">
