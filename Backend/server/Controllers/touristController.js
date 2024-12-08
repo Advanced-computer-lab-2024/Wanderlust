@@ -530,7 +530,7 @@ const processPayment = async (totalAmount, touristId, paymentMethod) => {
 */
 const checkoutOrder = async (req, res) => {
   try {
-    const { paymentMethod } = req.body;
+    const { paymentMethod, totalAmount } = req.body;
 
     const authHeader = req.header("Authorization");
     if (!authHeader) {
@@ -549,11 +549,6 @@ const checkoutOrder = async (req, res) => {
     if (tourist.cart.length === 0) {
       return res.status(400).json({ message: "Cart is empty" });
     }
-
-    let totalAmount = 0;
-    tourist.cart.forEach((item) => {
-      totalAmount += item.product.price * item.quantity;
-    });
 
     // Assuming you have a payment processing function
     const paymentResult = await processPayment(

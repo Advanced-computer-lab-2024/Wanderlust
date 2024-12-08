@@ -177,6 +177,8 @@ const App = () => {
           path="/TourismGovernorLocations"
           element={<TourismGovernorLocationsPage />}
         />
+
+        {/* Search Hotels */}
         <Route path="/SearchHotelsPage" element={<SearchHotelsPage />} />
       </Routes>
     </Router>
