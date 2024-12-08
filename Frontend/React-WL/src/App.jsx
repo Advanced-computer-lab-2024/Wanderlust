@@ -52,6 +52,7 @@ import SalesReportAdvertiser from "./Pages/Advertiser/SalesReportAdvertiser";
 import SalesReportSeller from "./Pages/Seller/SalesReportSeller";
 import AdminCreatePromocodePage from "./Pages/AdminCreatePromocodePage";
 import Guide from "./Components/Guide";
+import SearchHotelsPage from "./Pages/Tourist/SearchHotelsPage";
 import "./App.css";
 
 const App = () => {
@@ -176,6 +177,7 @@ const App = () => {
           path="/TourismGovernorLocations"
           element={<TourismGovernorLocationsPage />}
         />
+        <Route path="/SearchHotelsPage" element={<SearchHotelsPage />} />
       </Routes>
     </Router>
   );
