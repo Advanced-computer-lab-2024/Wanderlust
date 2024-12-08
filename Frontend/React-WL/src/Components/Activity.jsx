@@ -21,7 +21,7 @@ const Activity = ({
   const [currency, setCurrency] = useState(null);
   const [loading, setLoading] = useState(true);
   const [averageRating, setAverageRating] = useState(0);
-  const [isSaved, setIsSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(true);
 
   useEffect(() => {
     const fetchCurrency = async () => {
@@ -42,8 +42,8 @@ const Activity = ({
       try {
         const token = localStorage.getItem("jwtToken");
         const response = await axios.get("http://localhost:8000/api/activity/savedActivities", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+          headers: { Authorization: `Bearer ${token}` } },
+        );
         const savedActivities = response.data;
         const isActivitySaved = savedActivities.some(savedActivity => savedActivity._id === activity._id);
         setIsSaved(isActivitySaved);
@@ -163,14 +163,13 @@ const handleUnsaveActivity = async () => {
               <p className="text-gray-700 text-sm font-medium">{activity.description}</p>
             )}
             <div className="mt-1">
-              <a onClick={toggleDetails} className="custom underline cursor-pointer text-xs">
+              <a onClick={toggleDetails} className="custom underline cursor-pointer text-xs hover:text-blue-600">
                 More Details
               </a>
             </div>
           </div>
           <div className="flex justify-between items-start mt-2">
-            <Box sx={{ '& > legend': { mt: 1 }, paddingTop: 2 }}>
-              <Typography component="legend" sx={{ color: 'black', fontSize: '1rem' }}>Rating:</Typography>
+            <Box sx={{ '& > legend': { mt: 1 }, paddingTop: 2, marginTop: 3 }}>
               <Rating name="read-only" value={averageRating} readOnly sx={{ color: 'gold', fontSize: '1.5rem' }} />
             </Box>
             <div className="text-right pr-4 mt-2">
@@ -199,6 +198,22 @@ const handleUnsaveActivity = async () => {
                     className="bg-custom text-white font-semibold py-1 px-2 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:bg-blue-600 flex items-center text-xs"
                   >
                     {isSaved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+                  </button>
+                )}
+                {showUpdateButton && (
+                  <button
+                    onClick={() => onUpdate(activity.id)}
+                    className="bg-custom hover:bg-indigo-600 text-white font-semibold py-1 px-2 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105 flex items-center text-xs"
+                  >
+                    <Edit3 className="mr-1" size={12} /> Update
+                  </button>
+                )}
+                {showDeleteButton && (
+                  <button
+                    onClick={() => onDelete(activity.id)}
+                    className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105 flex items-center text-xs"
+                  >
+                    <Trash2 className="mr-1" size={12} /> Delete
                   </button>
                 )}
               </div>
@@ -285,7 +300,7 @@ const handleUnsaveActivity = async () => {
               {showUpdateButton && (
                 <button
                   onClick={() => onUpdate(activity.id)}
-                  className="custom hover:bg-indigo-600 text-white font-semibold py-1 px-2 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105 flex items-center text-xs"
+                  className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-1 px-2 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105 flex items-center text-xs"
                 >
                   <Edit3 className="mr-1" size={12} /> Update
                 </button>

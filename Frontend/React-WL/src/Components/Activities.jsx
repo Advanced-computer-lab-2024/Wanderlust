@@ -11,8 +11,7 @@ const Activities = ({
   showUpdateButton = true, 
   showDeleteButton = true, 
   showBookButton = true, // Added showBookButton
-  showBookmark = true, // Added showBookmark
-  onCreate 
+  showBookmark = true // Added showBookmark
 }) => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
