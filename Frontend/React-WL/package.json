@@ -33,8 +33,8 @@
     "react-spinner": "^0.2.7",
     "react-wl": "file:",
     "slick": "^1.12.2",
-
     "slick-carousel": "^1.8.1",
+    "socket.io-client": "^4.8.1",
     "styled-components": "^6.1.13"
   },
   "devDependencies": {

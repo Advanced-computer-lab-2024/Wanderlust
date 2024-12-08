@@ -6,6 +6,7 @@ const PDFDocument = require("pdfkit");
 const Tourist = require('../Models/Tourist');
 const Activity = require('../Models/Activity');
 const Itinerary = require('../Models/Itinerary');
+const jwt = require('jsonwebtoken');
 
 const fs = require("fs");
 const path = require("path");
