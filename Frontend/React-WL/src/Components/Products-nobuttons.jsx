@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { FaShoppingCart, FaHeart, FaStar, FaTimes, FaSearch, FaFilter } from 'react-icons/fa';
+import { 
+    FaShoppingCart, 
+    FaHeart, 
+    FaStar, 
+    FaTimes, 
+    FaSearch, 
+    FaFilter, 
+    FaComment 
+} from 'react-icons/fa';
 
 const Products = () => {
     const [products, setProducts] = useState([]);
@@ -18,12 +26,44 @@ const Products = () => {
     const [showCartForm, setShowCartForm] = useState(false);
     const [cartQuantity, setCartQuantity] = useState(1);
 
-    // State to track purchased products
-    const [purchasedProducts, setPurchasedProducts] = useState({});
+    // State to track reviewed products
+    const [reviewedProducts, setReviewedProducts] = useState({});
 
     useEffect(() => {
         fetchProducts();
     }, [sortOrder]);
+
+    // StarRating Component
+    const StarRating = ({ rating, setRating }) => {
+        const [hoverRating, setHoverRating] = useState(0);
+
+        return (
+            <div className="flex items-center">
+                {[...Array(5)].map((star, index) => {
+                    const starValue = index + 1;
+                    return (
+                        <button
+                            key={index}
+                            type="button"
+                            className={`ml-1 focus:outline-none`}
+                            onClick={() => setRating(starValue)}
+                            onMouseEnter={() => setHoverRating(starValue)}
+                            onMouseLeave={() => setHoverRating(0)}
+                            aria-label={`Rate ${starValue} star${starValue > 1 ? 's' : ''}`}
+                        >
+                            <FaStar 
+                                className={`h-6 w-6 ${
+                                    starValue <= (hoverRating || rating) 
+                                        ? 'text-yellow-400' 
+                                        : 'text-gray-300'
+                                }`}
+                            />
+                        </button>
+                    );
+                })}
+            </div>
+        );
+    };
 
     const fetchProducts = async () => {
         try {
@@ -100,12 +140,12 @@ const Products = () => {
         }
     };
 
-    const handlePurchase = (product) => {
+    const handleReview = (product) => {
         setSelectedProduct(product); // Store the selected product
         setShowRatingForm(true); // Show the rating form
         
-        // Mark product as purchased
-        setPurchasedProducts((prevState) => ({
+        // Mark product as reviewed
+        setReviewedProducts((prevState) => ({
             ...prevState,
             [product._id]: true
         }));
@@ -295,16 +335,16 @@ const Products = () => {
 
                             {/* Action Buttons */}
                             <div className="mt-4 flex space-x-2">
-                                {/* Purchase Button */}
+                                {/* Review Button */}
                                 <button
                                     className={`flex-1 bg-blue-900 text-white px-4 py-3 rounded-md hover:bg-blue-800 focus:outline-none flex items-center justify-center transition-colors duration-200 ${
-                                        purchasedProducts[product._id] ? 'opacity-50 cursor-not-allowed' : ''
+                                        reviewedProducts[product._id] ? 'opacity-50 cursor-not-allowed' : ''
                                     }`}
-                                    onClick={() => handlePurchase(product)}
-                                    disabled={purchasedProducts[product._id]}
+                                    onClick={() => handleReview(product)}
+                                    disabled={reviewedProducts[product._id]}
                                 >
-                                    <FaShoppingCart className="mr-2" />
-                                    {purchasedProducts[product._id] ? 'Purchased' : 'Purchase'}
+                                    <FaStar className="mr-2" />
+                                    {reviewedProducts[product._id] ? 'Reviewed' : 'Review'}
                                 </button>
                                 
                                 {/* Wishlist Button */}
@@ -333,31 +373,26 @@ const Products = () => {
                 ))}
             </div>
 
-            {/* Rating Form Modal */}
+            {/* Review Form Modal */}
             {showRatingForm && selectedProduct && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                     <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 md:w-1/3">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-xl font-semibold text-blue-900">Rate {selectedProduct.name}</h3>
-                            <button onClick={() => setShowRatingForm(false)} className="text-gray-500 hover:text-gray-700" aria-label="Close Rating Form">
+                            <h3 className="text-xl font-semibold text-blue-900">Review {selectedProduct.name}</h3>
+                            <button 
+                                onClick={() => setShowRatingForm(false)} 
+                                className="text-gray-500 hover:text-gray-700" 
+                                aria-label="Close Review Form"
+                            >
                                 <FaTimes size={20} />
                             </button>
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="rating" className="block text-sm font-medium text-gray-700 mb-1">Rating (1-5):</label>
-                            <input
-                                type="number"
-                                id="rating"
-                                value={rating}
-                                onChange={(e) => setRating(Number(e.target.value))}
-                                min="1"
-                                max="5"
-                                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="Enter rating"
-                            />
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Your Rating:</label>
+                            <StarRating rating={rating} setRating={setRating} />
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="review" className="block text-sm font-medium text-gray-700 mb-1">Review:</label>
+                            <label htmlFor="review" className="block text-sm font-medium text-gray-700 mb-1">Your Review:</label>
                             <textarea
                                 id="review"
                                 value={review}
@@ -377,6 +412,7 @@ const Products = () => {
                             <button
                                 className="bg-blue-900 text-white px-4 py-2 rounded-md hover:bg-blue-800 focus:outline-none flex items-center justify-center transition-colors duration-200"
                                 onClick={submitRating}
+                                disabled={rating === 0}
                             >
                                 <FaStar className="mr-2" /> Submit
                             </button>
@@ -391,7 +427,11 @@ const Products = () => {
                     <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 md:w-1/3">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-xl font-semibold text-blue-900">Add {selectedProduct.name} to Cart</h2>
-                            <button onClick={() => setShowCartForm(false)} className="text-gray-500 hover:text-gray-700" aria-label="Close Add to Cart Form">
+                            <button 
+                                onClick={() => setShowCartForm(false)} 
+                                className="text-gray-500 hover:text-gray-700" 
+                                aria-label="Close Add to Cart Form"
+                            >
                                 <FaTimes size={20} />
                             </button>
                         </div>
