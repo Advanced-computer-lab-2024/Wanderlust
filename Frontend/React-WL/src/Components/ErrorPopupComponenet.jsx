@@ -1,21 +1,44 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal, Button } from 'react-bootstrap';
+import Modal from 'react-modal';
 
 const ErrorPopupComponent = ({ errorMessage, show, handleClose }) => {
   return (
-    <Modal show={show} onHide={handleClose} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Error</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>{errorMessage}</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Close
-        </Button>
-      </Modal.Footer>
+    <Modal
+      isOpen={show}
+      onRequestClose={handleClose}
+      contentLabel="Error"
+      ariaHideApp={false}
+      className="modal-dialog modal-sm bg-white p-4"  // Use modal-sm for small modal
+      overlayClassName="modal-backdrop fade show"  // Backdrop should show correctly
+      style={{
+        overlay: {
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1050, // Ensure the overlay is above other content
+        },
+        content: {
+          maxWidth: '400px', // Optional: Define a max width for the modal
+          padding: '0',
+          borderRadius: '10px',
+        },
+      }}
+    >
+      <div className="modal-content">
+        <div className="modal-header">
+          <button type="button" className="btn-close " onClick={handleClose}></button>
+          <h5 className="modal-title text-danger">Error</h5>
+        </div>
+        <div className="modal-body">
+          <p>{errorMessage}</p>
+        </div>
+        <div className="modal-footer">
+          <button type="button" className="btn btn-secondary mt-2" onClick={handleClose}>
+            Close
+          </button>
+        </div>
+      </div>
     </Modal>
   );
 };
@@ -28,30 +51,4 @@ ErrorPopupComponent.propTypes = {
 
 export default ErrorPopupComponent;
 
-//example usage
 
-// import React, { useState } from 'react';
-// import ErrorPopupComponent from './ErrorPopupComponent';
-
-// const SomeComponent = () => {
-//   const [showError, setShowError] = useState(false);
-//   const [errorMessage, setErrorMessage] = useState('');
-
-//   const handleError = (message) => {
-//     setErrorMessage(message);
-//     setShowError(true);
-//   };
-
-//   const handleClose = () => {
-//     setShowError(false);
-//   };
-
-//   return (
-//     <div>
-//       <button onClick={() => handleError('Something went wrong!')}>Trigger Error</button>
-//       <ErrorPopupComponent errorMessage={errorMessage} show={showError} handleClose={handleClose} />
-//     </div>
-//   );
-// };
-
-// export default SomeComponent;
