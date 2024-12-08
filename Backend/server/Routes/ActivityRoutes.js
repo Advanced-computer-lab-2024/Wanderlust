@@ -21,7 +21,6 @@ const {
   saveActivity,
   unsaveActivity,
   getSavedActivities,
-  requestNotification,
   cardPaymentSuccess,
   flagActivity,
   unflagActivity,
@@ -46,7 +45,6 @@ router.delete("/cancelActivityBooking/:bookingId", cancelActivityBooking);
 router.post("/saveActivity", saveActivity);
 router.post("/unsaveActivity", unsaveActivity);
 router.get("/savedActivities", getSavedActivities);
-router.post("/requestNotification", requestNotification);
 //flag an activity
 router.put("/activity/:id/flag", authenticateUser, admin, flagActivity);
 //unflag an activity

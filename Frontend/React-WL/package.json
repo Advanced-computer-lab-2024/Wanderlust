@@ -28,8 +28,10 @@
     "react-icons": "^5.4.0",
     "react-modal": "^3.16.1",
     "react-router-dom": "^6.27.0",
+    "react-slick": "^0.30.2",
     "react-spinner": "^0.2.7",
     "react-wl": "file:",
+    "slick-carousel": "^1.8.1",
     "styled-components": "^6.1.13"
   },
   "devDependencies": {

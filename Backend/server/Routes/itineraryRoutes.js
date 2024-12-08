@@ -25,7 +25,6 @@ const {
   saveItinerary,
   unsaveItinerary,
   getSavedItineraries,
-  requestNotification
 } = require("../Controllers/ItineraryController");
 
 router.post("/createItinerary", createItinerary);
@@ -52,6 +51,6 @@ router.post("/itinerary/rate", authenticateUser, tourist, rateItinerary);
 router.post('/saveItinerary', saveItinerary);
 router.post('/unsaveItinerary', unsaveItinerary);
 router.get('/savedItineraries', getSavedItineraries);
-router.post("/requestNotification", requestNotification);
+
 
 module.exports = router;

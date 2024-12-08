@@ -11,14 +11,25 @@ const Locations = () => {
   const [selectedRating, setSelectedRating] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // Fetch locations
+  // Fetch locations and derive tags
   useEffect(() => {
     const fetchLocations = async () => {
       try {
         const res = await fetch('http://localhost:8000/api/location/getLocations');
         const data = await res.json();
         setLocations(data);
-        setFilteredLocations(data); // Initialize filtered locations with all locations
+        setFilteredLocations(data);
+
+        // Extract unique tags from locations
+        const uniqueTags = [];
+        data.forEach((location) => {
+          location.tags.forEach((tag) => {
+            if (!uniqueTags.some((t) => t._id === tag._id)) {
+              uniqueTags.push(tag);
+            }
+          });
+        });
+        setTags(uniqueTags);
       } catch (error) {
         console.log('Error fetching locations:', error);
       } finally {
@@ -27,21 +38,6 @@ const Locations = () => {
     };
 
     fetchLocations();
-  }, []);
-
-  // Fetch tags
-  useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        const res = await fetch('http://localhost:8000/api/preferenceTag/getpreferenceTags');
-        const tagsData = await res.json();
-        setTags(tagsData);
-      } catch (error) {
-        console.log('Error fetching tags:', error);
-      }
-    };
-
-    fetchTags();
   }, []);
 
   // Filter locations based on selected filters
