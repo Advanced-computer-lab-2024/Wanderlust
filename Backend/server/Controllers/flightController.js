@@ -1,5 +1,5 @@
 const axios = require("axios");
-const flightReservationsModel = require("../Models/flightReservations");
+const flightReservationsModel = require("../Models/flight");
 const User = require("../Models/user");
 const jwt = require("jsonwebtoken");
 
