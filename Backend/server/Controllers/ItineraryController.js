@@ -674,7 +674,9 @@ const saveItinerary = async (req, res) => {
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
     }
-
+    if (!tourist.savedItineraries) {
+      tourist.savedItineraries = [];
+    }
     if (!tourist.savedItineraries.includes(req.body.itineraryId)) {
       tourist.savedItineraries.push(req.body.itineraryId);
       await tourist.save();
@@ -722,7 +724,6 @@ const getSavedItineraries = async (req, res) => {
 
     const tourist = await touristModel.findById(decoded.id).populate({
       path: "savedItineraries",
-      populate: { path: "category tags" },
     });
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
@@ -732,6 +733,38 @@ const getSavedItineraries = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       message: "Error retrieving saved itineraries",
+      error: error.message,
+    });
+  }
+};
+const requestNotification = async (req, res) => {
+  try {
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findById(decoded.id);
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    const { itineraryId } = req.body;
+
+    if (!tourist.notificationRequest.includes(itineraryId)) {
+      tourist.notificationRequest.push(itineraryId);
+      await tourist.save();
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Notification request saved successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Error saving notification request",
       error: error.message,
     });
   }
@@ -757,5 +790,6 @@ module.exports = {
   rateItinerary,
   saveItinerary,
   unsaveItinerary,
-  getSavedItineraries
+  getSavedItineraries,
+  requestNotification
 };

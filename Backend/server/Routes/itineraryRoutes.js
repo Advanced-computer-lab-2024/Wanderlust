@@ -24,7 +24,8 @@ const {
   generateShareLink,
   saveItinerary,
   unsaveItinerary,
-  getSavedItineraries
+  getSavedItineraries,
+  requestNotification
 } = require("../Controllers/ItineraryController");
 
 router.post("/createItinerary", createItinerary);
@@ -48,8 +49,9 @@ router.put("/itinerary/:id/flag", authenticateUser, admin, flagItinerary);
 router.put("/itinerary/:id/unflag", authenticateUser, admin, unflagItinerary);
 // Tourist rate an itinerary they followed
 router.post("/itinerary/rate", authenticateUser, tourist, rateItinerary);
-router.post('/itinerary/saveItinerary', saveItinerary);
-router.post('/itinerary/unsaveItinerary', unsaveItinerary);
-router.get('/itinerary/savedItineraries', getSavedItineraries);
+router.post('/saveItinerary', saveItinerary);
+router.post('/unsaveItinerary', unsaveItinerary);
+router.get('/savedItineraries', getSavedItineraries);
+router.post("/requestNotification", requestNotification);
 
 module.exports = router;
