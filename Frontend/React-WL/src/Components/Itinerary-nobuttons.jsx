@@ -17,7 +17,7 @@ import {
 import Card from "../Components/Card";
 import Rating from "@mui/material/Rating"; // Ensure Rating component is imported
 
-const Itinerary = ({ guestMode, showCreateButton = true, showUpdateButton = true, showDeleteButton = true, showBookButton = true, showBookmark = true }) => {
+const Itinerary = ({ guestMode, showCreateButton = true, showUpdateButton = true, showDeleteButton = true, showBookButton = true, showBookmark = true, showBookButtonItinerary = true }) => {
   const [itinerary, setItinerary] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -371,7 +371,8 @@ const Itinerary = ({ guestMode, showCreateButton = true, showUpdateButton = true
                   showBookButton={showBookButton} 
                   showUpdateButton={showUpdateButton} 
                   showDeleteButton={showDeleteButton} 
-                  showBookmark={showBookmark} // Added showBookmark
+                  showBookmark={showBookmark} 
+                  showBookButtonItinerary={showBookButtonItinerary} // Added showBookButtonItinerary
                 />
               ))
             ) : (
@@ -389,7 +390,7 @@ const Itinerary = ({ guestMode, showCreateButton = true, showUpdateButton = true
   );
 }
 
-const ItineraryItem = ({ item, showBookButton, showUpdateButton, showDeleteButton, showBookmark, onUpdate, onDelete }) => {
+const ItineraryItem = ({ item, showBookButton, showUpdateButton, showDeleteButton, showBookmark, showBookButtonItinerary, onUpdate, onDelete }) => {
   const navigate = useNavigate();
 
   const handleBookItinerary = async () => {
@@ -426,7 +427,7 @@ const ItineraryItem = ({ item, showBookButton, showUpdateButton, showDeleteButto
         />
 
         {/* Add Book Itinerary button here */}
-        {showBookButton && (
+        {showBookButtonItinerary && (
           <button
             onClick={handleBookItinerary}
             className="bg-custom hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg mt-4 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
