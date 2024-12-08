@@ -78,11 +78,26 @@ const Register = () => {
   };
 
   const handleSubmit = async (e) => {
+
     e.preventDefault();
-    if (formData.password1 !== formData.password2) {
+  if (!formData) {
+      alert("Form data is not initialized.");
+      return;
+    }  
+  if (!formData.username || !formData.password1 || !formData.password2 || !formData.mobileNumber) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+  if (formData.password1 !== formData.password2) {
       alert("Passwords do not match");
       return;
     }
+  if (role === "tourist" && formData.age < 18) {
+    alert("Tourists must be at least 18 years old.");
+    return;
+  }
+  
+  try {
     const data = {
       username: formData.username,
       email: formData.email,
@@ -91,7 +106,6 @@ const Register = () => {
       role: role,
     };
     const formD1 = new FormData();
-
     const responseUser = await axios.post(`http://localhost:8000/signup`, data);
     const userId = responseUser.data._id;
     if (role === "tourist") {
@@ -208,7 +222,10 @@ const Register = () => {
       );
     }
     navigate("/login");
-
+  } catch (error) {
+    console.error("Error during form submission:", error);
+    alert("An error occurred during form submission. Please try again.");
+  }
   };
 
   return (
