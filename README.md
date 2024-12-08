@@ -22,11 +22,15 @@ By integrating these features, Wanderlust aspires to be the go-to platform for a
 ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
 
 ## Build Status
-- The project is currently in development phase.
-- Testing needs to be implemented using Jest.
-- Autherization middleware is not implemented eveyrwhere it should be.
-- Backend needs better organization
 
+![Build Status](https://img.shields.io/badge/status-In%20Development-blue)
+
+- **Current Phase:** Development
+- **Upcoming Tasks:**
+  - Implement testing using Jest
+  - Complete authorization middleware across all routes
+  - Organize backend structure for better maintainability
+ 
 ## Code Style
 Our project adheres to a set of coding standards to ensure consistency, readability, and maintainability across the codebase. Please follow these guidelines when contributing:
 
@@ -113,7 +117,7 @@ mongoose
   })
   .catch((err) => console.log(err));
 ```
-Example of Creating an Itenrary
+Example of Creating an Itinerary
 ```javascript
 const createItinerary = async (req, res) => {
   const {
@@ -257,8 +261,7 @@ export default CreatePromocode;
    ```
 2. Install dependencies for both backend and frontend:
    ```bash
-   cd Backend
-   cd server
+   cd Wanderlust/Backend/server
    npm install
    cd ../frontend/react-wl/src
    npm install
@@ -361,29 +364,38 @@ export default CreatePromocode;
 - `GET /requestDeleteAccount`: Request to delete account
 
 ## Tests
-Testing is done using Postman for manual API testing.
-- Example 1:
-```link
-http://localhost:8000/api/admin/login
-```
-```json
-{
-    "username": "nada",
-    "password": "nada123",
-    "role": "admin"
-}
-```
-- Example 2:
-```link
-http://localhost:3000/api/itinerary/rate
-```
-```json
-{
-  "itineraryId": "60d5f9b8f8d2c9b8f8d2c9b8",
-  "rating": 5,
-  "review": "Amazing tour! Highly recommend."
-}
-```
+
+Currently, testing is performed manually using Postman for API endpoints. Automated testing is planned to be implemented using Jest.
+
+### Manual Testing with Postman
+
+- **Example 1: Admin Login**
+  - **Endpoint:** `http://localhost:8000/api/admin/login`
+  - **Method:** POST
+  - **Body:**
+    ```json
+    {
+      "username": "nada",
+      "password": "nada123",
+      "role": "admin"
+    }
+    ```
+
+- **Example 2: Rate Itinerary**
+  - **Endpoint:** `http://localhost:3000/api/itinerary/rate`
+  - **Method:** POST
+  - **Body:**
+    ```json
+    {
+      "itineraryId": "60d5f9b8f8d2c9b8f8d2c9b8",
+      "rating": 5,
+      "review": "Amazing tour! Highly recommend."
+    }
+    ```
+
+### Future Testing Plans
+
+- Implement unit and integration tests using Jest and Supertest.
 
 ## How to Use
 1. Start the backend server:
@@ -415,50 +427,55 @@ http://localhost:3000/api/itinerary/rate
 
 ## Contribute
 
-1. Fork the repository.
-2. Clone the forked repository to your local machine.
-```bash
-git clone https://github.com/your-username/Wanderlust.git
-```
-3. Create a new branch for your feature or bug fix.
-```bash
-git checkout -b feature/your-feature-name
-```
-4. Make your changes and commit them with clear and descriptive messages.
-```bash
-git commit -m "Add feature: your feature name"
-```
-5.Push your changes to your forked repository.
-```bash
-git push origin feature/your-feature-name
-```
-6. Open a pull request in the original repository, describing the changes and linking to any relevant issues.
+We welcome contributions to Wanderlust! Follow the steps below to contribute:
+
+1. **Fork the repository.**
+
+2. **Clone your forked repository to your local machine:**
+   ```bash
+   git clone https://github.com/your-username/Wanderlust.git
+   cd Wanderlust
+   ```
+3. **Create a new branch for your feature or bug fix.**
+  ```bash
+  git checkout -b feature/your-feature-name
+  ```
+4. **Make your changes and commit them with clear and descriptive messages.**
+  ```bash
+  git commit -m "Add feature: your feature name"
+  ```
+5.**Push your changes to your forked repository.**
+  ```bash
+  git push origin feature/your-feature-name
+  ```
+6. **Open a pull request in the original repository, describing the changes and linking to any relevant issues.**
    
 ## Credits
 
-[Lucid React](https://lucide.dev/guide/packages/lucide-react)
+Wanderlust leverages various third-party services and libraries to enhance functionality:
 
-[Material UI](https://mui.com)
+- [Lucid React](https://lucide.dev/guide/packages/lucide-react) - Icon library for React.
 
-[UiVerse](https://uiverse.io)
+- [Material UI](https://mui.com) - React UI framework for building responsive interfaces.
 
-[NodeMailer](https://www.nodemailer.com)
+- [UiVerse](https://uiverse.io) - Design resources and UI components.
 
-[MongoDB Atlas](https://www.mongodb.com/docs/atlas/)
+- [NodeMailer](https://www.nodemailer.com) - Module for sending emails from Node.js.
 
-[Stripe Web Elements](https://stripe.com/docs/payments/elements)
+- [MongoDB Atlas](https://www.mongodb.com/docs/atlas/) - Cloud database service.
+
+- [Stripe Web Elements](https://stripe.com/docs/payments/elements) - Payment processing integration.
 
 ## License
 
-[App Exchange](app.exchangerate-api.com)
+- [App Exchange](app.exchangerate-api.com)
 
-[Amadeus](https://amadeus.com/en)
+- [Amadeus](https://amadeus.com/en)
 
-[Stripe](https://stripe.com)
+- [Stripe](https://stripe.com)
 
-[Cloudinary](https://cloudinary.com)
+- [Cloudinary](https://cloudinary.com)
 
-
-This proeject is licensed under the terms of Apache 2.0 licence.
+This project is licensed under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0).
 
 ---

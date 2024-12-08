@@ -152,6 +152,25 @@ const Itinerary = ({ guestMode, showCreateButton = true, showUpdateButton = true
     var preference = document.getElementById("preferences").value;
     filterItineraryByPref({ preference });
   };
+  const sortItinerary = async () => {
+    try {
+      const sortBy = document.getElementById("sortBy").value;
+      const orderBy = document.getElementById("orderBy").value;
+      const response = await axios.get(`http://localhost:8000/api/itinerary/sortItineraries?sortBy=${sortBy}&orderBy=${orderBy}`);
+      const data = await response.data;
+      if (Array.isArray(data) && data.length > 0) {
+        setItinerary(data);
+      } else {
+        setItinerary(data);
+        console.log("Itinerary array is empty or undefined.");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filterItineraryByPref = async ({ preference }) => {
     try {
@@ -251,6 +270,24 @@ const Itinerary = ({ guestMode, showCreateButton = true, showUpdateButton = true
     <section className="bg-blue-50 px-4 py-10">
       <div className="container mx-auto flex flex-col lg:flex-row">
         <div className="bg-white rounded-xl shadow-md p-6 lg:w-1/3 mb-6 lg:mb-0 lg:mr-6 mt-10">
+        <div className="mb-4">
+            <label htmlFor="sortBy" className="text-gray-700 font-semibold mb-1 block">Sort by:</label>
+            <select id="sortBy" className="border border-gray-300 p-2 rounded-lg w-full mb-2">
+              <option value="price">Price</option>
+              <option value="rating">Rating</option>
+            </select>
+            <label htmlFor="orderBy" className="text-gray-700 font-semibold mb-1 block">Order:</label>
+            <select id="orderBy" className="border border-gray-300 p-2 rounded-lg w-full mb-2">
+              <option value="1">Ascending</option>
+              <option value="-1">Descending</option>
+            </select>
+            <button
+              onClick={sortItinerary}
+              className="bg-custom hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg w-full shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+            >
+              Sort
+            </button>
+          </div>
           <div className="mb-4">
             <div className="Slider mb-6">
               <div className="sliderleft mb-4">

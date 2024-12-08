@@ -6,7 +6,7 @@ const Itinerary = () => {
   return (
     <>
       <GuestNavbar />
-      <Itineraries showUpdateButton={false} showBookButton={false} showBookmark={false} showBookButtonItinerary={false} />
+      <Itineraries showUpdateButton={false} showBookButton={false} showBookmark={false} showBookButtonItinerary={false} showDeleteButton={false} />
     </>
   );
 };
