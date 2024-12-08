@@ -6,6 +6,7 @@ const itineraryModel = require("../Models/Itinerary");
 const productModel = require("../Models/Products");
 const Notification = require("../Models/Notification");
 const Seller = require("../Models/Seller");
+const PromoCode = require("../Models/PromoCode");
 const {
   createNotification,
   sendMail,
@@ -945,7 +946,7 @@ const deliveryAddresses = async (req, res) => {
 
 const usePromoCode = async (req, res) => {
   try {
-    const { promoCodeId, touristId, orderAmount } = req.body;
+    const { promoCodeId, orderAmount } = req.body;
     const authHeader = req.header("Authorization");
     if (!authHeader) {
       return res.status(401).json({ message: "Authorization header missing" });
@@ -953,7 +954,7 @@ const usePromoCode = async (req, res) => {
     const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const tourist = await touristModel.findById(touristId);
+    const tourist = await touristModel.findOne({ _id: decoded.id });
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
     }
@@ -1016,6 +1017,19 @@ const receiveBirthdayPromo = async (req, res) => {
   }
 };
 
+const getPromoCodeId = async (req, res) => {
+  try {
+    const { code } = req.body;
+    const promo = await PromoCode.findOne({ code });
+    if (!promo) {
+      return res.status(404).json({ message: "Promo code not found" });
+    }
+    res.status(200).json({ promoCodeId: promo._id });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getTourist,
   createTourist,
@@ -1043,4 +1057,5 @@ module.exports = {
   usePromoCode,
   receiveBirthdayPromo,
   testOutOfStockNotification,
+  getPromoCodeId,
 };

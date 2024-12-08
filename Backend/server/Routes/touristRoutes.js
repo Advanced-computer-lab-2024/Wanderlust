@@ -24,7 +24,8 @@ const {
   deliveryAddresses,
   usePromoCode,
   receiveBirthdayPromo,
-  testOutOfStockNotification
+  testOutOfStockNotification,
+  getPromoCodeId
 
 } = require("../Controllers/touristController");
 
@@ -100,7 +101,7 @@ router.put(
 );
 router.get("/deliveryAddresses", authenticateUser, tourist, deliveryAddresses);
 router.post(
-  "/usePromoCode/:touristId",
+  "/usePromoCode",
   authenticateUser,
   tourist,
   usePromoCode
@@ -112,6 +113,7 @@ router.post(
   receiveBirthdayPromo
 );
 router.post("/createSystemNotification", createSystemNotification);
+router.post("/getPromoCodeId", authenticateUser, tourist, getPromoCodeId);
 
 // Endpoint to trigger event notifications
 router.post('/send-activity-notifications', async (req, res) => {
