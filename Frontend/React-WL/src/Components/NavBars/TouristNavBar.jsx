@@ -8,7 +8,7 @@ const TouristNavBar = () => {
         t1={"Profile"} p1={"/TouristProfile"}
         t2={"Itineraries"} p2={"/ItineraryTourist"}
         t3={"Activities"} p3={"/ActivityTourist"}
-        t4={"Historical Places"} p4={"/LocationTourist"}
+        t4={"Whereabouts"} p4={"/LocationTourist"}
         t5={"Products"} p5={"/ProductTourist"}
         t6={"Logout"} p6={"/"}
         t7={"Bookings"} p7={"/BookingsTourist"}

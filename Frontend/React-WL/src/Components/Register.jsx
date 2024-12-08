@@ -212,10 +212,10 @@ const Register = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10">
+    <div className="max-w-screen-lg mx-auto mt-10 p-12 flex items-center justify-between bg-gradient-to-r from-blue-400 via-purple-500 to-blue-900">
       <div
-        className="bg-white p-8 rounded shadow-2xl w-full overflow-y-auto"
-        style={{ maxHeight: "80vh" }}
+        className="bg-white p-10 rounded shadow-2xl w-full max-w-md"
+        
       >
         <h2 className="text-2xl font-bold text-gray-800">Register</h2>
         <form action="" className="mt-6">
@@ -526,7 +526,7 @@ const Register = () => {
           <button
             onClick={handleSubmit}
             type="submit"
-            className="w-full bg-indigo-600 text-white p-3 rounded-md"
+            className="w-full bg-custom text-white p-3 rounded-md transition duration-300 ease-in-out transform hover:scale-105"
           >
             Register
           </button>
@@ -538,6 +538,19 @@ const Register = () => {
           </Link>
         </div>
       </div>
+      {/* Right - Text Section */}
+      <div className="w-1/2 hidden md:block text-white px-8">
+                    <h2 className="text-4xl font-bold mb-4"style={{ fontFamily: "'Tangerine'" }}>Welcome to Wanderlust</h2>
+                    <p className="text-lg mb-4">
+                    Discover the world with ease and excitement! Join our community of travelers, tour guides, and explorers
+                    </p>
+                    <p className="text-lg mb-4">
+                    Plan amazing journeys and access curated travel itineraries and explore top destinations.
+                    </p>
+                    <p className="text-lg">
+                    Choose your role and access exclusive features and services.
+                    </p>
+                </div>
     </div>
   );
 };

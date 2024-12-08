@@ -5,7 +5,10 @@ const Locations = () => {
   const [locations, setLocations] = useState([]);
   const [filteredLocations, setFilteredLocations] = useState([]);
   const [tags, setTags] = useState([]);
-  const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedTag, setSelectedTag] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [selectedRating, setSelectedRating] = useState('');
   const [loading, setLoading] = useState(true);
 
   // Fetch locations
@@ -41,53 +44,96 @@ const Locations = () => {
     fetchTags();
   }, []);
 
-  // Handle tag selection
-  const handleTagClick = (tagId) => {
-    const isSelected = selectedTags.includes(tagId);
-    if (isSelected) {
-      setSelectedTags(selectedTags.filter((id) => id !== tagId));
-    } else {
-      setSelectedTags([...selectedTags, tagId]);
-    }
-  };
-
-  // Filter locations when selectedTags changes
+  // Filter locations based on selected filters
   useEffect(() => {
-    if (selectedTags.length === 0) {
-      setFilteredLocations(locations);
-    } else {
-      const filtered = locations.filter((location) =>
-        location.tags.some((tag) => selectedTags.includes(tag._id))
+    let filtered = locations;
+
+    if (selectedTag) {
+      filtered = filtered.filter((location) =>
+        location.tags.some((tag) => tag._id === selectedTag)
       );
-      setFilteredLocations(filtered);
     }
-  }, [selectedTags, locations]);
+
+    // Filter based on min and max price
+    if (minPrice || maxPrice) {
+      filtered = filtered.filter((location) => {
+        const price = location.price;
+        return (
+          (minPrice ? price >= minPrice : true) &&
+          (maxPrice ? price <= maxPrice : true)
+        );
+      });
+    }
+
+    // Filter based on rating
+    if (selectedRating) {
+      filtered = filtered.filter((location) => location.rating >= selectedRating);
+    }
+
+    setFilteredLocations(filtered);
+  }, [selectedTag, minPrice, maxPrice, selectedRating, locations]);
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
   return (
-    <section className="bg-blue-50 px-4 py-10">
-      <div className="container-xl lg:container m-auto">
-        <h2 className="text-3xl font-bold text-indigo-500 mb-6 text-center">Browse Locations</h2>
+    <section className="bg-gray-50 px-4 py-10">
+      <div className="container-xl lg:container mx-auto">
+        <h2 className="text-3xl font-bold text-blue-900 mb-6 text-center">Browse Locations</h2>
         
-        {/* Tag Filter */}
-        <div className="mb-6 flex justify-center flex-wrap gap-4">
-          {tags.map((tag) => (
-            <button
-              key={tag._id}
-              onClick={() => handleTagClick(tag._id)}
-              className={`px-4 py-2 border rounded-lg ${
-                selectedTags.includes(tag._id) ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'
-              }`}
-            >
-              {tag.name}
-            </button>
-          ))}
+        {/* Filter Section */}
+        <div className="flex justify-between mb-8">
+          <div className="flex items-center space-x-6">
+            {/* Tag Filter (Dropdown) */}
+            <div>
+              <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+              <select
+                id="tags"
+                value={selectedTag}
+                onChange={(e) => setSelectedTag(e.target.value)}
+                className="block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+              >
+                <option value="">All Tags</option>
+                {tags.map((tag) => (
+                  <option key={tag._id} value={tag._id}>
+                    {tag.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Price Range Filter (Custom Min and Max Inputs) */}
+            <div className="flex space-x-4">
+              <div>
+                <label htmlFor="minPrice" className="block text-sm font-medium text-gray-700 mb-1">Min Price</label>
+                <input
+                  id="minPrice"
+                  type="number"
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                  className="block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  placeholder="Min Price"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="maxPrice" className="block text-sm font-medium text-gray-700 mb-1">Max Price</label>
+                <input
+                  id="maxPrice"
+                  type="number"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                  className="block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  placeholder="Max Price"
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Location Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredLocations.length > 0 ? (
             filteredLocations.map((location) => (
               <Location key={location._id} location={location} />
