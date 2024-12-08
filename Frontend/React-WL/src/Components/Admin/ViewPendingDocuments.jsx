@@ -69,7 +69,7 @@ const ViewPendingDocuments = () => {
       <div className="d-flex flex-wrap gap-3">
         {pendingUsers.pendingAdvertisers.map(advertiser => (
           <div key={advertiser._id} className="flex-fill border rounded p-4 shadow-sm" style={{ flex: '1 1 calc(33.333% - 20px)' }}>
-            <h2 className='fw-bold'>Advertiser</h2>
+            <h2 className=''>Advertiser</h2>
             <p><strong>Username:</strong> {advertiser.userId.username}</p>
             <p><strong>Email:</strong> {advertiser.userId.email}</p>
             <p><strong>Website:</strong> {advertiser.website}</p>
@@ -92,7 +92,7 @@ const ViewPendingDocuments = () => {
             <p><strong>ID URL:</strong> {seller.IdURL}</p>
             <p><strong>Taxation Registry Card URL:</strong> {seller.taxationRegistryCardURL}</p>
             <p><strong>Logo URL:</strong> {seller.logoURL}</p>
-            <button className="btn btn-success mt-2" onClick={() => handleApproveUser(seller.userId._id, 'Seller')}>Approve</button>
+            <button className="btn btn-success mt-2 me-1" onClick={() => handleApproveUser(seller.userId._id, 'Seller')}>Approve</button>
             <button className="btn btn-danger mt-2" onClick={() => handleRejectUser(seller.userId._id, 'Seller')}>Reject</button>
           </div>
         ))}
@@ -103,7 +103,7 @@ const ViewPendingDocuments = () => {
             <p><strong>Email:</strong> {tourGuide.userId.email}</p>
             <p><strong>ID URL:</strong> {tourGuide.IdURL}</p>
             <p><strong>Certificates URL:</strong> {tourGuide.certificatesURL}</p>
-            <button className="btn btn-success mt-2" onClick={() => handleApproveUser(tourGuide.userId._id, 'TourGuide')}>Approve</button>
+            <button className="btn btn-success mt-2 me-1" onClick={() => handleApproveUser(tourGuide.userId._id, 'TourGuide')}>Approve</button>
             <button className="btn btn-danger mt-2" onClick={() => handleRejectUser(tourGuide.userId._id, 'TourGuide')}>Reject</button>
           </div>
         ))}

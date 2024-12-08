@@ -24,7 +24,8 @@ const {
   deliveryAddresses,
   usePromoCode,
   receiveBirthdayPromo,
-  testOutOfStockNotification
+  testOutOfStockNotification,
+  getPromoCodeId
 
 } = require("../Controllers/touristController");
 
@@ -100,7 +101,7 @@ router.put(
 );
 router.get("/deliveryAddresses", authenticateUser, tourist, deliveryAddresses);
 router.post(
-  "/usePromoCode/:touristId",
+  "/usePromoCode",
   authenticateUser,
   tourist,
   usePromoCode
@@ -112,6 +113,7 @@ router.post(
   receiveBirthdayPromo
 );
 router.post("/createSystemNotification", createSystemNotification);
+router.post("/getPromoCodeId", authenticateUser, tourist, getPromoCodeId);
 
 // Endpoint to trigger event notifications
 router.post('/send-activity-notifications', async (req, res) => {
@@ -134,5 +136,32 @@ router.post('/send-itinerary-notifications', async (req, res) => {
 });
 router.post('/request-notification', requestNotification);
 router.get('/get-notifications', getNotifications);
+const cron = require('node-cron');
+
+
+// Schedule to run every day at midnight
+cron.schedule('0 0 * * *', async () => {
+  console.log("Running daily notification tasks...");
+  await sendUpcomingActivityNotifications();
+  await sendUpcomingItineraryNotifications();
+});
+// For testing, add temporary routes to invoke the functions
+router.get('/test-activities', async (req, res) => {
+  try {
+    await sendUpcomingActivityNotifications();
+    res.status(200).json({ message: 'Activity notifications sent.' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/test-itineraries', async (req, res) => {
+  try {
+    await sendUpcomingItineraryNotifications();
+    res.status(200).json({ message: 'Itinerary notifications sent.' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 module.exports = router;

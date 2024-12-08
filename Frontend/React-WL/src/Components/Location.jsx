@@ -44,21 +44,29 @@ const Location = ({ location }) => {
         {/* Display the ticket prices */}
         <div className="flex flex-col">
           <label className="text-lg font-medium text-gray-800 mb-2">Ticket Prices</label>
-          <input
-            type="number"
-            value={location.ticketPrices}
-            readOnly
-            className="bg-gray-100 text-gray-800 p-3 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-600"
-          />
+          <div className="bg-gray-100 p-3 rounded-lg shadow-md">
+            {location.ticketPrices ? (
+              <ul>
+                <li className="text-gray-800">Natives: {location.ticketPrices.natives} {location.currency}</li>
+                <li className="text-gray-800">Foreigners: {location.ticketPrices.foreigners} {location.currency}</li>
+                <li className="text-gray-800">Students: {location.ticketPrices.students} {location.currency}</li>
+              </ul>
+            ) : (
+              <p className="text-gray-500">Ticket prices not available</p>
+            )}
+          </div>
         </div>
 
-        {/* Display the tags in a grid */}
+        {/* Display the tags in a grid with smaller styling */}
         <div className="flex flex-col sm:col-span-2">
           <label className="text-lg font-medium text-gray-800 mb-2">Tags</label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
             {location.tags && location.tags.length > 0 ? (
               location.tags.map((tag, index) => (
-                <div key={index} className="bg-gray-200 text-gray-700 rounded-full px-4 py-2 text-sm text-center">
+                <div
+                  key={index}
+                  className="bg-gray-200 text-gray-700 rounded-full px-2 py-1 text-xs text-center"
+                >
                   {tag.name}
                 </div>
               ))

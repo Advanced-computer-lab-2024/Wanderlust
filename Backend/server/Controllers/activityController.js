@@ -374,7 +374,7 @@ const rateActivity = async (req, res) => {
 
 const bookActivity = async (req, res) => {
   try {
-    const { activityId, paymentMethod } = req.body;
+    const { activityId, paymentMethod, price } = req.body;
     const authHeader = req.header("Authorization");
     if (!authHeader) {
       return res.status(401).json({ message: "Authorization header missing" });
@@ -405,12 +405,12 @@ const bookActivity = async (req, res) => {
 
     if (paymentMethod === "wallet") {
       // Wallet payment
-      if (tourist.wallet < activity.price) {
+      if (tourist.wallet < price) {
         return res.status(400).json({ message: "Insufficient wallet balance" });
       }
 
       // Deduct from wallet and update booking
-      tourist.wallet -= activity.price;
+      tourist.wallet -= price;
       await tourist.save();
 
       console.log("Payment successful using wallet");
@@ -428,7 +428,7 @@ const bookActivity = async (req, res) => {
       // Stripe payment
       try {
         const paymentIntent = await stripe.paymentIntents.create({
-          amount: activity.price * 100, // Convert to cents
+          amount: price * 100, // Convert to cents
           currency: tourist.currency,
           automatic_payment_methods: {
             enabled: true,
@@ -481,7 +481,7 @@ const postPaymentSuccess = async (activityId, touristId) => {
 
 
     // Update points on payment
-    await updatePointsOnPayment(tourist._id, activity.price);
+    await updatePointsOnPayment(tourist._id, price);
 
     // Update badge
     updateBadge(tourist);
@@ -491,7 +491,7 @@ const postPaymentSuccess = async (activityId, touristId) => {
       tourist.email,
       tourist.name,
       activity.name,
-      activity.price
+      price
     );
 
     return { success: true, message: "Post-payment actions completed" };
