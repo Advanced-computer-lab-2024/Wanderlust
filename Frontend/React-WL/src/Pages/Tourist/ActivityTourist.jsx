@@ -10,7 +10,10 @@ const ActivityTourist = () => {
       <Activities showCreateButton={false} showDeleteButton={false} showUpdateButton={false} guestMode={false} />
       
   
-     
+      <div className="bg-custom text-white py-4 shadow-inner text-center ">
+  <p>&copy; {new Date().getFullYear()} Wanderlust. All Rights Reserved.</p>
+  <p className="text-sm">Need help? Contact us at support@Wanderlust.com</p>
+</div>
       </>
     )
   }

@@ -565,6 +565,7 @@ const ItineraryItem = ({ item, showBookButton, showUpdateButton, showDeleteButto
         </div>
       </div>
     </div>
+    
   );
 };
 

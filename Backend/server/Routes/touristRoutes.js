@@ -24,12 +24,13 @@ const {
   deliveryAddresses,
   usePromoCode,
   receiveBirthdayPromo,
-  testOutOfStockNotification,
+  testOutOfStockNotification
+
 } = require("../Controllers/touristController");
 
 const { authenticateUser } = require("../Controllers/authController");
 const tourist = require("../Middleware/touristMiddleware");
-const { createSystemNotification } = require("../Controllers/NotificationController");
+const { createSystemNotification,sendUpcomingActivityNotifications, sendUpcomingItineraryNotifications, requestNotification,getNotifications } = require("../Controllers/NotificationController");
 
 const router = express.Router();
 
@@ -111,5 +112,27 @@ router.post(
   receiveBirthdayPromo
 );
 router.post("/createSystemNotification", createSystemNotification);
+
+// Endpoint to trigger event notifications
+router.post('/send-activity-notifications', async (req, res) => {
+  try {
+    await sendUpcomingActivityNotifications();
+    res.status(200).send('Event notifications sent successfully.');
+  } catch (error) {
+    res.status(500).send('Error sending event notifications.');
+  }
+});
+
+// Endpoint to trigger itinerary notifications
+router.post('/send-itinerary-notifications', async (req, res) => {
+  try {
+    await sendUpcomingItineraryNotifications();
+    res.status(200).send('Itinerary notifications sent successfully.');
+  } catch (error) {
+    res.status(500).send('Error sending itinerary notifications.');
+  }
+});
+router.post('/request-notification', requestNotification);
+router.get('/get-notifications', getNotifications);
 
 module.exports = router;

@@ -65,7 +65,7 @@ const TouristOrders = () => {
         }
     };
 
-    return (
+    return (<>
         <div className="p-5 max-w-3xl mx-auto">
             <h1 className="text-center text-2xl font-bold text-gray-800">My Orders</h1>
             {loading ? (
@@ -107,7 +107,39 @@ const TouristOrders = () => {
             ) : (
                 <p className="text-center text-gray-500">You have no orders.</p>
             )}
+            
         </div>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        
+   
+        
+           <div className="bg-custom text-white py-4 shadow-inner text-center ">
+           <p>&copy; {new Date().getFullYear()} Wanderlust. All Rights Reserved.</p>
+           <p className="text-sm">Need help? Contact us at support@Wanderlust.com</p>
+         </div>
+           
+             </>
+        
     );
 };
 
