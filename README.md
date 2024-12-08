@@ -21,6 +21,8 @@ By integrating these features, Wanderlust aspires to be the go-to platform for a
 ![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
 
+## Build Status
+
 ![Build Status](https://img.shields.io/badge/status-In%20Development-blue)
 
 - **Current Phase:** Development
