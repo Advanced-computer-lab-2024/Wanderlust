@@ -139,7 +139,7 @@ const BookingItinerary = ({ itineraryId, price }) => {
         {/* Confirm Payment Button */}
         <div className="mt-6">
           <button
-            className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-custom text-white px-2 py-1 rounded-md text-xs"
             onClick={handlePayment}
             disabled={loading}
           >

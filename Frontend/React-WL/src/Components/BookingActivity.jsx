@@ -96,8 +96,7 @@ const BookingActivity = ({ activityId, price }) => {
         {/* Total Amount Section */}
         <div className="mb-6">
           <p className="text-lg font-semibold text-gray-700">
-            Activity Price:{" "}
-            <span className="text-green-600">${price}</span>
+            Activity Price: <span className="text-green-600">${price}</span>
           </p>
         </div>
 
@@ -140,7 +139,7 @@ const BookingActivity = ({ activityId, price }) => {
         {/* Confirm Payment Button */}
         <div className="mt-6">
           <button
-            className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-custom text-white px-2 py-1 rounded-md text-xs"
             onClick={handlePayment}
             disabled={loading}
           >

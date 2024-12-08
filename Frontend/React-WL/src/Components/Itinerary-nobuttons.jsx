@@ -1,10 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import MultiRangeSlider from "multi-range-slider-react";
-import Activities from './Activities';
-import { Calendar, MapPin, Globe, DollarSign, Users, Check, Star, Search } from 'lucide-react';
-import Card from '../Components/Card';
-import Activity from './Activity';
+import Activities from "./Activities";
+import { useNavigate } from "react-router-dom";
+import {
+  Calendar,
+  MapPin,
+  Globe,
+  DollarSign,
+  Users,
+  Check,
+  Star,
+  Search,
+} from "lucide-react";
+import Card from "../Components/Card";
+import Activity from "./Activity";
 
 const Itinerary = ({ guestMode }) => {
   const [itinerary, setItinerary] = useState([]);
@@ -18,7 +28,7 @@ const Itinerary = ({ guestMode }) => {
   useEffect(() => {
     const fetchCurrency = async () => {
       const userCurrency = await getTouristId().currency;
-      setCurrency(userCurrency || 'EGP');  // Default to 'EGP' if no currency is fetched
+      setCurrency(userCurrency || "EGP"); // Default to 'EGP' if no currency is fetched
     };
     fetchCurrency();
   }, []);
@@ -27,11 +37,15 @@ const Itinerary = ({ guestMode }) => {
     try {
       const [infoResponse, userResponse] = await Promise.all([
         axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
-          headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          },
         }),
         axios.get("http://localhost:8000/api/admin/getLoggedInUser", {
-          headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
-        })
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          },
+        }),
       ]);
 
       const combinedData = { ...infoResponse.data, ...userResponse.data };
@@ -61,35 +75,49 @@ const Itinerary = ({ guestMode }) => {
         }
 
         // Define itinerary URL based on guestMode and currency
-        const itineraryUrl = id === 1
-          ? "http://localhost:8000/api/itinerary/getItineraryGuest"
-          : `http://localhost:8000/api/itinerary/getItinerary?currency=${currency}`;
+        const itineraryUrl =
+          id === 1
+            ? "http://localhost:8000/api/itinerary/getItineraryGuest"
+            : `http://localhost:8000/api/itinerary/getItinerary?currency=${currency}`;
 
         // Fetch itineraries based on the URL
         const itineraryResponse = await axios.get(itineraryUrl, {
-          headers: id !== 1 ? { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` } : undefined
+          headers:
+            id !== 1
+              ? { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
+              : undefined,
         });
 
         let itineraryData = itineraryResponse.data;
 
         // Fetch bookings for the current tourist if not in guest mode
         if (!guestMode) {
-          const userIdResponse = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-            },
-          });
+          const userIdResponse = await axios.get(
+            "http://localhost:8000/api/admin/getLoggedInInfo",
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+              },
+            }
+          );
           const userIdValue = userIdResponse.data?._id;
 
-          const bookingsResponse = await axios.get("http://localhost:8000/api/bookings/getBooking", {
-            params: { userId: userIdValue },
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-            },
-          });
+          const bookingsResponse = await axios.get(
+            "http://localhost:8000/api/bookings/getBooking",
+            {
+              params: { userId: userIdValue },
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+              },
+            }
+          );
 
-          const bookings = Array.isArray(bookingsResponse.data) ? bookingsResponse.data : [];
-          const bookedItineraryIds = bookings.map((booking) => booking.itineraryId?._id);
+          const bookings = Array.isArray(bookingsResponse.data)
+            ? bookingsResponse.data
+            : [];
+          const bookedItineraryIds = bookings.map(
+            (booking) => booking.itineraryId?._id
+          );
 
           // Filter itineraries based on bookings
           itineraryData = itineraryData.filter(
@@ -99,7 +127,6 @@ const Itinerary = ({ guestMode }) => {
 
         // Update itinerary state with either filtered or fetched data
         setItinerary(itineraryData);
-
       } catch (error) {
         console.error("Error fetching itineraries or bookings:", error);
       } finally {
@@ -128,8 +155,8 @@ const Itinerary = ({ guestMode }) => {
 
   const filterItineraryByPref = async ({ preference }) => {
     try {
-      if (preference === 'All') {
-        preference = 'undefined';
+      if (preference === "All") {
+        preference = "undefined";
       }
       let url = `http://localhost:8000/api/itinerary/filterItinerariesByPref?preference=${preference}`;
       const response = await axios.get(url);
@@ -151,10 +178,10 @@ const Itinerary = ({ guestMode }) => {
 
   const filterItinerary = async ({ language, date }) => {
     try {
-      if (language === 'All') {
+      if (language === "All") {
         language = undefined;
       }
-      if (date === '') {
+      if (date === "") {
         date = undefined;
       }
       let url = "http://localhost:8000/api/itinerary/filterItineraries?";
@@ -163,9 +190,7 @@ const Itinerary = ({ guestMode }) => {
       if (date) url += `date=${date}&`;
       if (language) url += `language=${language}&`;
       url =
-        url.slice(-1) === "&" || url.slice(-1) === "?"
-          ? url.slice(0, -1)
-          : url;
+        url.slice(-1) === "&" || url.slice(-1) === "?" ? url.slice(0, -1) : url;
       const response = await axios.get(url);
       const data = await response.data;
       console.log(data);
@@ -186,7 +211,9 @@ const Itinerary = ({ guestMode }) => {
   const searchItinerary = async () => {
     try {
       const query = document.getElementById("searchInput").value;
-      const response = await axios.get(`http://localhost:8000/api/itinerary/searchItinerary?query=${query}`);
+      const response = await axios.get(
+        `http://localhost:8000/api/itinerary/searchItinerary?query=${query}`
+      );
       const data = await response.data;
       if (Array.isArray(data) && data.length > 0) {
         setItinerary(data);
@@ -202,18 +229,23 @@ const Itinerary = ({ guestMode }) => {
     }
   };
 
-  if (loading) return (
-    <div className="flex justify-center items-center h-64">
-      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
 
-  if (error) return (
-    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-      <strong className="font-bold">Error!</strong>
-      <span className="block sm:inline"> {error.message}</span>
-    </div>
-  );
+  if (error)
+    return (
+      <div
+        className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+        role="alert"
+      >
+        <strong className="font-bold">Error!</strong>
+        <span className="block sm:inline"> {error.message}</span>
+      </div>
+    );
 
   return (
     <section className="bg-blue-50 px-4 py-10">
@@ -238,20 +270,39 @@ const Itinerary = ({ guestMode }) => {
               </div>
               <div className="slidertext flex justify-between">
                 <p className="minValue text-gray-700">
-                  Min Value: <span className="text-custom font-semibold">${minValue}</span>
+                  Min Value:{" "}
+                  <span className="text-custom font-semibold">${minValue}</span>
                 </p>
                 <p className="maxValue text-gray-700">
-                  Max Value: <span className="text-custom font-semibold">${maxValue}</span>
+                  Max Value:{" "}
+                  <span className="text-custom font-semibold">${maxValue}</span>
                 </p>
               </div>
             </div>
             <div className="Datediv mb-4">
-              <label htmlFor="date" className="text-gray-700 font-semibold mb-1 block">Date:</label>
-              <input id="date" type="date" className="border border-gray-300 p-2 rounded-lg w-full" />
+              <label
+                htmlFor="date"
+                className="text-gray-700 font-semibold mb-1 block"
+              >
+                Date:
+              </label>
+              <input
+                id="date"
+                type="date"
+                className="border border-gray-300 p-2 rounded-lg w-full"
+              />
             </div>
             <div className="Datediv mb-4">
-              <label htmlFor="language" className="text-gray-700 font-semibold mb-1 block">Language:</label>
-              <select id="language" className="border border-gray-300 p-2 rounded-lg w-full">
+              <label
+                htmlFor="language"
+                className="text-gray-700 font-semibold mb-1 block"
+              >
+                Language:
+              </label>
+              <select
+                id="language"
+                className="border border-gray-300 p-2 rounded-lg w-full"
+              >
                 <option value="All">All</option>
                 <option value="English">English</option>
                 <option value="Spanish">Spanish</option>
@@ -268,8 +319,16 @@ const Itinerary = ({ guestMode }) => {
               </button>
             </div>
             <div className="Datediv mb-4">
-              <label htmlFor="preferences" className="text-gray-700 font-semibold mb-1 block">Preferences:</label>
-              <select id="preferences" className="border border-gray-300 p-2 rounded-lg w-full">
+              <label
+                htmlFor="preferences"
+                className="text-gray-700 font-semibold mb-1 block"
+              >
+                Preferences:
+              </label>
+              <select
+                id="preferences"
+                className="border border-gray-300 p-2 rounded-lg w-full"
+              >
                 <option value="All">All</option>
                 <option value="Beaches">Beaches</option>
                 <option value="Family-Friendly">Family-Friendly</option>
@@ -310,15 +369,14 @@ const Itinerary = ({ guestMode }) => {
           <div className="flex flex-col space-y-6">
             {itinerary.length > 0 ? (
               itinerary.map((item) => (
-                <ItineraryItem
-                  key={item._id}
-                  item={item}
-                />
+                <ItineraryItem key={item._id} item={item} />
               ))
             ) : (
               <div className="text-center py-8">
                 <Globe className="mx-auto text-gray-400" size={64} />
-                <p className="mt-4 text-xl text-gray-600">No itineraries available. Create your first adventure!</p>
+                <p className="mt-4 text-xl text-gray-600">
+                  No itineraries available. Create your first adventure!
+                </p>
               </div>
             )}
           </div>
@@ -328,34 +386,86 @@ const Itinerary = ({ guestMode }) => {
   );
 };
 
-const ItineraryItem = ({ item }) => (
-  <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
-    <div className="p-6">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h2 className="text-2xl font-semibold mb-2 text-indigo-600">{item.title}</h2>
-          <p className="text-gray-600 text-sm flex items-center">
-            <Calendar className="mr-2" size={16} />
-            {new Date(item.timeline.start).toISOString().split("T")[0]} - {new Date(item.timeline.end).toISOString().split("T")[0]}
-          </p>
+const ItineraryItem = ({ item, onUpdate, onDelete }) => {
+  const navigate = useNavigate();
+
+  const handleBookItinerary = async () => {
+    navigate("/BookingItineraryPage", {
+      state: { itineraryId: item._id, price: item.price },
+    });
+  };
+
+  return (
+    <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
+      <div className="p-6">
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h2 className="text-2xl font-semibold mb-2 text-indigo-600">
+              {item.title}
+            </h2>
+            <p className="text-gray-600 text-sm flex items-center">
+              <Calendar className="mr-2" size={16} />
+              {item.timeline.start} - {item.timeline.end}
+            </p>
+          </div>
         </div>
+        <ItineraryDetails item={item} />
+        <ItineraryActivities activities={item.activities} />
+        <ItinerarySection
+          title="Locations"
+          items={item.locations}
+          icon={<MapPin size={18} />}
+        />
+        <ItinerarySection
+          title="Available Dates"
+          items={item.availableDates}
+          icon={<Calendar size={18} />}
+        />
+
+        {/* Add Book Itinerary button here */}
+        <button
+          onClick={handleBookItinerary}
+          className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg mt-4 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+        >
+          Book Itinerary
+        </button>
       </div>
-      <ItineraryDetails item={item} />
-      <ItineraryActivities activities={item.activities} />
-      <ItinerarySection title="Locations" items={item.locations} icon={<MapPin size={18} />} />
-      <ItinerarySection title="Available Dates" items={item.availableDates} icon={<Calendar size={18} />} />
     </div>
-  </div>
-);
+  );
+};
 
 const ItineraryDetails = ({ item }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4 mb-6">
-    <DetailItem icon={<DollarSign size={18} />} label="Price" value={item.price} />
-    <DetailItem icon={<Globe size={18} />} label="Language of Tour" value={item.languageOfTour} />
-    <DetailItem icon={<Users size={18} />} label="Accessibility" value={item.accessibility} />
-    <DetailItem icon={<MapPin size={18} />} label="Pickup Location" value={item.pickupLocation} />
-    <DetailItem icon={<MapPin size={18} />} label="Dropoff Location" value={item.dropoffLocation} />
-    <DetailItem icon={<Check size={18} />} label="Booking Open" value={item.isActive ? "Yes" : "No"} />
+    <DetailItem
+      icon={<DollarSign size={18} />}
+      label="Price"
+      value={item.price}
+    />
+    <DetailItem
+      icon={<Globe size={18} />}
+      label="Language of Tour"
+      value={item.languageOfTour}
+    />
+    <DetailItem
+      icon={<Users size={18} />}
+      label="Accessibility"
+      value={item.accessibility}
+    />
+    <DetailItem
+      icon={<MapPin size={18} />}
+      label="Pickup Location"
+      value={item.pickupLocation}
+    />
+    <DetailItem
+      icon={<MapPin size={18} />}
+      label="Dropoff Location"
+      value={item.dropoffLocation}
+    />
+    <DetailItem
+      icon={<Check size={18} />}
+      label="Booking Open"
+      value={item.isActive ? "Yes" : "No"}
+    />
     <DetailItem icon={<Star size={18} />} label="Rating" value={item.rating} />
   </div>
 );
@@ -378,8 +488,15 @@ const ItineraryActivities = ({ activities }) => (
     </h3>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {activities.map((activity) => (
-        <div key={activity.id} className="bg-gray-50 rounded-lg p-3 hover:shadow-md transition duration-300">
-          <Activity activity={activity} showDeleteButton={false} showUpdateButton={false} />
+        <div
+          key={activity.id}
+          className="bg-gray-50 rounded-lg p-3 hover:shadow-md transition duration-300"
+        >
+          <Activity
+            activity={activity}
+            showDeleteButton={false}
+            showUpdateButton={false}
+          />
         </div>
       ))}
     </div>
