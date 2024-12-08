@@ -11,7 +11,6 @@ const ItineraryTourist = () => {
     <Itineraries guestMode={false} showBookButton={false} showBookmark={false} showCreateButton={false} showDeleteButton={false} showUpdateButton={false}/>
     
 
-
    
     </>
   )

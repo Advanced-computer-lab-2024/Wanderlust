@@ -13,6 +13,7 @@ import {
   Check,
   Star,
   Search,
+  Bookmark, BookmarkCheck 
 } from "lucide-react";
 import Card from "../Components/Card";
 import Rating from "@mui/material/Rating"; // Ensure Rating component is imported
@@ -392,13 +393,75 @@ const Itinerary = ({ guestMode, showCreateButton = true, showUpdateButton = true
 
 const ItineraryItem = ({ item, showBookButton, showUpdateButton, showDeleteButton, showBookmark, showBookButtonItinerary, onUpdate, onDelete }) => {
   const navigate = useNavigate();
+  const [isSaved, setIsSaved] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleBookItinerary = async () => {
     navigate("/BookingItineraryPage", {
       state: { itineraryId: item._id, price: item.price },
     });
   };
-
+  const handleSaveItinerary = async () => {
+    const token = localStorage.getItem('jwtToken'); // Retrieve the token from local storage
+    if (!token) {
+      console.error('No token found. Please log in.');
+      return;
+    }
+  
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        'http://localhost:8000/api/itinerary/saveItinerary',
+        { itineraryId: item._id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      if (response.status === 200) {
+        setIsSaved(true);
+        console.log('Itinerary saved successfully');
+      } else {
+        console.error('Failed to save itinerary');
+      }
+    } catch (error) {
+      console.error('Error saving itinerary:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleUnsaveItinerary = async () => {
+    const token = localStorage.getItem('jwtToken'); // Retrieve the token from local storage
+    if (!token) {
+      console.error('No token found. Please log in.');
+      return;
+    }
+  
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        'http://localhost:8000/api/itinerary/unsaveItinerary',
+        { itineraryId: item._id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      if (response.status === 200) {
+        setIsSaved(false);
+        console.log('Itinerary unsaved successfully');
+      } else {
+        console.error('Failed to unsave itinerary');
+      }
+    } catch (error) {
+      console.error('Error unsaving itinerary:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleSaveUnsave = async () => {
+    if (isSaved) {
+      await handleUnsaveItinerary();
+    } else {
+      await handleSaveItinerary();
+    }
+  };
   return (
     <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg">
       <div className="p-6">
@@ -426,15 +489,24 @@ const ItineraryItem = ({ item, showBookButton, showUpdateButton, showDeleteButto
           icon={<Calendar size={18} />}
         />
 
-        {/* Add Book Itinerary button here */}
-        {showBookButtonItinerary && (
-          <button
-            onClick={handleBookItinerary}
-            className="bg-custom hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg mt-4 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
-          >
-            Book Itinerary
-          </button>
-        )}
+<div className="flex space-x-4 mt-4">
+          {showBookButtonItinerary && (
+            <button
+              onClick={handleBookItinerary}
+              className="bg-custom hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+            >
+              Book Itinerary
+            </button>
+          )}
+          {showBookButtonItinerary && (
+            <button
+              onClick={isSaved ? handleUnsaveItinerary : handleSaveItinerary}
+              className="bg-custom text-white font-semibold py-1 px-2 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:bg-blue-600 flex items-center text-xs"
+            >
+              {isSaved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

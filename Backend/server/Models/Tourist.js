@@ -44,16 +44,22 @@ const touristSchema = new Schema(
       type: [String],
       default: [],
     },
-  
   savedActivities: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Activity",
+  }],
+  savedItineraries: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Itinerary",
   }],
   notificationRequests: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Activity",
   }],
-
+  notificationRequest: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Activity",
+  }],
     cart: [
       {
         product: {
