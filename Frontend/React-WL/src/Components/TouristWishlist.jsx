@@ -84,7 +84,11 @@ const TouristWishlist = () => {
       <div className="bg-white p-10 rounded shadow-2xl w-full max-w-lg">
         <h1 className="text-2xl font-bold mb-6 text-center">My Wishlist</h1>
         {loading ? (
-          <p className="text-center text-gray-500">Loading...</p>
+            
+                <div className="flex justify-center items-center h-64">
+                  <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+                </div>
+            
         ) : error ? (
           <h1 className="text-center text-red-500">{error}</h1>
         ) : wishlist.length > 0 ? (

@@ -7,7 +7,7 @@ const SalesReportTourGuide = () => {
   return (<>
     <TourguideNavBar />
     <Itinerary />
-    <Salestg />
+    
     
     </>
   )

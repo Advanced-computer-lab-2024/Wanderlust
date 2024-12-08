@@ -45,6 +45,7 @@ import AdminManageItinerary from "./Pages/AdminManageItinerary";
 import AdminViewNotifications from "./Pages/AdminViewNotifications";
 import TouristOrdersPage from "./Pages/Tourist/TouristOrdersPage";
 import TouristBookmarkPage from "./Pages/Tourist/TouristBookmarkPage";
+import TouristNotifPage from "./Pages/Tourist/TouristNotifPage";
 import OrderDetailsPage from "./Pages/Tourist/OrderDetailsPage";
 import SalesReportTourGuide from "./Pages/Tourguide/SalesReportTourGuide";
 import SalesReportAdvertiser from "./Pages/Advertiser/SalesReportAdvertiser";
@@ -129,6 +130,7 @@ const App = () => {
         <Route path="/TouristOrders" element={<TouristOrdersPage />} />
         <Route path="/OrderDetails/:orderId" element={<OrderDetailsPage />} />
         <Route path="/TouristBookmarks" element={<TouristBookmarkPage />} />
+        <Route path="/TouristNotif" element={<TouristNotifPage />} />
 
         {/* Guest Routes */}
         <Route path="/register" element={<RegisterPage />} />

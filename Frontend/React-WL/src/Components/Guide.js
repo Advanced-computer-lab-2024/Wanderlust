@@ -25,7 +25,7 @@ const Guide = () => {
                 },
                 {
                   element: '#resultDiv',
-                  intro: 'Click on Locations to browse detailed information about various destinations and find the perfect spot for your next adventure.'
+                  intro: 'Click on Whereabouts to browse detailed information about various destinations and find the perfect spot for your next adventure.'
                 },
                 {
                   element: '#resultDiv',

@@ -1,5 +1,6 @@
 const Booking = require("../Models/Booking");
-
+const jwt = require("jsonwebtoken");
+const Tourist = require("../Models/Tourist");
 const fetchBookings = async (req, res) => {
   try {
     const { userId } = req.query;
@@ -13,15 +14,15 @@ const fetchBookings = async (req, res) => {
       .populate("activityId") // Populate related activity data (if present)
       .populate("userId", "username email") // Populate user data (e.g., name and email)
       .populate({
-      path: "itineraryId",
-      populate: {
-        path: "creator",
+        path: "itineraryId",
         populate: {
-        path: "userId",
-        select: "username email"
+          path: "creator",
+          populate: {
+            path: "userId",
+            select: "username email"
+          }
         }
-      }
-      })
+      });
 
     // Iterate and update the `attended` status based on the current time
     const currentTime = new Date();
@@ -67,4 +68,106 @@ const fetchBookings = async (req, res) => {
   }
 };
 
-module.exports = { fetchBookings };
+const fetchUpcomingBookings = async (req, res) => {
+  console.log("FetchUpcomingBookings");
+  const authHeader = req.header("Authorization");
+  if (!authHeader) {
+    return res.status(401).json({ message: "Authorization header missing" });
+  }
+  const token = authHeader.replace("Bearer ", "");
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const touristId = decoded.id;
+  const tourist = await Tourist.findById(touristId);
+  if (!tourist) {
+    return res.status(404).json({ message: "Tourist not found" });
+  }
+
+  try {
+    let bookings = await Booking.find({ userId: tourist.userId })
+      .populate("activityId") // Populate related activity data (if present)
+      .populate("userId", "username email") // Populate user data (e.g., name and email)
+      .populate({
+        path: "itineraryId",
+        populate: {
+          path: "creator",
+          populate: {
+            path: "userId",
+            select: "username email"
+          }
+        }
+      })
+      .exec();
+
+    const currentTime = new Date();
+    let upcomingBookings = bookings.filter((booking) => {
+      const { activityId, itineraryId } = booking;
+      if(activityId){
+        const activityStartTime = activityId.date;
+        return currentTime < activityStartTime;
+      }
+       else if(itineraryId){
+        const itineraryStartTime = itineraryId.timeline.start;
+        return currentTime < itineraryStartTime;
+      }
+
+    });
+
+    res.status(200).json(upcomingBookings);
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const fetchPastBookings = async (req, res) => {
+  console.log("FetchUpcomingBookings");
+  const authHeader = req.header("Authorization");
+  if (!authHeader) {
+    return res.status(401).json({ message: "Authorization header missing" });
+  }
+  const token = authHeader.replace("Bearer ", "");
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const touristId = decoded.id;
+  const tourist = await Tourist.findById(touristId);
+  if (!tourist) {
+    return res.status(404).json({ message: "Tourist not found" });
+  }
+
+  try {
+    let bookings = await Booking.find({ userId: tourist.userId })
+      .populate("activityId") // Populate related activity data (if present)
+      .populate("userId", "username email") // Populate user data (e.g., name and email)
+      .populate({
+        path: "itineraryId",
+        populate: {
+          path: "creator",
+          populate: {
+            path: "userId",
+            select: "username email"
+          }
+        }
+      })
+      .exec();
+
+    const currentTime = new Date();
+    let upcomingBookings = bookings.filter((booking) => {
+      const { activityId, itineraryId } = booking;
+      if(activityId){
+        const activityStartTime = activityId.date;
+        return currentTime > activityStartTime;
+      }
+       else if(itineraryId){
+        const itineraryStartTime = itineraryId.timeline.start;
+        return currentTime > itineraryStartTime;
+      }
+
+    });
+
+    res.status(200).json(upcomingBookings);
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { fetchBookings, fetchUpcomingBookings , fetchPastBookings};

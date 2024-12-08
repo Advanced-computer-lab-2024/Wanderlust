@@ -57,7 +57,7 @@ const TouristBookmarks = () => {
   const handleReqActivityNotification = async (activityId) => {
     try {
       const response = await axios.post(
-        'http://localhost:8000/api/activity/requestNotification',
+        'http://localhost:8000/api/tourist//request-notification',
         { activityId },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -135,7 +135,7 @@ const TouristBookmarks = () => {
   
     try {
       const response = await axios.post(
-        'http://localhost:8000/api/itinerary/requestNotification',
+        'http://localhost:8000/api/tourist/request-notification',
         { itineraryId },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -155,9 +155,14 @@ const TouristBookmarks = () => {
 
   return (
     <div className="p-5 max-w-3xl mx-auto">
-      <h1 className="text-center text-2xl font-bold text-gray-800">My Bookmarks</h1>
+      <h2 className="text-3xl font-bold text-blue-900 mb-6 text-center">My Saved Spots</h2>
       {loading ? (
-        <p className="text-center text-gray-500">Loading...</p>
+          
+            
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+              </div>
+            
       ) : error ? (
         <h1 className="text-center text-red-500">{error}</h1>
       ) : (

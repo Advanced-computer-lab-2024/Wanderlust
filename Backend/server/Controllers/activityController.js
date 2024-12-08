@@ -473,6 +473,13 @@ const postPaymentSuccess = async (activityId, touristId) => {
       activityId: activityId,
     });
     await booking.save();
+
+    if (activity) {
+      activity.touristCount += 1;
+      await activity.save();
+  }
+
+
     // Update points on payment
     await updatePointsOnPayment(tourist._id, activity.price);
 
@@ -661,39 +668,6 @@ const getSavedActivities = async (req, res) => {
   }
 };
 
-const requestNotification = async (req, res) => {
-  try {
-    const authHeader = req.header("Authorization");
-    if (!authHeader) {
-      return res.status(401).json({ message: "Authorization header missing" });
-    }
-    const token = authHeader.replace("Bearer ", "");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    const tourist = await touristModel.findById(decoded.id);
-    if (!tourist) {
-      return res.status(404).json({ message: "Tourist not found" });
-    }
-
-    const { activityId } = req.body;
-
-    if (!tourist.notificationRequests.includes(activityId)) {
-      tourist.notificationRequests.push(activityId);
-      await tourist.save();
-    }
-
-    return res
-      .status(200)
-      .json({ message: "Notification request saved successfully" });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      message: "Error saving notification request",
-      error: error.message,
-    });
-  }
-};
-
 // flag an activity as inappropriate (admin onlyFlag)
 const flagActivity = async (req, res) => {
   try {
@@ -783,7 +757,6 @@ module.exports = {
   saveActivity,
   unsaveActivity,
   getSavedActivities,
-  requestNotification,
   flagActivity,
   unflagActivity,
   handleBookingSuccess

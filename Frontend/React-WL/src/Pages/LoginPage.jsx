@@ -7,8 +7,10 @@ import GuestNavBar from "../Components/NavBars/GuestNavBar";
 
 const Login = () => {
     const [role, setRole] = useState("");
+    const [loading, setLoading] = useState(true); // Spinner state
     const navigate = useNavigate();
     const [showTerms, setShowTerms] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
     const [formData, setFormData] = useState({
         username: "",
         password: "",
@@ -51,6 +53,7 @@ const Login = () => {
             password: formData.password,
             role: role,
         };
+    try {
         const response = await axios.post("http://localhost:8000/api/admin/login", data);
         localStorage.setItem("jwtToken", response.data.token);
         if (data.role === "admin") {
@@ -78,6 +81,17 @@ const Login = () => {
             } else {
                 setShowTerms(true);
             }
+            
+        }
+    }catch (error) {
+            console.error("Login error:", error);
+            if (error.response?.status === 400) {
+                setErrorMessage("Incorrect username or password. Please try again.");
+            } else if (error.response?.status === 404) {
+                setErrorMessage("Username does not exist");
+            } else {
+                setErrorMessage("An error occurred. Please try again later.");
+            }
         }
     };
 
@@ -88,6 +102,11 @@ const Login = () => {
                 {/* Left - Form Section */}
                 <div  className="bg-white p-10 rounded shadow-2xl w-full max-w-md">
                     <h1 className="text-2xl font-bold mb-6">Login</h1>
+                    {errorMessage && (
+                        <div className="mb-4 text-red-500 font-semibold text-sm">
+                            {errorMessage}
+                        </div>
+                    )}
                     <form>
                         <div className="mb-6">
                             <label htmlFor="role" className="block text-gray-800 font-semibold">
@@ -179,6 +198,7 @@ const Login = () => {
                     </div>
                 </div>
             )}
+            
         </>
     );
 };

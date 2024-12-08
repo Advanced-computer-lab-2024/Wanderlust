@@ -6,6 +6,7 @@ const TouristOrdersPage = () => {
         <>
         <TouristNavBar />
         <TouristOrders />
+        
         </>
         
     );

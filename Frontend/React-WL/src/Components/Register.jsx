@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [role, setRole] = useState("");
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [nationalities, setNationalities] = useState([]);
   const [documents, setDocuments] = useState({
@@ -40,23 +41,25 @@ const Register = () => {
     idAdvertiserDocument: "", // Advertiser
     taxationRegistryCardAdvertiserDocument: "", // Advertiser
   });
-
+  
   //lesa tourguide m4 sha8ala w lesa seller w advertiser
 
   useEffect(() => {
     axios
       .get("https://restcountries.com/v3.1/all")
       .then((response) => {
-        // Extract the demonym (nationality) from each country
         const fetchedNationalities = response.data.map(
           (country) => country.demonyms?.eng?.m || country.name.common
         );
-        setNationalities(fetchedNationalities.sort()); // Sorting the nationalities alphabetically
+        setNationalities(fetchedNationalities.sort());
+        setLoading(false); // Set loading to false after fetching data
       })
       .catch((error) => {
         console.error("Error fetching nationalities:", error);
+        setLoading(false); // Also set loading to false in case of an error
       });
   }, []);
+  
 
   // Handle input change
   const handleInputChange = (e) => {
@@ -78,11 +81,26 @@ const Register = () => {
   };
 
   const handleSubmit = async (e) => {
+
     e.preventDefault();
-    if (formData.password1 !== formData.password2) {
+  if (!formData) {
+      alert("Form data is not initialized.");
+      return;
+    }  
+  if (!formData.username || !formData.password1 || !formData.password2 || !formData.mobileNumber) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+  if (formData.password1 !== formData.password2) {
       alert("Passwords do not match");
       return;
     }
+  if (role === "tourist" && formData.age < 18) {
+    alert("Tourists must be at least 18 years old.");
+    return;
+  }
+  
+  try {
     const data = {
       username: formData.username,
       email: formData.email,
@@ -91,7 +109,6 @@ const Register = () => {
       role: role,
     };
     const formD1 = new FormData();
-
     const responseUser = await axios.post(`http://localhost:8000/signup`, data);
     const userId = responseUser.data._id;
     if (role === "tourist") {
@@ -208,8 +225,17 @@ const Register = () => {
       );
     }
     navigate("/login");
-
+  } catch (error) {
+    console.error("Error during form submission:", error);
+    alert("An error occurred during form submission. Please try again.");
+  }
   };
+  if (loading)
+    return (
+        <div className="flex justify-center items-center h-screen">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+        </div>
+    );
 
   return (
     <div className="max-w-screen-lg mx-auto mt-10 p-12 flex items-center justify-between bg-gradient-to-r from-blue-400 via-purple-500 to-blue-900">

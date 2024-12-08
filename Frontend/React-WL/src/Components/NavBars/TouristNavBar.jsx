@@ -16,7 +16,7 @@ const TouristNavBar = () => {
         t9={"OrderHistory"} p9={"/TouristOrders"}
         t10={"Wishlist"} p10={"/TouristWishlist"}
         t11={"Cart"} p11={"/TouristCart"}
-        t12={"Notifications"} p12={"/TouristNotifications"}
+        t12={"Notifications"} p12={"/TouristNotif"}
       />
     </>
   );

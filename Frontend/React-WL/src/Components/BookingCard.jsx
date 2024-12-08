@@ -1,7 +1,58 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
+import { FaStar, FaTimes } from "react-icons/fa";
+
+// Reusable StarRating Component
+const StarRating = ({ rating, setRating }) => {
+  const [hoverRating, setHoverRating] = useState(0);
+
+  return (
+    <div className="flex items-center">
+      {[...Array(5)].map((_, index) => {
+        const starValue = index + 1;
+        return (
+          <button
+            key={index}
+            type="button"
+            className="focus:outline-none"
+            onClick={() => setRating(starValue)}
+            onMouseEnter={() => setHoverRating(starValue)}
+            onMouseLeave={() => setHoverRating(0)}
+            aria-label={`Rate ${starValue} star${starValue > 1 ? "s" : ""}`}
+          >
+            <FaStar
+              className={`h-6 w-6 ${
+                starValue <= (hoverRating || rating)
+                  ? "text-yellow-400" // Updated to a yellow shade
+                  : "text-gray-300"
+              }`}
+            />
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 const BookingCard = ({ booking, onCancel }) => {
+  // State for transportation booking
+  const [selectedTransportation, setSelectedTransportation] = useState("uber");
+
+  // States for review modals
+  const [showActivityReview, setShowActivityReview] = useState(false);
+  const [showTourGuideReview, setShowTourGuideReview] = useState(false);
+  const [showItineraryReview, setShowItineraryReview] = useState(false);
+
+  // States for review inputs
+  const [activityRating, setActivityRating] = useState(0);
+  const [activityComment, setActivityComment] = useState("");
+
+  const [tourGuideRating, setTourGuideRating] = useState(0);
+  const [tourGuideComment, setTourGuideComment] = useState("");
+
+  const [itineraryRating, setItineraryRating] = useState(0);
+  const [itineraryComment, setItineraryComment] = useState("");
+
   // Function to display the booking name (either activity or itinerary)
   const getBookingName = () => {
     if (booking.activityId) {
@@ -10,114 +61,6 @@ const BookingCard = ({ booking, onCancel }) => {
       return booking.itineraryId.title;
     } else {
       return "No Name Available";
-    }
-  };
-  const handleBookTransportation = async () => {
-    const transportation = document.querySelector('select').value;
-
-    const response = await axios.get("http://localhost:8000/api/admin/getLoggedInUser", {
-      headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
-      }
-    });
-    const user = response.data;
-    // console.log(transportation);
-    try {
-      await axios.post(
-        `http://localhost:8000/api/transportation/bookTransportation`,
-        {
-          advertiserId: transportation == "uber" ? "67324784d7b329c5a5120909" : "67324738d7b329c5a5120903",
-          touristId : user._id,
-        },
-      );
-      alert("Transportation booked successfully!");
-    } catch (error) {
-      console.error("Error booking transportation:", error);
-      alert("Failed to book transportation. Please try again later.");
-    }
-  };
-
-  const handleReviewTourGuide = async () => {
-    const tourGuideRating = document.querySelector('input[placeholder="Rate the tourguide (1-5)"]').value;
-    const tourGuideComment = document.querySelector('textarea[placeholder="Comment on the tourguide"]').value;
-    // console.log(tourGuideRating, tourGuideComment);
-    // console.log(booking.itineraryId.creator._id);
-    const response = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
-      headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
-      }
-    });
-    const user = response.data;
-    try {
-      await axios.post(
-        `http://localhost:8000/api/tourGuide/rate/${booking.itineraryId.creator._id}`,
-        {
-          userId: user._id,
-          rating: tourGuideRating,
-          comment: tourGuideComment,
-        },
-      );
-      alert("Tour guide review submitted successfully!");
-    } catch (error) {
-      console.error("Error submitting tour guide review:", error);
-      alert("Failed to submit tour guide review. Please try again later.");
-    }
-  };
-  const handleReviewItinerary = async () => {
-    const itineraryRating = document.querySelector('input[placeholder="Rate the itinerary (1-5)"]').value;
-    const itineraryComment = document.querySelector('textarea[placeholder="Comment on the itinerary"]').value;
-    // console.log(itineraryRating, itineraryComment);
-    // console.log(booking.itineraryId._id);
-    try {
-      await axios.post(
-        `http://localhost:8000/api/itinerary/itinerary/rate`,
-        {
-          itineraryId: booking.itineraryId._id,
-          rating: itineraryRating,
-          review: itineraryComment,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-        }
-      }
-      );
-      alert("Itinerary review submitted successfully!");
-    } catch (error) {
-      console.error("Error submitting itinerary review:", error);
-      alert("Failed to submit itinerary review. Please try again later.");
-    }
-  };
-
-  const handleReviewActivity = async () => {
-    const activityRating = document.querySelector('input[placeholder="Rate the activity (1-5)"]').value;
-    const activityComment = document.querySelector('textarea[placeholder="Comment on the activity"]').value;
-    // console.log(activityRating, activityComment);
-    // console.log(booking.activityId._id);
-    const response = await axios.get("http://localhost:8000/api/admin/getLoggedInInfo", {
-      headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
-      }
-    });
-    const user = response.data;
-    try {
-      await axios.post(
-        `http://localhost:8000/api/activity/rate/${booking.activityId._id}`,
-        {
-          userId: user._id,
-          rating: activityRating,
-          comment: activityComment,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-        }
-      }
-      );
-      alert("Activity review submitted successfully!");
-    } catch (error) {
-      console.error("Error submitting activity review:", error);
-      alert("Failed to submit activity review. Please try again later.");
     }
   };
 
@@ -140,164 +83,264 @@ const BookingCard = ({ booking, onCancel }) => {
   // Function to handle booking cancellation
   const handleCancelBooking = async () => {
     try {
-      // Determine whether it's an activity or itinerary booking
-      const bookingType = booking.activityId ? "activity" : booking.itineraryId ? "itinerary" : null;
+      const bookingType = booking.activityId
+        ? "activity"
+        : booking.itineraryId
+        ? "itinerary"
+        : null;
 
-      // Check the booking type and call the appropriate API route
-      if (bookingType === "activity") {
-        await axios.delete(`http://localhost:8000/api/activity/cancelActivityBooking/${booking._id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-          },
-        });
-      } else if (bookingType === "itinerary") {
-        await axios.delete(`http://localhost:8000/api/itinerary/cancelItineraryBooking/${booking._id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-          },
-        });
+      if (!bookingType) {
+        alert("Invalid booking type.");
+        return;
       }
 
-      // Call the onCancel function to refresh bookings after cancellation
-      onCancel(booking._id);
+      const cancelEndpoint =
+        bookingType === "activity"
+          ? `http://localhost:8000/api/activity/cancelActivityBooking/${booking._id}`
+          : `http://localhost:8000/api/itinerary/cancelItineraryBooking/${booking._id}`;
+
+      const response = await axios.delete(cancelEndpoint, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+        },
+      });
+
+      if (response.status === 200) {
+        alert("Booking canceled successfully!");
+        onCancel(booking._id);
+      } else {
+        alert("Failed to cancel booking. Please try again.");
+      }
     } catch (error) {
       console.error("Error canceling booking:", error);
-      alert("Failed to cancel booking. Please try again later.");
+      alert("An error occurred while canceling the booking.");
     }
   };
 
+  // Function to handle transportation booking
+  const handleBookTransportation = async () => {
+    try {
+      const responseUser = await axios.get(
+        "http://localhost:8000/api/admin/getLoggedInUser",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          },
+        }
+      );
+      const user = responseUser.data;
 
-  // Render booking card
+      const advertiserId =
+        selectedTransportation === "uber"
+          ? "67324784d7b329c5a5120909"
+          : "67324738d7b329c5a5120903";
+
+      const response = await axios.post(
+        "http://localhost:8000/api/transportation/bookTransportation",
+        {
+          advertiserId,
+          touristId: user._id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        alert("Transportation booked successfully!");
+      } else {
+        alert("Failed to book transportation. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error booking transportation:", error);
+      alert("An error occurred while booking transportation.");
+    }
+  };
+
+  // Function to handle review submissions
+  const handleSubmitReview = async (type, rating, comment, id) => {
+    if (rating < 1 || rating > 5) {
+      alert(`Please enter a valid rating between 1 and 5 for the ${type}.`);
+      return;
+    }
+
+    try {
+      const responseUser = await axios.get(
+        "http://localhost:8000/api/admin/getLoggedInUser",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          },
+        }
+      );
+      const user = responseUser.data;
+
+      let response;
+      if (type === "activity") {
+        response = await axios.post(
+          `http://localhost:8000/api/activity/rate/${id}`,
+          {
+            userId: user._id,
+            rating,
+            comment,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            },
+          }
+        );
+      } else if (type === "tour-guide") {
+        response = await axios.post(
+          `http://localhost:8000/api/tourGuide/rate/${id}`,
+          {
+            userId: user._id,
+            rating,
+            comment,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            },
+          }
+        );
+      } else if (type === "itinerary") {
+        response = await axios.post(
+          `http://localhost:8000/api/itinerary/itinerary/rate`,
+          {
+            itineraryId: id,
+            rating,
+            review: comment,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            },
+          }
+        );
+      }
+
+      if (response.status === 200) {
+        alert(`${type} review submitted successfully!`);
+        setActivityRating(0);
+        setActivityComment("");
+        setTourGuideRating(0);
+        setTourGuideComment("");
+        setItineraryRating(0);
+        setItineraryComment("");
+      } else {
+        alert(`Failed to submit ${type} review. Please try again.`);
+      }
+    } catch (error) {
+      console.error(`Error submitting ${type} review:`, error);
+      alert(`An error occurred while submitting the ${type} review.`);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-xl shadow-md relative p-4 mb-4">
-      <h3 className="text-lg font-bold">{getBookingName()}</h3>
-      <p className="text-gray-600 text-sm">Booking Date: {formatDate(booking.createdAt)}</p>
+    <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+      {/* Booking Header */}
+      <h3 className="text-lg font-bold text-blue-900">{getBookingName()}</h3>
+      <p className="text-gray-600 text-sm">
+        Booking Date: {formatDate(booking.createdAt)}
+      </p>
       <p className="text-gray-600 text-sm">Price: ${getBookingPrice()}</p>
-      <p className="text-gray-600 text-sm">Attended: {booking.attended ? "True" : "False"} </p>
+      <p className="text-gray-600 text-sm">
+        Attended: {booking.attended ? "Yes" : "No"}
+      </p>
+
+      {/* Transportation Booking */}
       {!booking.attended && (
         <>
-      <div className="mt-2">
-        <label className="block text-gray-500 text-xs">Select Transportation:</label>
-        <select className="border rounded p-1 text-xs w-full">
-          <option value="london-cab">London Cab</option>
-          <option value="uber">Uber</option>
-        </select>
-      </div>
-      <div className="mt-2">
-        <button onClick={handleBookTransportation} className="bg-green-500 text-white px-4 py-2 rounded">
-          Book
-        </button>
-
-      </div>
-      </>
+          <div className="mt-4">
+            <label className="block text-gray-500 text-xs">
+              Select Transportation:
+            </label>
+            <select
+              className="border rounded p-2 text-xs w-full mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={selectedTransportation}
+              onChange={(e) => setSelectedTransportation(e.target.value)}
+              aria-label="Select Transportation"
+            >
+              <option value="uber">Uber</option>
+              <option value="london-cab">London Cab</option>
+            </select>
+          </div>
+          <div className="mt-2">
+            <button
+              onClick={handleBookTransportation}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none transition-colors duration-200 text-xs flex items-center"
+              aria-label="Book Transportation"
+            >
+              Book Transportation
+            </button>
+          </div>
+        </>
       )}
-      
 
-      <div className="mt-2"></div>
-      <div className="mt-</div>2">
-        <h4 className="font-semibold text-sm">Booking Details:</h4>
-        {booking.activityId ? (
-          <div>
-            <p className="text-gray-500 text-xs">Activity: {booking.activityId.name}</p>
-            <p className="text-gray-500 text-xs">Date: {new Date(booking.activityId.date).toLocaleDateString()}</p>
-            <p className="text-gray-500 text-xs">Price: ${booking.activityId.price}</p>
-            {booking.attended && (
-              <div className="mt-2">
-              <h4 className="font-semibold text-sm">Add a Comment and Rating:</h4>
-              <div className="mt-1">
-                <label className="block text-gray-500 text-xs">Activity Rating:</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="5"
-                  className="border rounded p-1 text-xs w-full"
-                  placeholder="Rate the activity (1-5)"
+      {/* Review Modals */}
+      <div className="mt-4">
+        {/* Activity Review */}
+        <div className="flex items-center mt-2">
+          <button
+            onClick={() => setShowActivityReview(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none transition-colors duration-200 text-xs flex items-center"
+            aria-label="Review Activity"
+          >
+            Review Activity
+          </button>
+          {showActivityReview && (
+            <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
+              <div className="bg-white p-6 rounded-xl w-80">
+                <h3 className="text-xl text-center text-blue-900 mb-4">
+                  Review Activity
+                </h3>
+                <StarRating
+                  rating={activityRating}
+                  setRating={setActivityRating}
                 />
-              </div>
-              <div className="mt-1">
-                <label className="block text-gray-500 text-xs">Activity Comment:</label>
                 <textarea
-                  className="border rounded p-1 text-xs w-full"
-                  placeholder="Comment on the activity"
+                  value={activityComment}
+                  onChange={(e) => setActivityComment(e.target.value)}
+                  placeholder="Write your review"
+                  rows={4}
+                  className="w-full border rounded p-2 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 ></textarea>
+                <div className="flex justify-center gap-4 mt-4">
+                  <button
+                    onClick={() =>
+                      handleSubmitReview("activity", activityRating, activityComment, booking.activityId._id)
+                    }
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none text-xs"
+                  >
+                    Submit
+                  </button>
+                  <button
+                    onClick={() => setShowActivityReview(false)}
+                    className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 focus:outline-none text-xs"
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
               </div>
-              <div className="mt-1">
-                <button onClick={handleReviewActivity} className="bg-blue-500 text-white px-4 py-2 rounded">
-                  Submit Review
-                </button>
-              </div>
-              </div>
-            )}
+            </div>
+          )}
+        </div>
 
-
-          </div>
-        ) : booking.itineraryId ? (
-          <div>
-            <p className="text-gray-500 text-xs">Itinerary: {booking.itineraryId.title}</p>
-            <p className="text-gray-500 text-xs">Duration: {booking.itineraryId.duration} hours</p>
-            <p className="text-gray-500 text-xs">Price: ${booking.itineraryId.price}</p>
-            <p className="text-gray-600 text-sm">Tourguide: {booking.itineraryId.creator.userId.username} </p>
-            {booking.attended && (
-              <div className="mt-2">
-              <h4 className="font-semibold text-sm">Add a Comment and Rating:</h4>
-              <div className="mt-1">
-                <label className="block text-gray-500 text-xs">Tourguide Rating:</label>
-                <input
-                type="number"
-                min="1"
-                max="5"
-                className="border rounded p-1 text-xs w-full"
-                placeholder="Rate the tourguide (1-5)"
-                />
-              </div>
-              <div className="mt-1">
-                <label className="block text-gray-500 text-xs">Tourguide Comment:</label>
-                <textarea
-                className="border rounded p-1 text-xs w-full"
-                placeholder="Comment on the tourguide"
-                ></textarea>
-              </div>
-              <div className="mt-1">
-                <button onClick={handleReviewTourGuide} className="bg-blue-500 text-white px-4 py-2 rounded">
-                  Submit Review
-                </button>
-              </div>
-              <div className="mt-1">
-                <label className="block text-gray-500 text-xs">Itinerary Rating:</label>
-                <input
-                type="number"
-                min="1"
-                max="5"
-                className="border rounded p-1 text-xs w-full"
-                placeholder="Rate the itinerary (1-5)"
-                />
-              </div>
-              <div className="mt-1">
-                <label className="block text-gray-500 text-xs">Itinerary Comment:</label>
-                <textarea
-                className="border rounded p-1 text-xs w-full"
-                placeholder="Comment on the itinerary"
-                ></textarea>
-              </div>
-              <div className="mt-1">
-                <button onClick={handleReviewItinerary} className="bg-blue-500 text-white px-4 py-2 rounded">
-                  Submit Review
-                </button>
-              </div>
-              </div>
-            )}
-
-          </div>
-        ) : null}
+        {/* Other Reviews (Tour Guide, Itinerary) can be added in a similar manner */}
       </div>
 
       {/* Cancel Booking Button */}
-      <button
-        onClick={handleCancelBooking}
-        className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
-      >
-        Cancel Booking
-      </button>
+      {!booking.attended && (
+        <button
+          onClick={handleCancelBooking}
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none text-xs mt-4"
+        >
+          Cancel Booking
+        </button>
+      )}
     </div>
   );
 };

@@ -61,7 +61,12 @@ Our project adheres to a set of coding standards to ensure consistency, readabil
 By adhering to these coding standards, we ensure that our codebase remains clean, efficient, and easy to understand for all contributors.
 
 ## Screenshots
-
+<details>
+<summary>Landing Page</summary>
+  
+  ![Home Page](screenshots/HomePage.png)
+  
+</details>
 
 ## Tech/Framework Used
 Our project leverages a modern tech stack to deliver a seamless and efficient experience for users. The following technologies and frameworks are used:

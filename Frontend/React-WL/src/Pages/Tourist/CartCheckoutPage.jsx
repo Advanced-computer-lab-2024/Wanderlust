@@ -19,6 +19,7 @@ const CartCheckoutPage = () => {
       <Elements stripe={stripePromise}>
         <CartCheckout totalAmount={totalAmount} />
       </Elements>
+      
     </>
   );
 };

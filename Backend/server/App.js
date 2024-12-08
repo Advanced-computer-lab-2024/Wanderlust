@@ -13,7 +13,6 @@ const cron = require('node-cron');
 //calling for controllers
 
 const { signUp } = require('./Controllers/userController');
-const { sendNotifications } = require('./Controllers/notifications');
 
 const {
   createLocation,
