@@ -136,6 +136,7 @@ const ItinerarySales = () => {
   );
 
   return (
+    <>
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-4xl font-bold text-indigo-700 mb-8">Itinerary Sales Report</h1>
       
@@ -248,6 +249,11 @@ const ItinerarySales = () => {
         </div>
       </Card>
     </div>
+        <div className="bg-custom text-white py-4 shadow-inner text-center ">
+        <p>&copy; {new Date().getFullYear()} Wanderlust. All Rights Reserved.</p>
+        <p className="text-sm">Need help? Contact us at support@Wanderlust.com</p>
+      </div>
+        </>
   );
 };
 

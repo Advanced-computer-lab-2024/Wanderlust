@@ -276,7 +276,7 @@ const Itinerary = () => {
     </div>
   );
 
-  return (
+  return (<>
     <section className="bg-blue-50 px-4 py-10">
       <div className="container mx-auto flex flex-col lg:flex-row">
         <div className="bg-white rounded-xl shadow-md p-6 lg:w-1/3 mb-6 lg:mb-0 lg:mr-6 mt-10">
@@ -431,6 +431,11 @@ const Itinerary = () => {
         />
       )}
     </section>
+        <div className="bg-custom text-white py-4 shadow-inner text-center ">
+        <p>&copy; {new Date().getFullYear()} Wanderlust. All Rights Reserved.</p>
+        <p className="text-sm">Need help? Contact us at support@Wanderlust.com</p>
+      </div>
+        </>
   );
 };
 
