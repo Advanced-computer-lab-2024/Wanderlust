@@ -23,7 +23,7 @@ const StarRating = ({ rating, setRating }) => {
             <FaStar
               className={`h-6 w-6 ${
                 starValue <= (hoverRating || rating)
-                  ? "text-yellow-400" // Updated to a yellow shade
+                  ? "text-yellow-400" // Booking.com yellow
                   : "text-gray-300"
               }`}
             />
@@ -224,6 +224,7 @@ const BookingCard = ({ booking, onCancel }) => {
 
       if (response.status === 200) {
         alert(`${type} review submitted successfully!`);
+        // Reset all review states
         setActivityRating(0);
         setActivityComment("");
         setTourGuideRating(0);
@@ -281,56 +282,113 @@ const BookingCard = ({ booking, onCancel }) => {
       )}
 
       {/* Review Modals */}
-      <div className="mt-4">
-        {/* Activity Review */}
-        <div className="flex items-center mt-2">
-          <button
-            onClick={() => setShowActivityReview(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none transition-colors duration-200 text-xs flex items-center"
-            aria-label="Review Activity"
-          >
-            Review Activity
-          </button>
-          {showActivityReview && (
-            <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
-              <div className="bg-white p-6 rounded-xl w-80">
-                <h3 className="text-xl text-center text-blue-900 mb-4">
-                  Review Activity
-                </h3>
-                <StarRating
-                  rating={activityRating}
-                  setRating={setActivityRating}
-                />
-                <textarea
-                  value={activityComment}
-                  onChange={(e) => setActivityComment(e.target.value)}
-                  placeholder="Write your review"
-                  rows={4}
-                  className="w-full border rounded p-2 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                ></textarea>
-                <div className="flex justify-center gap-4 mt-4">
-                  <button
-                    onClick={() =>
-                      handleSubmitReview("activity", activityRating, activityComment, booking.activityId._id)
-                    }
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none text-xs"
-                  >
-                    Submit
-                  </button>
-                  <button
-                    onClick={() => setShowActivityReview(false)}
-                    className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 focus:outline-none text-xs"
-                  >
-                    <FaTimes />
-                  </button>
+      {booking.attended && (
+        <div className="mt-4 space-y-2">
+          {/* Activity Review */}
+          <div className="flex items-center mt-2">
+            <button
+              onClick={() => setShowActivityReview(true)}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none transition-colors duration-200 text-xs flex items-center"
+              aria-label="Review Activity"
+            >
+              Review Activity
+            </button>
+            {showActivityReview && (
+              <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
+                <div className="bg-white p-6 rounded-xl w-80">
+                  <h3 className="text-xl text-center text-blue-900 mb-4">
+                    Review Activity
+                  </h3>
+                  <StarRating
+                    rating={activityRating}
+                    setRating={setActivityRating}
+                  />
+                  <textarea
+                    value={activityComment}
+                    onChange={(e) => setActivityComment(e.target.value)}
+                    placeholder="Write your review"
+                    rows={4}
+                    className="w-full border rounded p-2 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  ></textarea>
+                  <div className="flex justify-center gap-4 mt-4">
+                    <button
+                      onClick={() =>
+                        handleSubmitReview(
+                          "activity",
+                          activityRating,
+                          activityComment,
+                          booking.activityId._id
+                        )
+                      }
+                      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none text-xs"
+                    >
+                      Submit
+                    </button>
+                    <button
+                      onClick={() => setShowActivityReview(false)}
+                      className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 focus:outline-none text-xs"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* Other Reviews (Tour Guide, Itinerary) can be added in a similar manner */}
-      </div>
+          {/* Tour Guide Review */}
+          <div className="flex items-center mt-2">
+            <button
+              onClick={() => setShowTourGuideReview(true)}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none transition-colors duration-200 text-xs flex items-center"
+              aria-label="Review Tour Guide"
+            >
+              Review Tour Guide
+            </button>
+            {showTourGuideReview && (
+              <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
+                <div className="bg-white p-6 rounded-xl w-80">
+                  <h3 className="text-xl text-center text-blue-900 mb-4">
+                    Review Tour Guide
+                  </h3>
+                  <StarRating
+                    rating={tourGuideRating}
+                    setRating={setTourGuideRating}
+                  />
+                  <textarea
+                    value={tourGuideComment}
+                    onChange={(e) => setTourGuideComment(e.target.value)}
+                    placeholder="Write your review"
+                    rows={4}
+                    className="w-full border rounded p-2 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  ></textarea>
+                  <div className="flex justify-center gap-4 mt-4">
+                    <button
+                      onClick={() =>
+                        handleSubmitReview(
+                          "tour-guide",
+                          tourGuideRating,
+                          tourGuideComment,
+                          booking.tourGuideId._id
+                        )
+                      }
+                      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none text-xs"
+                    >
+                      Submit
+                    </button>
+                    <button
+                      onClick={() => setShowTourGuideReview(false)}
+                      className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 focus:outline-none text-xs"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Cancel Booking Button */}
       {!booking.attended && (
