@@ -62,6 +62,7 @@ By adhering to these coding standards, we ensure that our codebase remains clean
 
 ## Screenshots
 
+- ![Home Page](Screenshots/Homepage.png)
 
 ## Tech/Framework Used
 Our project leverages a modern tech stack to deliver a seamless and efficient experience for users. The following technologies and frameworks are used:
