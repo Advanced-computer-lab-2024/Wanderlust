@@ -118,10 +118,7 @@ const AdvertiserProfile = () => {
   };
 
   const handleSaveProfile = async () => {
-    if (profilePicture) {
-      const formData = new FormData();
-      formData.append('file', profilePicture); // Append the file
-      formData.append('userId', profile.userId);
+   
     try {
       console.log('Sending update request with:', {
         username,
@@ -170,7 +167,7 @@ const AdvertiserProfile = () => {
       console.error('Error updating profile:', error);
       const errorMessage = error.response?.data?.error || 'An error occurred. Please try again later.';
       alert(errorMessage);
-    }}
+    }
   };
   const handleProfilePictureChange = (e) => {
     setSelectedImage(e.target.files[0]); // Set the uploaded file to state
@@ -192,6 +189,7 @@ const AdvertiserProfile = () => {
   if (!profile) return null;
 
   return (
+    <>
     <div className="bg-gray-100 min-h-screen py-8">
       <div className="max-w-6xl mx-auto px-4 flex justify-between items-center">
         <div className="flex items-center text-indigo-600 cursor-pointer ml-auto" onClick={toggleSettings}>
@@ -236,8 +234,18 @@ const AdvertiserProfile = () => {
                     <span>{profile.website || "N/A"}</span>
                   </div>
                 </div>
+                
               </div>
+              <div className="flex justify-end mt-4">
+    <button
+      onClick={handleUpdateProfile}
+      className="bg-indigo-600 text-white py-2 px-4 rounded-md"
+    >
+      Update Profile
+    </button>
+    </div>
             </div>
+     
           </div>
         </div>
       </Card>
@@ -312,12 +320,18 @@ const AdvertiserProfile = () => {
                   </div>
                 </div>
           
-                <div className="flex justify-end">
+                <div className="flex justify-end space-x-2">
                   <button
                     onClick={handleSaveProfile}
                     className="bg-indigo-600 text-white py-2 px-4 rounded-md"
                   >
                     Save Profile
+                  </button>
+                  <button
+                    onClick={() => setShowUpdateForm(false)}
+                    className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md"
+                  >
+                    Close
                   </button>
                 </div>
               </div>
@@ -326,13 +340,13 @@ const AdvertiserProfile = () => {
         </Card>
       )}
 
-      <button
-        onClick={handleUpdateProfile}
-        className="bg-indigo-600 text-white py-2 px-4 rounded-md mt-4"
-      >
-        Update Profile
-      </button>
+
     </div>
+    <div className="bg-custom text-white py-4 shadow-inner text-center ">
+  <p>&copy; {new Date().getFullYear()} Wanderlust. All Rights Reserved.</p>
+  <p className="text-sm">Need help? Contact us at support@Wanderlust.com</p>
+</div>
+    </>
   );
 };
 
@@ -473,18 +487,18 @@ const SettingsPopup = ({ profile, username, onClose }) => {
           )}
         </div>
 
-        <div className="mt-4 text-center">
+        <div className="mt-4 flex justify-between space-x-4">
           <button
             onClick={onClose}
             className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md">
             Close
           </button>
           <button
-          onClick={handleDeleteAccount}
-          className="mt-4 bg-red-600 text-white rounded px-4 py-2"
-        >
-          Delete Account
-        </button>
+            onClick={handleDeleteAccount}
+            className="bg-red-600 text-white py-2 px-4 rounded-md">
+            Delete Account
+          </button>
+        
         </div>
       </div>
     </div>

@@ -98,6 +98,10 @@ const ActivitySchema = new Schema({
   },
   description: {
     type: String,
+  },
+  touristCounrt: {  
+    type: Number
+    
   }
 });
 

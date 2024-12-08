@@ -14,6 +14,8 @@ const ItinerarySales = () => {
   const [itinerary, setItinerary] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
+  const [userId, setUserId] = useState(null);
   const [minValue, set_minValue] = useState(1);
   const [maxValue, set_maxValue] = useState(10000);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -22,9 +24,26 @@ const [selectedItinerary, setSelectedItinerary] = useState(null);
 const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
 
-  useEffect(() => {
-    fetchItinerary();
+useEffect(() => {
+    fetchUser();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      setUserId(user._id || '');
+      console.log("User ID set:", user._id);
+      
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (userId) {
+      fetchItinerary();
+    }
+  }, [userId]);
+
+
+
 
   const handleInput = (e) => {
     set_minValue(e.minValue);
@@ -141,17 +160,66 @@ const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     }
   };
 
+  const fetchUser = async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/api/admin/getLoggedInUser", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
+        }
+      });
+      
+      setUser(response.data);
+      console.log(response.data);
+      console.log(user);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchItinerary = async () => {
     try {
       const response = await fetch('http://localhost:8000/api/itinerary/getitinerary');
+      
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
+  
       const data = await response.json();
-      if (Array.isArray(data) && data.length > 0) {
-        setItinerary(data);
+      
+      console.log("All Itineraries Raw Data:", data);
+      console.log("Current User ID:", userId);
+  
+      // Log detailed creator information
+      data.forEach((itinerary, index) => {
+        console.log(`Itinerary ${index}:`, {
+          fullItinerary: itinerary,
+          creator: itinerary.creator,
+          creatorId: itinerary.creatorId,
+          userId: userId
+        });
+      });
+  
+      // Try alternative filtering approaches
+      const filteredItineraries = data.filter(itinerary => {
+        // Try different ways of matching
+        return (
+          itinerary.creator === userId || 
+          itinerary.creator === String(userId) || 
+          itinerary.creatorId === userId || 
+          itinerary.creatorId === String(userId)
+        );
+      });
+  
+      console.log("Filtered Itineraries:", filteredItineraries);
+  
+      if (filteredItineraries.length > 0) {
+        setItinerary(filteredItineraries);
       } else {
-        console.log("Itinerary array is empty or undefined.");
+        console.log("No itineraries match the criteria.");
+        console.log("Raw data length:", data.length);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -159,9 +227,10 @@ const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     } finally {
       setLoading(false);
     }
-  };
+  }
+  
 
-   console.log(itinerary);
+  
   const handleCreate = () => {
     console.log("Create new itinerary");
     setIsCreateModalOpen(true);
@@ -395,7 +464,7 @@ const ItineraryItem = ({ item, onUpdate, onDelete,deleteConfirmId,setDeleteConfi
       <ItineraryActivities activities={item.activities} />
       <ItinerarySection title="Locations" items={item.locations} icon={<MapPin size={18} />} />
       <ItinerarySection title="Available Dates" items={item.availableDates} icon={<Calendar size={18} />} />
-      <DetailItem icon={<Users size={18} />} label="Number of tourists" value={item.accessibility} />
+      <DetailItem icon={<Users size={18} />} label="Number of tourists" value={item.touristCount} />
     </div>
   </div>
 );

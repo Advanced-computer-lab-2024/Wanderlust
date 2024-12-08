@@ -48,6 +48,8 @@ const TourGuideProfile = () => {
         }
       });
       setProfile(response.data);
+      console.log(response.data);
+     
     } catch (error) {
       console.error("Error fetching profile:", error);
       setError(error);
@@ -65,6 +67,7 @@ const TourGuideProfile = () => {
       });
       setInfo(response.data);
       setUsername(response.data.username);
+      
     } catch (error) {
       console.error("Error fetching info:", error);
       setError(error);
@@ -141,6 +144,7 @@ const TourGuideProfile = () => {
         }
       );
       console.log(response.data);
+      console.log(response.errorMessage);
 
       if (response.data) {
         setProfile((prevProfile) => ({
@@ -184,6 +188,7 @@ const TourGuideProfile = () => {
   if (!profile) return null;
 
   return (
+    <>
     <div className="bg-gray-100 min-h-screen py-8">
       <div className="max-w-6xl mx-auto px-4 flex justify-between items-center">
         <div className="flex items-center text-indigo-600 cursor-pointer ml-auto" onClick={toggleSettings}>
@@ -194,41 +199,71 @@ const TourGuideProfile = () => {
       {showSettings && <SettingsPopup profile={info} username={username} onClose={toggleSettings} />}
 
       <Card>
-        <div className="profile-container">
-          <div className="bg-white rounded-xl shadow-md overflow-hidden">
-            <div className="p-6">
-              <div className="flex items-center mb-6">
-                <div className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center">
-                {profile.photoURL ? (
-                      <img src={profile.photoURL} alt="Profile" className="w-full h-full object-cover" />
-                    ) : (
-                      <User className="w-12 h-12 text-indigo-600" />
-                    )}
-                </div>
-                <div className="ml-6">
-                  {info && <h2 className="text-2xl font-semibold text-indigo-600">{info.username}</h2>}
-                  <div className="flex items-center text-gray-600 mt-2">
-                    <Phone className="w-4 h-4 mr-2" />
-                    {info && <span>{info.mobileNumber || "N/A"}</span>}
-                  </div>
-                  <div className="flex items-center text-gray-600 mt-2">
-                    <Mail className="w-4 h-4 mr-2" />
-                    {info && <span>{info.email || "N/A"}</span>}
-                  </div>
-                  <div className="flex items-center text-gray-600 mt-2">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    <span>{profile.YOE || "N/A"} years of experience</span>
-                  </div>
-                  <div className="flex items-center text-gray-600 mt-2">
-                    <Briefcase className="w-4 h-4 mr-2" />
-                    <span>{profile.previousWork || "N/A"}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+  <div className="profile-container">
+    {/* Main Profile Section */}
+    <div className="bg-white rounded-xl shadow-md overflow-hidden">
+  <div className="p-6">
+    <div className="flex items-center justify-between mb-6">
+      {/* Profile Picture and Info */}
+      <div className="flex items-center">
+        <div className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center">
+          {profile.photoURL ? (
+            <img
+              src={profile.photoURL}
+              alt="Profile"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <User className="w-12 h-12 text-indigo-600" />
+          )}
+        </div>
+        <div className="ml-6">
+          {info && (
+            <h2 className="text-2xl font-semibold text-indigo-600">
+              {info.username}
+            </h2>
+          )}
+          <div className="flex items-center text-gray-600 mt-2">
+            <Phone className="w-4 h-4 mr-2" />
+            {info && <span>{info.mobileNumber || "N/A"}</span>}
+          </div>
+          <div className="flex items-center text-gray-600 mt-2">
+            <Mail className="w-4 h-4 mr-2" />
+            {info && <span>{info.email || "N/A"}</span>}
+          </div>
+          <div className="flex items-center text-gray-600 mt-2">
+            <Calendar className="w-4 h-4 mr-2" />
+            <span>{profile.YOE || "N/A"} years of experience</span>
+          </div>
+          <div className="flex items-center text-gray-600 mt-2">
+            <Briefcase className="w-4 h-4 mr-2" />
+            <span>{profile.previousWork || "N/A"}</span>
           </div>
         </div>
-      </Card>
+      </div>
+    </div>
+    <div className="flex justify-end mt-4">
+    <button
+      onClick={handleUpdateProfile}
+      className="bg-indigo-600 text-white py-2 px-4 rounded-md"
+    >
+      Update Profile
+    </button>
+    </div>
+  </div>
+</div>
+    {/* Footer */}
+ 
+    
+  </div>
+  
+  
+  
+    
+
+</Card>
+
+
 
       {showUpdateForm && (
         <Card>
@@ -289,12 +324,18 @@ const TourGuideProfile = () => {
                     </button>
                   </div>
                 </div>
-                <div className="flex justify-end">
+                <div className="flex justify-end space-x-2">
                   <button
                     onClick={handleSaveProfile}
                     className="bg-indigo-600 text-white py-2 px-4 rounded-md"
                   >
                     Save Profile
+                  </button>
+                  <button
+                    onClick={() => setShowUpdateForm(false)}
+                    className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md"
+                  >
+                    Close
                   </button>
                 </div>
               </div>
@@ -302,14 +343,12 @@ const TourGuideProfile = () => {
           </div>
         </Card>
       )}
-
-      <button
-        onClick={handleUpdateProfile}
-        className="bg-indigo-600 text-white py-2 px-4 rounded-md mt-4"
-      >
-        Update Profile
-      </button>
     </div>
+    <div className="bg-custom text-white py-4 shadow-inner text-center ">
+  <p>&copy; {new Date().getFullYear()} Wanderlust. All Rights Reserved.</p>
+  <p className="text-sm">Need help? Contact us at support@Wanderlust.com</p>
+</div>
+  </>
   );
 };
 
@@ -450,23 +489,24 @@ const SettingsPopup = ({ profile, username, onClose }) => {
           )}
         </div>
 
-        <div className="mt-4 text-center">
+        <div className="mt-4 flex justify-between space-x-4">
           <button
             onClick={onClose}
             className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md">
             Close
           </button>
           <button
-          onClick={handleDeleteAccount}
-          className="mt-4 bg-red-600 text-white rounded px-4 py-2"
-        >
-          Delete Account
-        </button>
+            onClick={handleDeleteAccount}
+            className="bg-red-600 text-white py-2 px-4 rounded-md">
+            Delete Account
+          </button>
         </div>
       </div>
     </div>
   );
 };
+
+
 
 
 export default TourGuideProfile;
