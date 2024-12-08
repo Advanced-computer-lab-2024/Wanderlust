@@ -12,8 +12,20 @@ Traveling and exploring new places can be both exciting and overwhelming. The pl
 
 By integrating these features, Wanderlust aspires to be the go-to platform for all travel enthusiasts, making travel planning seamless, enjoyable, and personalized.
 
+## Badges
+
+![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)
+![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)
+![ReactJS](https://img.shields.io/badge/-ReactJs-61DAFB?logo=react&logoColor=white&style=for-the-badge)
+![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
+![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
+
 ## Build Status
-Currently, the project is in the development phase. If there are any issues or problems, they will be documented here.
+- The project is currently in development phase.
+- Testing needs to be implemented using Jest.
+- Autherization middleware is not implemented eveyrwhere it should be.
+- Backend needs better organization
 
 ## Code Style
 Our project adheres to a set of coding standards to ensure consistency, readability, and maintainability across the codebase. Please follow these guidelines when contributing:
@@ -350,6 +362,28 @@ export default CreatePromocode;
 
 ## Tests
 Testing is done using Postman for manual API testing.
+- Example 1:
+```link
+http://localhost:8000/api/admin/login
+```
+```json
+{
+    "username": "nada",
+    "password": "nada123",
+    "role": "admin"
+}
+```
+- Example 2:
+```link
+http://localhost:3000/api/itinerary/rate
+```
+```json
+{
+  "itineraryId": "60d5f9b8f8d2c9b8f8d2c9b8",
+  "rating": 5,
+  "review": "Amazing tour! Highly recommend."
+}
+```
 
 ## How to Use
 1. Start the backend server:
@@ -406,6 +440,13 @@ git push origin feature/your-feature-name
 
 [Material UI](https://mui.com)
 
+[UiVerse](https://uiverse.io)
+
+[NodeMailer](https://www.nodemailer.com)
+
+[MongoDB Atlas](https://www.mongodb.com/docs/atlas/)
+
+[Stripe Web Elements](https://stripe.com/docs/payments/elements)
 
 ## License
 
@@ -418,5 +459,6 @@ git push origin feature/your-feature-name
 [Cloudinary](https://cloudinary.com)
 
 
+This proeject is licensed under the terms of Apache 2.0 licence.
 
 ---

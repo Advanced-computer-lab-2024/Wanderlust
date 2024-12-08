@@ -10,7 +10,7 @@ const locationsSchema = new mongoose.Schema({
   pictures: { type: String },  // Store the image URL
   location: { type: String, required: true },
   openingHours: { type: String, required: true },
-  ticketPrices: { type: Number, required: true },
+  ticketPrices: { type: [Number], required: true },  
   tags: [{
     type: mongoose.Types.ObjectId,
     ref: "PreferenceTag", // Reference to PreferenceTag model

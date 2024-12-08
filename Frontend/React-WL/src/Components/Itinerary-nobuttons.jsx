@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Card from "../Components/Card";
 import Activity from "./Activity";
+import Rating from "@mui/material/Rating"; // Ensure Rating component is imported
 
 const Itinerary = ({ guestMode }) => {
   const [itinerary, setItinerary] = useState([]);
@@ -434,7 +435,9 @@ const ItineraryItem = ({ item, onUpdate, onDelete }) => {
   );
 };
 
-const ItineraryDetails = ({ item }) => (
+const ItineraryDetails = (
+  { item, showBookingOpen } // Added showBookingOpen
+) => (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4 mb-6">
     <DetailItem
       icon={<DollarSign size={18} />}
@@ -447,11 +450,6 @@ const ItineraryDetails = ({ item }) => (
       value={item.languageOfTour}
     />
     <DetailItem
-      icon={<Users size={18} />}
-      label="Accessibility"
-      value={item.accessibility}
-    />
-    <DetailItem
       icon={<MapPin size={18} />}
       label="Pickup Location"
       value={item.pickupLocation}
@@ -461,12 +459,27 @@ const ItineraryDetails = ({ item }) => (
       label="Dropoff Location"
       value={item.dropoffLocation}
     />
-    <DetailItem
-      icon={<Check size={18} />}
-      label="Booking Open"
-      value={item.isActive ? "Yes" : "No"}
-    />
-    <DetailItem icon={<Star size={18} />} label="Rating" value={item.rating} />
+    {showBookingOpen && (
+      <DetailItem
+        icon={<Check size={18} />}
+        label="Booking Open"
+        value={item.isActive ? "Yes" : "No"}
+      />
+    )}{" "}
+    {/* Conditionally render */}
+    <div className="flex items-center">
+      <DetailItem
+        icon={<Star size={18} />}
+        label="Rating"
+        value={item.rating}
+      />
+      <Rating
+        name="read-only"
+        value={item.rating}
+        readOnly
+        sx={{ color: "gold", fontSize: "1.5rem", marginLeft: "0.5rem" }}
+      />
+    </div>
   </div>
 );
 
@@ -486,7 +499,9 @@ const ItineraryActivities = ({ activities }) => (
       <Users className="mr-2" size={20} />
       Activities
     </h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="flex flex-col gap-4">
+      {" "}
+      {/* Changed to flex-col */}
       {activities.map((activity) => (
         <div
           key={activity.id}

@@ -19,6 +19,7 @@ const Activity = ({
   const [detailsVisible, setDetailsVisible] = useState(false);
   const [currency, setCurrency] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [averageRating, setAverageRating] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
@@ -37,6 +38,14 @@ const Activity = ({
     };
     fetchCurrency();
   }, []);
+
+  useEffect(() => {
+    if (activity.comments && activity.comments.length > 0) {
+      const totalRating = activity.comments.reduce((sum, comment) => sum + comment.rating, 0);
+      const avgRating = totalRating / activity.comments.length;
+      setAverageRating(avgRating);
+    }
+  }, [activity.comments]);
 
   const getGoogleMapsEmbedUrl = (lat, lng) => {
     return `https://www.google.com/maps/embed/v1/place?key=AIzaSyA_eS_8ocAw_f4vgD01n-_vDIXG16QixpI&q=${lat},${lng}`;
@@ -145,7 +154,7 @@ const handleUnsaveActivity = async () => {
           <div className="flex justify-between items-start mt-2">
             <Box sx={{ '& > legend': { mt: 1 }, paddingTop: 2 }}>
               <Typography component="legend" sx={{ color: 'black', fontSize: '1rem' }}>Rating</Typography>
-              <Rating name="read-only" value={activity.rating || 0} readOnly sx={{ color: 'gold', fontSize: '1.5rem' }} />
+              <Rating name="read-only" value={averageRating} readOnly sx={{ color: 'gold', fontSize: '1.5rem' }} />
             </Box>
             <div className="text-right pr-4 mt-2">
               {!loading && (
@@ -218,7 +227,7 @@ const handleUnsaveActivity = async () => {
             </h3>
             <p className="text-gray-500 text-xs">Duration: {activity.duration}</p>
             <p className="text-gray-500 text-xs">
-              Rating: {activity.rating ? activity.rating : "Not Rated"}
+              Rating: {averageRating ? averageRating.toFixed(1) : "Not Rated"}
             </p>
             <p className="text-gray-500 text-xs">
               <strong>Booking Open: {activity.bookingOpen ? "Yes" : "No"}</strong>
