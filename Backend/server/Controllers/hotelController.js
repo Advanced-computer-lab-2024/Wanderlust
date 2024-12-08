@@ -58,12 +58,35 @@ const searchHotels = async (req, res) => {
       checkOutDate,
       guests
     );
+
     if (offers.length === 0) {
       return res.status(404).json({ message: "No hotels found" });
     }
 
-    return res.status(200).json(offers);
+    // Format the response with all offers for each hotel
+    const formattedOffers = offers.flatMap((offer) => {
+      const hotel = offer.hotel;
+      if (!offer.offers || !offer.offers.length) {
+        console.warn(`No offers available for hotel: ${hotel.name}`);
+        return [];
+      }
+
+      return offer.offers.map((singleOffer) => ({
+        hotelName: hotel.name || "N/A",
+        checkInDate: singleOffer.checkInDate || "N/A",
+        checkOutDate: singleOffer.checkOutDate || "N/A",
+        guests: singleOffer.guests?.adults || 0,
+        priceTotal: singleOffer.price?.total || "N/A",
+        currency: singleOffer.price?.currency || "N/A",
+        cityCode: hotel.cityCode || "N/A",
+        numberOfRooms: singleOffer.room?.typeEstimated?.beds || "N/A",
+        availability: offer.available || false,
+      }));
+    });
+
+    return res.status(200).json(formattedOffers);
   } catch (error) {
+    console.error("Error in searchHotels:", error);
     return res
       .status(500)
       .json({ message: "Server error", error: error.message });
@@ -82,61 +105,124 @@ const getCityCode = async (destination) => {
       }
     );
 
-    if (locationResponse?.data?.data?.length === 0) {
+    if (!locationResponse?.data?.data?.length) {
       return null;
     }
 
     return locationResponse.data.data[0].iataCode;
   } catch (error) {
-    console.log(error);
+    console.error("Error in getCityCode:", error.message);
+    return null;
+  }
+};
+
+const validateDates = (checkInDate, checkOutDate) => {
+  const today = new Date();
+  const checkIn = new Date(checkInDate);
+  const checkOut = new Date(checkOutDate);
+
+  if (checkIn < today) {
+    throw new Error("Check-in date cannot be in the past.");
+  }
+
+  if (checkOut <= checkIn) {
+    throw new Error("Check-out date must be after check-in date.");
+  }
+
+  if ((checkOut - checkIn) / (1000 * 60 * 60 * 24) > 30) {
+    throw new Error(
+      "Booking period exceeds the maximum allowable range (30 days)."
+    );
   }
 };
 
 const getHotelOffers = async (cityCode, checkInDate, checkOutDate, guests) => {
   const token = await generateAccessToken();
 
-  const hotelListResponse = await axios.get(
-    `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-city?cityCode=${cityCode}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-
-  if (hotelListResponse?.data?.data?.length === 0) {
-    return [];
+  // Validate the date ranges before proceeding
+  try {
+    validateDates(checkInDate, checkOutDate);
+  } catch (dateError) {
+    console.error("Date validation error:", dateError.message);
+    throw dateError;
   }
 
-  // Extract hotelIds
-  const hotelIds = hotelListResponse.data.data.map((hotel) => hotel.hotelId);
+  try {
+    const hotelListResponse = await axios.get(
+      `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-city?cityCode=${cityCode}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-  // Fetch offers concurrently
-  const offerPromises = hotelIds.map((hotelId) =>
-    axios
-      .get(
-        `https://test.api.amadeus.com/v2/shopping/hotel-offers?hotelId=${hotelId}&checkInDate=${checkInDate}&checkOutDate=${checkOutDate}&adults=${guests}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-      .then((response) => response.data.data || []) // Return the offers or an empty array if none
-      .catch((error) => {
-        console.error(
-          `Error fetching offers for hotelId ${hotelId}:`,
-          error.message
+    if (!hotelListResponse?.data?.data?.length) {
+      console.warn("No hotels found for the provided cityCode.");
+      return [];
+    }
+
+    // Extract hotelIds
+    const hotelIds = hotelListResponse.data.data.map((hotel) => hotel.hotelId);
+
+    // Track invalid property codes
+    const invalidHotelIds = new Set();
+
+    // Chunk hotelIds into smaller batches
+    const chunkSize = 20; // Adjust based on API constraints
+    const chunks = [];
+    for (let i = 0; i < hotelIds.length; i += chunkSize) {
+      chunks.push(hotelIds.slice(i, i + chunkSize));
+    }
+
+    // Process chunks sequentially
+    const offersArray = [];
+    for (const chunk of chunks) {
+      // Filter out invalid hotelIds
+      const validChunk = chunk.filter((id) => !invalidHotelIds.has(id));
+      if (validChunk.length === 0) continue;
+
+      try {
+        const response = await axios.get(
+          `https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelIds=${validChunk.join(
+            ","
+          )}&checkInDate=${checkInDate}&checkOutDate=${checkOutDate}&adults=${guests}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
-        return []; // Handle errors gracefully
-      })
-  );
+        offersArray.push(...(response.data.data || []));
+      } catch (error) {
+        console.error(
+          "Error fetching offers for chunk:",
+          error.response?.data || error.message
+        );
 
-  // Wait for all promises to resolve
-  const offersArray = await Promise.all(offerPromises);
+        // Handle specific errors and track invalid hotelIds
+        if (error.response?.data?.errors) {
+          error.response.data.errors.forEach((err) => {
+            if (
+              err.code === 1257 &&
+              err.detail.includes("INVALID PROPERTY CODE")
+            ) {
+              validChunk.forEach((id) => invalidHotelIds.add(id));
+              console.warn(`Invalid hotelIds: ${validChunk.join(",")}`);
+            }
+          });
+        }
+      }
+    }
 
-  // Flatten the array of arrays
-  return offersArray.flat();
+    return offersArray;
+  } catch (error) {
+    console.error(
+      "Error in getHotelOffers:",
+      error.response?.data || error.message
+    );
+    return [];
+  }
 };
 
 const bookHotel = async (req, res) => {

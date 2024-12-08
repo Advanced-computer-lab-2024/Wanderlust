@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
+import {Trash} from "lucide-react";
 const TouristWishlist = () => {
   const [wishlist, setWishlist] = useState([]);
   const [error, setError] = useState(null);
