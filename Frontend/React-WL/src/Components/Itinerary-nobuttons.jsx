@@ -59,6 +59,21 @@ const Itinerary = ({ guestMode, showCreateButton = true, showUpdateButton = true
     }
   };
 
+  const fetchSavedItineraries = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const response = await axios.get("http://localhost:8000/api/itinerary/savedItineraries", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const savedItineraries = response.data;
+      const savedItineraryIds = savedItineraries.map(itinerary => itinerary._id);
+      return savedItineraryIds;
+    } catch (error) {
+      console.error("Error fetching saved itineraries:", error);
+      return [];
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -125,8 +140,12 @@ const Itinerary = ({ guestMode, showCreateButton = true, showUpdateButton = true
           );
         }
 
-        // Update itinerary state with either filtered or fetched data
-        setItinerary(itineraryData);
+        const savedItineraryIds = await fetchSavedItineraries();
+        const updatedItineraryData = itineraryData.map(itinerary => ({
+          ...itinerary,
+          isSaved: savedItineraryIds.includes(itinerary._id),
+        }));
+        setItinerary(updatedItineraryData);
       } catch (error) {
         console.error("Error fetching itineraries or bookings:", error);
       } finally {
@@ -430,7 +449,7 @@ const Itinerary = ({ guestMode, showCreateButton = true, showUpdateButton = true
 
 const ItineraryItem = ({ item, showBookButton, showUpdateButton, showDeleteButton, showBookmark, showBookButtonItinerary, onUpdate, onDelete }) => {
   const navigate = useNavigate();
-  const [isSaved, setIsSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(item.isSaved);
   const [loading, setLoading] = useState(false);
 
   const handleBookItinerary = async () => {
@@ -535,9 +554,9 @@ const ItineraryItem = ({ item, showBookButton, showUpdateButton, showDeleteButto
               Book Itinerary
             </button>
           )}
-          {showBookButtonItinerary && (
+          {showBookmark && (
             <button
-              onClick={isSaved ? handleUnsaveItinerary : handleSaveItinerary}
+              onClick={handleSaveUnsave}
               className="bg-custom text-white font-semibold py-1 px-2 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:bg-blue-600 flex items-center text-xs"
             >
               {isSaved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
