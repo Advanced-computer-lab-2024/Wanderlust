@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import BookingActivity from "./BookingActivity";
-import { Edit3, Trash2, DollarSign, Euro, PoundSterling } from "lucide-react";
+import { Edit3, Trash2, DollarSign, Euro, PoundSterling, Bookmark, BookmarkCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Box from '@mui/material/Box';
 import Rating from '@mui/material/Rating';
@@ -36,8 +36,24 @@ const Activity = ({
         setLoading(false);
       }
     };
+
+    const fetchSavedActivities = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        const response = await axios.get("http://localhost:8000/api/activity/savedActivities", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const savedActivities = response.data;
+        const isActivitySaved = savedActivities.some(savedActivity => savedActivity._id === activity._id);
+        setIsSaved(isActivitySaved);
+      } catch (error) {
+        console.error("Error fetching saved activities:", error);
+      }
+    };
+
     fetchCurrency();
-  }, []);
+    fetchSavedActivities();
+  }, [activity._id]);
 
   useEffect(() => {
     if (activity.comments && activity.comments.length > 0) {
@@ -131,7 +147,7 @@ const handleUnsaveActivity = async () => {
     }
   };
   return (
-    <div className="bg-white rounded-xl shadow-md relative flex p-2">
+    <div className="bg-white rounded-xl shadow-md relative flex p-2 transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg">
       {/* Display activity picture */}
       {activity.picture && (
         <div className="w-1/3 p-1 flex items-center">
@@ -153,13 +169,13 @@ const handleUnsaveActivity = async () => {
           </div>
           <div className="flex justify-between items-start mt-2">
             <Box sx={{ '& > legend': { mt: 1 }, paddingTop: 2 }}>
-              <Typography component="legend" sx={{ color: 'black', fontSize: '1rem' }}>Rating</Typography>
+              <Typography component="legend" sx={{ color: 'black', fontSize: '1rem' }}>Rating:</Typography>
               <Rating name="read-only" value={averageRating} readOnly sx={{ color: 'gold', fontSize: '1.5rem' }} />
             </Box>
             <div className="text-right pr-4 mt-2">
               {!loading && (
                 <h3 className="custom text-lg font-semibold mb-1">
-                  {activity.specialDiscounts && (
+                  {activity.specialDiscounts && activity.specialDiscounts !== "undefined" && (
                     <button className="bg-green-500 text-white text-xs font-semibold py-1 px-2 rounded-md mr-2 cursor-default">
                       {activity.specialDiscounts}
                     </button>
@@ -167,20 +183,22 @@ const handleUnsaveActivity = async () => {
                   {getCurrencyIcon(currency)}{activity.price}
                 </h3>
               )}
-              <button
-                onClick={isSaved ? handleUnsaveActivity : handleSaveActivity}
-                className="bg-custom text-white font-semibold py-1 px-2 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105 flex items-center text-xs"
-              >
-                {isSaved ? 'Unsave Activity' : 'Save Activity'}
-              </button>
-              {showBookButton && ( // Added showBookButton logic
+              <div className="flex space-x-2">
+                {showBookButton && ( // Added showBookButton logic
+                  <button
+                    onClick={handleBookActivity}
+                    className="bg-custom text-white px-3 py-2 rounded-md text-sm mt-1 transition duration-300 ease-in-out transform hover:bg-blue-600"
+                  >
+                    Book Activity
+                  </button>
+                )}
                 <button
-                  onClick={handleBookActivity}
-                  className="bg-custom text-white px-3 py-2 rounded-md text-sm mt-1"
+                  onClick={isSaved ? handleUnsaveActivity : handleSaveActivity}
+                  className="bg-custom text-white font-semibold py-1 px-2 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:bg-blue-600 flex items-center text-xs"
                 >
-                  Book Activity
+                  {isSaved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
                 </button>
-              )}
+              </div>
             </div>
           </div>
         </div>
@@ -253,7 +271,7 @@ const handleUnsaveActivity = async () => {
             <div className="mt-2">
               <button
                 onClick={handleBookActivity}
-                className="bg-custom text-white px-2 py-1 rounded-md text-xs"
+                className="bg-custom text-white px-2 py-1 rounded-md text-xs transition duration-300 ease-in-out transform hover:bg-blue-600"
               >
                 Book Activity
               </button>

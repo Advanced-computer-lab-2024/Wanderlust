@@ -361,7 +361,7 @@ const Itinerary = ({ guestMode }) => {
               />
               <button
                 onClick={searchItinerary}
-                className="bg-custom hover:bg-indigo-600 text-white font-semibold py-2.5 px-3 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
+                className="bg-custom hover:bg-blue-600 text-white font-semibold py-2.5 px-3 rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
               >
                 <Search size={16} />
               </button>
@@ -397,16 +397,16 @@ const ItineraryItem = ({ item, onUpdate, onDelete }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-md mb-6 overflow-hidden transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg">
       <div className="p-6">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h2 className="text-2xl font-semibold mb-2 text-indigo-600">
+            <h2 className="text-2xl font-semibold mb-2 text-blue-600">
               {item.title}
             </h2>
             <p className="text-gray-600 text-sm flex items-center">
               <Calendar className="mr-2" size={16} />
-              {item.timeline.start} - {item.timeline.end}
+              {new Date(item.timeline.start).toLocaleDateString()} - {new Date(item.timeline.end).toLocaleDateString()}
             </p>
           </div>
         </div>
@@ -419,14 +419,14 @@ const ItineraryItem = ({ item, onUpdate, onDelete }) => {
         />
         <ItinerarySection
           title="Available Dates"
-          items={item.availableDates}
+          items={item.availableDates.map(date => new Date(date).toLocaleDateString())}
           icon={<Calendar size={18} />}
         />
 
         {/* Add Book Itinerary button here */}
         <button
           onClick={handleBookItinerary}
-          className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg mt-4 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+          className="bg-custom hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg mt-4 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
         >
           Book Itinerary
         </button>
@@ -438,7 +438,7 @@ const ItineraryItem = ({ item, onUpdate, onDelete }) => {
 const ItineraryDetails = (
   { item, showBookingOpen } // Added showBookingOpen
 ) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4 mb-6">
+  <div className="text-custom grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4 mb-6">
     <DetailItem
       icon={<DollarSign size={18} />}
       label="Price"
@@ -485,7 +485,7 @@ const ItineraryDetails = (
 
 const DetailItem = ({ icon, label, value }) => (
   <div className="flex items-center">
-    <div className="text-indigo-500 mr-2">{icon}</div>
+    <div className="text-blue-600 mr-2">{icon}</div>
     <div>
       <span className="font-medium text-gray-700">{label}:</span>
       <span className="ml-2 text-gray-600">{value}</span>
@@ -495,7 +495,7 @@ const DetailItem = ({ icon, label, value }) => (
 
 const ItineraryActivities = ({ activities }) => (
   <div className="mb-6">
-    <h3 className="text-lg font-semibold mb-3 text-indigo-500 border-b border-indigo-100 pb-1 flex items-center">
+    <h3 className="text-lg font-semibold mb-3 text-blue-600 border-b border-indigo-100 pb-1 flex items-center">
       <Users className="mr-2" size={20} />
       Activities
     </h3>
@@ -511,6 +511,7 @@ const ItineraryActivities = ({ activities }) => (
             activity={activity}
             showDeleteButton={false}
             showUpdateButton={false}
+            showBookButton={false} // Set showBookButton to false
           />
         </div>
       ))}
@@ -520,7 +521,7 @@ const ItineraryActivities = ({ activities }) => (
 
 const ItinerarySection = ({ title, items, icon }) => (
   <div className="mb-4">
-    <h3 className="text-lg font-semibold mb-2 text-indigo-500 border-b border-indigo-100 pb-1 flex items-center">
+    <h3 className="text-lg font-semibold mb-2 text-blue-600 border-b border-indigo-100 pb-1 flex items-center">
       {icon}
       <span className="ml-2">{title}</span>
     </h3>
