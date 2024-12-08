@@ -157,7 +157,12 @@ const TouristBookmarks = () => {
     <div className="p-5 max-w-3xl mx-auto">
       <h1 className="text-center text-2xl font-bold text-gray-800">My Bookmarks</h1>
       {loading ? (
-        <p className="text-center text-gray-500">Loading...</p>
+          
+            
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+              </div>
+            
       ) : error ? (
         <h1 className="text-center text-red-500">{error}</h1>
       ) : (

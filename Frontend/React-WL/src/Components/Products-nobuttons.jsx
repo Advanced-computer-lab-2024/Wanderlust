@@ -13,6 +13,7 @@ import {
 const Products = () => {
     const [products, setProducts] = useState([]);
     const [sortOrder, setSortOrder] = useState('desc');
+    const [loading, setLoading] = useState(true);
     const [searchName, setSearchName] = useState('');
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
@@ -95,7 +96,9 @@ const Products = () => {
         } catch (error) {
             console.error('Error fetching products:', error);
             alert('Error fetching products. Please try again later.');
-        }
+        }finally {
+            setLoading(false);
+          }
     };
 
     const searchProducts = async () => {
@@ -116,7 +119,9 @@ const Products = () => {
         } catch (error) {
             console.error('Error searching products:', error);
             alert('Error searching products. Please try again later.');
-        }
+        }finally {
+            setLoading(false);
+          }
     };
 
     const filterProducts = async () => {
@@ -137,7 +142,9 @@ const Products = () => {
         } catch (error) {
             console.error('Error filtering products:', error);
             alert('Error filtering products. Please try again later.');
-        }
+        }finally {
+            setLoading(false);
+          }
     };
 
     const handleReview = (product) => {
@@ -175,7 +182,9 @@ const Products = () => {
         } catch (error) {
             console.error('Error submitting rating:', error);
             alert('Error submitting rating. Please try again later.');
-        }
+        }finally {
+            setLoading(false);
+          }
     };
 
     const handleSaveToWishlist = async (product) => {
@@ -194,7 +203,9 @@ const Products = () => {
         } catch (error) {
             console.error('Error adding product to wishlist:', error);
             alert('Error adding product to wishlist. Please try again later.');
-        }
+        }finally {
+            setLoading(false);
+          }
     };
 
     const handleAddToCart = async () => {
@@ -215,8 +226,16 @@ const Products = () => {
         } catch (error) {
             console.error('Error adding product to cart:', error);
             alert('Error adding product to cart. Please try again later.');
-        }
+        }finally {
+            setLoading(false);
+          }
     };
+    if (loading)
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+            </div>
+        );
 
     return (
         <div className="max-w-6xl mx-auto py-8 px-4">
