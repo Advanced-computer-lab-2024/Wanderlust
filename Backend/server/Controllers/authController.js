@@ -100,6 +100,7 @@ const login = async (req, res) => {
                 return res.status(404).json({ message: 'User not found' });
             }
             const token = jwt.sign({ id: userToken._id, role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            console.log( token);
             res.status(200).json({
                 message: 'Login successful',
                 user: userToken,
