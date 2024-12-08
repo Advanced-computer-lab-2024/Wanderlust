@@ -13,6 +13,7 @@ const ManageActivities = () => {
         name: '',
         description: ''
     });
+    const [confirmDeleteCategoryId, setConfirmDeleteCategoryId] = useState(null);
 
     useEffect(() => {
         fetchCategories();
@@ -99,15 +100,28 @@ const ManageActivities = () => {
             console.error('Error deleting category:', error);
         }
     };
+    const [isCreateOpen, setCreateOpenOpen] = useState(false);
+    const [isUpdateOpen, setUpdateOpen] = useState(false);
+    const [isAvailableCategoriesOpen, setAvailableCategoriesOpen] = useState(false);
 
+    const toggleCreate = () => setCreateOpenOpen(!isCreateOpen);
+    const toggleUpdate = () => setUpdateOpen(!isUpdateOpen);
+    // const toggleAvailable = () => setAvailableCategoriesOpen(!isAvailableCategoriesOpen);
     return (
         <div className="container py-4 w-75">
             <div className="mb-4">
                 <h1 className='text-2xl font-bold mb-6 text-center'>Manage Activity Categories</h1>
             </div>
             <div className="form-container mb-4 p-4 border rounded shadow-sm">
-                <h2 className='text-gray-800 font-semibold'>Create Category</h2>
-                <form onSubmit={handleCreateCategory}>
+                {/* <h2 className='text-gray-800 font-semibold'>Create Category</h2> */}
+                <h2 
+      className="text-gray-800 font-semibold mb-3" 
+      onClick={toggleCreate} 
+      style={{ cursor: 'pointer' }}
+    >
+      {isCreateOpen ? '-' : '+'} Create Category
+    </h2>
+    {isCreateOpen && ( <form onSubmit={handleCreateCategory}>
                     <div className="mb-3">
                         <label htmlFor="createName" className="form-label">Name:</label>
                         <input type="text" id="createName" name="name" value={createFormData.name} onChange={handleCreateInputChange} className="form-control" required />
@@ -117,11 +131,18 @@ const ManageActivities = () => {
                         <input type="text" id="createDescription" name="description" value={createFormData.description} onChange={handleCreateInputChange} className="form-control" required />
                     </div>
                     <button type="submit" className="btn btn-primary">Create Category</button>
-                </form>
+                </form>)}
             </div>
             <div className="form-container mb-4 p-4 border rounded shadow-sm">
-                <h2 className='text-gray-800 font-semibold'>Update Category</h2>
-                <form onSubmit={handleUpdateCategory}>
+                {/* <h2 className='text-gray-800 font-semibold'>Update Category</h2> */}
+                <h2 
+      className="text-gray-800 font-semibold mb-3" 
+      onClick={toggleUpdate} 
+      style={{ cursor: 'pointer' }}
+    >
+      {isUpdateOpen ? '-' : '+'} Update Category
+    </h2>
+    {isUpdateOpen && (<form onSubmit={handleUpdateCategory}>
                     <div className="mb-3">
                         <label htmlFor="updateId" className="form-label">ID:</label>
                         <input type="text" id="updateId" name="id" value={updateFormData.id} onChange={handleUpdateInputChange} className="form-control" required />
@@ -135,20 +156,40 @@ const ManageActivities = () => {
                         <input type="text" id="updateDescription" name="description" value={updateFormData.description} onChange={handleUpdateInputChange} className="form-control" required />
                     </div>
                     <button type="submit" className="btn btn-primary">Update Category</button>
-                </form>
+                </form>)}
             </div>
             <div className="categories-container p-4 border rounded shadow-sm">
-                <h2 className='text-gray-800 font-semibold'>Available Categories</h2>
-                <div id="categoriesList">
-                    {categories.map(category => (
-                        <div key={category._id} className="category-item mb-3 p-3 border rounded">
-                            <span>ID: {category._id}</span><br />
-                            <span>Name: {category.name}</span><br />
-                            <span>Description: {category.description}</span><br />
-                            <button className="btn btn-danger mt-2" onClick={() => deleteCategory(category._id)}>Delete</button>
-                        </div>
-                    ))}
-                </div>
+            <h2 className='text-2xl font-bold mb-6'>Available Categories</h2>
+      <table className="table table-bordered">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {categories.map(category => (
+            <tr key={category._id}>
+              <td>{category._id}</td>
+              <td>{category.name}</td>
+              <td>{category.description}</td>
+              <td className="d-flex justify-content-center align-items-center">
+                {confirmDeleteCategoryId === category._id ? (
+                  <>
+                    <p className='text-center text-danger'>Are you sure?</p>
+                    <button className="btn btn-danger ms-1" onClick={() => deleteCategory(category._id)}>Yes</button>
+                    <button className="btn btn-secondary ms-1" onClick={() => setConfirmDeleteCategoryId(null)}>No</button>
+                  </>
+                ) : (
+                  <button className="btn btn-danger" onClick={() => setConfirmDeleteCategoryId(category._id)}>Delete</button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
             </div>
         </div>
     );

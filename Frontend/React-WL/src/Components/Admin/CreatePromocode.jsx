@@ -34,8 +34,8 @@ const CreatePromocode = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h1>Create Promo Code</h1>
+    <div className="container mt-4 w-75">
+      <h1 className='text-2xl font-bold mb-6 text-center'>Create Promo Code</h1>
       <form onSubmit={handleCreatePromoCode}>
         <div className="mb-3">
           <label htmlFor="code" className="form-label">Promo Code</label>

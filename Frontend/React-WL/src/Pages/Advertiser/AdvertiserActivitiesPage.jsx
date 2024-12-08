@@ -6,7 +6,7 @@ const AdvertiserActivitiesPage = () => {
     return (
     <>      
       <AdvertiserNavBar /> 
-      <Activities />
+      <Activities showBookButton={false} showBookmark={false} showCreateButton={true} showUpdateButton={true} showDeleteButton={true}/>
     </>
     )
   }

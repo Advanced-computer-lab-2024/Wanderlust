@@ -382,7 +382,7 @@ const ItineraryItem = ({ item, onUpdate, onDelete, deleteConfirmId, setDeleteCon
         <div>
           <button
             onClick={() => onUpdate(item._id)}
-            className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-1 px-3 rounded-lg mr-2 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+            className="bg-custom hover:bg-indigo-600 text-white font-semibold py-1 px-3 rounded-lg mr-2 shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
           >
             Update
           </button>
@@ -448,10 +448,10 @@ const ItineraryActivities = ({ activities }) => (
       <Users className="mr-2" size={20} />
       Activities
     </h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="flex flex-col gap-4">
       {activities.map((activity) => (
         <div key={activity.id} className="bg-gray-50 rounded-lg p-3 hover:shadow-md transition duration-300">
-          <Activities activity={activity} showDeleteButton={false} showUpdateButton={false} />
+          <Activities activity={activity} showDeleteButton={false} showUpdateButton={false} showBookButton={false} showBookmark={false} />
         </div>
       ))}
     </div>

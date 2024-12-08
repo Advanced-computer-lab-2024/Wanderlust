@@ -42,9 +42,9 @@ const UpdateAdminPassword = () => {
     };
 
     return (
-        <div className="container py-4">
+        <div className="container py-4 w-25">
             <div className="mb-4">
-                <h1>Update Admin Password</h1>
+                <h1 className='fw-bold text-center'>Update Admin Password</h1>
             </div>
             <div className="form-container mb-4 p-4 border rounded shadow-sm">
                 <form onSubmit={handleSubmit}>

@@ -9,6 +9,7 @@ const ViewUsers = () => {
         usersThisMonth: 0,
         averageUsersPerMonth: 0,
     });
+    const [confirmDeleteUserId, setConfirmDeleteUserId] = useState(null);
 
     useEffect(() => {
         fetchUsers();
@@ -59,28 +60,50 @@ const ViewUsers = () => {
 
     return (
         <div className="container">
-            <div className="mb-4">
-                <h2 className='text-2xl font-bold mb-6'>User Statistics</h2>
-                <p><strong>Total Users:</strong> {statistics.totalUsers}</p>
-                <p><strong>New users This Month:</strong> {statistics.usersThisMonth}</p>
-                <p><strong>Average new users Per Month:</strong> {statistics.averageUsersPerMonth}</p>
-            </div>
-            <div className="mb-4">
-                <h2 className='text-2xl font-bold mb-6'>Details of Users</h2>
-            </div>
-            <div className="d-flex flex-wrap gap-3">
-                {users.map(user => (
-                    <div key={user.id} className="flex-fill border rounded p-4 shadow-sm" style={{ flex: '1 1 calc(33.333% - 20px)' }}>
-                        <span ><span className='text-gray-800 font-semibold'>ID:</span> {user.id}</span><br />
-                        <span><span className='text-gray-800 font-semibold'>Username:</span> {user.username}</span><br />
-                        <span><span className='text-gray-800 font-semibold'>Email:</span> {user.email}</span><br />
-                        <span><span className='text-gray-800 font-semibold'>Password:</span> {user.password}</span><br />
-                        <span><span className='text-gray-800 font-semibold'>Account Type:</span> {user.accountType}</span><br />
-                        <button className="btn btn-danger mt-2" onClick={() => deleteUser(user.id)}>Delete Account</button>
-                    </div>
-                ))}
-            </div>
-        </div>
+      <div className="mx-auto text-center mb-4 mt-4 rounded shadow p-4 w-25">
+        <h2 className='text-2xl font-bold mb-6'>User Statistics</h2>
+        <p><strong>Total Users:</strong> {statistics.totalUsers}</p>
+        <p><strong>New users This Month:</strong> {statistics.usersThisMonth}</p>
+        <p><strong>Average new users Per Month:</strong> {statistics.averageUsersPerMonth}</p>
+      </div>
+      <div className="mb-4">
+        <h2 className='text-2xl font-bold mb-6'>Details of Users</h2>
+      </div>
+      <table className="table table-bordered">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Account Type</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map(user => (
+            <tr key={user.id}>
+              <td>{user.id}</td>
+              <td>{user.username}</td>
+              <td>{user.email}</td>
+              <td>{user.password}</td>
+              <td>{user.accountType}</td>
+              <td className="d-flex justify-content-center align-items-center">
+              {confirmDeleteUserId === user.id ? (
+                  <>
+                    <p className='text-center text-danger'>Are you sure?</p>
+                    <button className="btn btn-danger ms-1" onClick={() => deleteUser(user.id)}>Yes</button>
+                    <button className="btn btn-secondary ms-1" onClick={() => setConfirmDeleteUserId(null)}>No</button>
+                  </>
+                ) : (
+                  <button className="btn btn-danger" onClick={() => setConfirmDeleteUserId(user.id)}>Delete Account</button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
     );
 };
 

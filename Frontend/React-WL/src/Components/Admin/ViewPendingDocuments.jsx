@@ -62,14 +62,14 @@ const ViewPendingDocuments = () => {
   };
 
   return (
-    <div className="container py-4">
+    <div className="container py-4 w-75">
       <div className="mb-4">
-        <h1>Pending Users</h1>
+        <h1 className='text-2xl font-bold mb-6 text-center'>Pending Users</h1>
       </div>
       <div className="d-flex flex-wrap gap-3">
         {pendingUsers.pendingAdvertisers.map(advertiser => (
           <div key={advertiser._id} className="flex-fill border rounded p-4 shadow-sm" style={{ flex: '1 1 calc(33.333% - 20px)' }}>
-            <h2>Advertiser</h2>
+            <h2 className='fw-bold'>Advertiser</h2>
             <p><strong>Username:</strong> {advertiser.userId.username}</p>
             <p><strong>Email:</strong> {advertiser.userId.email}</p>
             <p><strong>Website:</strong> {advertiser.website}</p>
@@ -78,7 +78,7 @@ const ViewPendingDocuments = () => {
             <p><strong>ID URL:</strong> {advertiser.IdURL}</p>
             <p><strong>Taxation Registry Card URL:</strong> {advertiser.taxationRegistryCardURL}</p>
             <p><strong>Logo URL:</strong> {advertiser.logoURL}</p>
-            <button className="btn btn-success mt-2" onClick={() => handleApproveUser(advertiser.userId._id, 'Advertiser')}>Approve</button>
+            <button className="btn btn-success mt-2 me-1" onClick={() => handleApproveUser(advertiser.userId._id, 'Advertiser')}>Approve</button>
             <button className="btn btn-danger mt-2" onClick={() => handleRejectUser(advertiser.userId._id, 'Advertiser')}>Reject</button>
           </div>
         ))}
