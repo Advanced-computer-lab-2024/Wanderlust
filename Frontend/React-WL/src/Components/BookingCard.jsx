@@ -248,9 +248,7 @@ const BookingCard = ({ booking, onCancel }) => {
         Booking Date: {formatDate(booking.createdAt)}
       </p>
       <p className="text-gray-600 text-sm">Price: ${getBookingPrice()}</p>
-      <p className="text-gray-600 text-sm">
-        Attended: {booking.attended ? "Yes" : "No"}
-      </p>
+      
 
       {/* Transportation Booking */}
       {!booking.attended && (
