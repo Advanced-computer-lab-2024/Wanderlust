@@ -742,38 +742,7 @@ const getSavedItineraries = async (req, res) => {
     });
   }
 };
-const requestNotification = async (req, res) => {
-  try {
-    const authHeader = req.header("Authorization");
-    if (!authHeader) {
-      return res.status(401).json({ message: "Authorization header missing" });
-    }
-    const token = authHeader.replace("Bearer ", "");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const tourist = await touristModel.findById(decoded.id);
-    if (!tourist) {
-      return res.status(404).json({ message: "Tourist not found" });
-    }
-
-    const { itineraryId } = req.body;
-
-    if (!tourist.notificationRequest.includes(itineraryId)) {
-      tourist.notificationRequest.push(itineraryId);
-      await tourist.save();
-    }
-
-    return res
-      .status(200)
-      .json({ message: "Notification request saved successfully" });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      message: "Error saving notification request",
-      error: error.message,
-    });
-  }
-};
 module.exports = {
   createItinerary,
   getItinerary,
@@ -796,5 +765,4 @@ module.exports = {
   saveItinerary,
   unsaveItinerary,
   getSavedItineraries,
-  requestNotification
 };
