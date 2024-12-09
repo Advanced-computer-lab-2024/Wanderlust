@@ -54,6 +54,7 @@ import AdminCreatePromocodePage from "./Pages/AdminCreatePromocodePage";
 import AdminViewSalesReport from "./Pages/AdminViewSalesReport";
 import Guide from "./Components/Guide";
 import SearchHotelsPage from "./Pages/Tourist/SearchHotelsPage";
+import SearchFlightsPage from "./Pages/Tourist/SearchFlights";
 import "./App.css";
 
 const App = () => {
@@ -182,6 +183,8 @@ const App = () => {
 
         {/* Search Hotels */}
         <Route path="/SearchHotelsPage" element={<SearchHotelsPage />} />
+         {/* Search Hotels */}
+         <Route path="/SearchFlightsPage" element={<SearchFlightsPage />} />
       </Routes>
     </Router>
   );
