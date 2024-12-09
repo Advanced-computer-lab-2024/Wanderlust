@@ -118,7 +118,7 @@ router.post("/getPromoCodeId", authenticateUser, tourist, getPromoCodeId);
 
 
 router.post('/requestNotification', requestNotification);
-router.get('/getNotifications', getNotificationsAll);
+router.get('/getNotificationsAll', getNotificationsAll);
 router.get('/getNotification', getNotifications);
 router.post(
   "/sendUpcomingEventReminder",

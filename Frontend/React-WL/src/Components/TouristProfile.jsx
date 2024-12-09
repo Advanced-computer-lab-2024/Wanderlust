@@ -300,7 +300,7 @@ const TouristProfile = () => {
       View Complaints
     </button>
                 <button
-      onClick={toggleSettings}
+      onClick={redeemPoints}
       className="bg-blue-600 text-white py-2 px-4 rounded-md"
     >
       Redeem Points

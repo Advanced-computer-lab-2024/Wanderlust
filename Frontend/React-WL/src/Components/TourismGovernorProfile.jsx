@@ -28,17 +28,13 @@ const TourismGovernorProfile = () => {
     }
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
-            <h1 className="text-3xl font-bold text-indigo-600 mb-4">Welcome, {profile.username}</h1>
-            <div className="flex items-center text-indigo-600 cursor-pointer mb-4" onClick={toggleSettings}>
-                <Settings className="w-6 h-6 mr-1" />
-                <span className="text-lg font-semibold">Settings</span>
-            </div>
-            {showSettings && (
+          
+           
                 <SettingsPopup
                     profile={profile}
                     onClose={toggleSettings}
                 />
-            )}
+            
         </div>
     );
 };
@@ -79,12 +75,12 @@ const SettingsPopup = ({ profile, onClose }) => {
     };
   
     return (
-      <div className="fixed inset-0 flex items-center justify-center z-50">
-        <div className="absolute inset-0 bg-black opacity-50" onClick={onClose}></div>
+      <>
+        
         <div className="bg-white rounded-lg shadow-lg p-6 z-10">
-          <h3 className="text-xl font-semibold text-indigo-600 mb-4">Settings</h3>
+          <h3 className="text-xl font-semibold text-blue-600 mb-4">Settings</h3>
           <div className="mb-4">
-            <h4 className="text-lg font-semibold text-indigo-600 mb-2">Account Details</h4>
+            <h4 className="text-lg font-semibold text-blue-600 mb-2">Account Details</h4>
             <div className="mb-2">
               <label className="text-gray-700 font-semibold">Username</label>
               <p>{profile.username}</p>
@@ -106,7 +102,7 @@ const SettingsPopup = ({ profile, onClose }) => {
             </div>
             <button
               onClick={() => setShowChangePasswordFields(true)}
-              className="text-indigo-600 font-semibold"
+              className="text-blue-600 font-semibold"
             >
               Change Password
             </button>
@@ -143,7 +139,7 @@ const SettingsPopup = ({ profile, onClose }) => {
                 {passwordError && <p className="text-red-600">{passwordError}</p>}
                 <button
                   onClick={handleChangePassword}
-                  className="bg-indigo-600 text-white rounded px-4 py-2 mt-2"
+                  className="bg-blue-600 text-white rounded px-4 py-2 mt-2"
                 >
                   Update Password
                 </button>
@@ -153,14 +149,9 @@ const SettingsPopup = ({ profile, onClose }) => {
   
 
   
-          <button
-            onClick={onClose}
-            className="mt-4 bg-red-600 text-white rounded px-4 py-2"
-          >
-            Close
-          </button>
+     
         </div>
-      </div>
+    </>
     );
   };
 

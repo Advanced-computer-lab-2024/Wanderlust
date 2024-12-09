@@ -152,7 +152,9 @@ const CartCheckout = ({ totalAmount }) => {
             Total Amount:{" "}
             {discountedPrice ? (
               <>
-                <span className="line-through text-red-600">${totalAmount.toFixed(2)}</span>
+                <span className="line-through text-red-600">
+                  ${totalAmount.toFixed(2)}
+                </span>
                 <span className="text-green-600"> ${discountedPrice}</span>
               </>
             ) : (

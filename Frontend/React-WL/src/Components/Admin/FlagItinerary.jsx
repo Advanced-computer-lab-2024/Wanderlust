@@ -12,8 +12,9 @@ const FlagItinerary = () => {
 
   const fetchItineraries = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/itinerary/getitinerary');
+      const response = await axios.get('http://localhost:8000/api/itinerary/itineraryAdmin');
       setItineraries(response.data);
+      console.log(response.data);
     } catch (error) {
       setError(error);
     }
@@ -65,26 +66,48 @@ const FlagItinerary = () => {
   );
 
   return (
-    <div className="container py-4">
+    <div className="container py-4 w-75">
       <div className="mb-4">
-        <h1 className='text-2xl font-bold mb-6'>Itineraries</h1>
+        <h1 className="text-center mb-4 text-2xl font-bold mb-6 text-center ">Flag Itinerary</h1>
       </div>
-      <div className="d-flex flex-wrap gap-3">
-        {itineraries.map(itinerary => (
-          <div key={itinerary._id} className="bg-white rounded-xl shadow-md p-6 md:w-1/3">
-            <h2 className="text-xl font-bold">{itinerary.title}</h2>
-            <p className="text-gray-700">{itinerary.description}</p>
-            <p className="text-gray-700">Price: ${itinerary.price}</p>
-            <p className="text-gray-700">Date: {new Date(itinerary.date).toLocaleDateString()}</p>
-            <button
-              className={`btn ${itinerary.flagged ? 'btn-danger' : 'btn-warning'} mt-2`}
-              onClick={() => itinerary.flagged ? handleUnflagItinerary(itinerary._id) : handleFlagItinerary(itinerary._id)}
-            >
-              {itinerary.flagged ? 'Unflag as Inappropriate' : 'Flag as Inappropriate'}
-            </button>
-          </div>
-        ))}
-      </div>
+      <table className="table table-bordered">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Creator</th>
+            <th>Status</th>
+            <th>Flagged</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {itineraries.map((itinerary) => (
+            <tr key={itinerary._id}>
+              <td>{itinerary.title}</td>
+              <td>{itinerary.creator}</td>
+              <td>{itinerary.status}</td>
+              <td>{itinerary.flagged ? 'Yes' : 'No'}</td>
+              <td>
+                {itinerary.flagged ? (
+                  <button
+                    className="btn btn-primary w-100"
+                    onClick={() => handleUnflagItinerary(itinerary._id)}
+                  >
+                    Unflag
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-primary w-100"
+                    onClick={() => handleFlagItinerary(itinerary._id)}
+                  >
+                    Flag
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

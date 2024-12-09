@@ -74,15 +74,15 @@ const searchHotels = async (req, res) => {
 
       return offer.offers.map((singleOffer) => ({
         hotelName: hotel.name || "N/A",
-        checkInDate: singleOffer.checkInDate || "N/A",
-        checkOutDate: singleOffer.checkOutDate || "N/A",
+        checkInDate: singleOffer.checkInDate || null, // Use `null` instead of "N/A"
+        checkOutDate: singleOffer.checkOutDate || null, // Use `null` instead of "N/A"
         guests: singleOffer.guests?.adults || 0,
-        priceTotal: singleOffer.price?.total || "N/A",
+        priceTotal: singleOffer.price?.total || null, // Use `null` instead of "N/A"
         currency: singleOffer.price?.currency || "N/A",
         cityCode: hotel.cityCode || "N/A",
         numberOfRooms: singleOffer.room?.typeEstimated?.beds || "N/A",
         availability: offer.available || false,
-        offerId: singleOffer.id || "N/A", // Include the offerId
+        offerId: singleOffer.id || "N/A",
       }));
     });
 
@@ -228,18 +228,41 @@ const getHotelOffers = async (cityCode, checkInDate, checkOutDate, guests) => {
 };
 
 const bookHotel = async (req, res) => {
-  const { offerId } = req.body;
+  const {
+    hotelName,
+    checkInDate,
+    checkOutDate,
+    priceTotal,
+    currency,
+    guests,
+    cityCode,
+    numberOfRooms,
+    availability,
+    offerId,
+  } = req.body;
 
-  if (!offerId) {
-    return res.status(400).json({ message: "Offer ID is required" });
+  // Validate the request body
+  if (
+    !hotelName ||
+    !checkInDate ||
+    !checkOutDate ||
+    !priceTotal ||
+    !currency ||
+    !guests ||
+    !cityCode ||
+    !numberOfRooms ||
+    !availability ||
+    !offerId
+  ) {
+    return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
+    // Verify the user
     const authHeader = req.header("Authorization");
     if (!authHeader) {
       return res.status(401).json({ message: "Authorization header missing" });
     }
-
     const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const tourist = await touristModel.findOne({ _id: decoded.id });
@@ -247,34 +270,19 @@ const bookHotel = async (req, res) => {
       return res.status(404).json({ message: "Tourist not found" });
     }
 
-    const apiToken = await generateAccessToken();
-    const response = await axios.get(
-      `https://test.api.amadeus.com/v3/shopping/hotel-offers/${offerId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${apiToken}`,
-        },
-      }
-    );
-
-    const offerData = response.data?.data;
-
-    if (!offerData) {
-      return res.status(404).json({ message: "Offer not found" });
-    }
-
-    // Construct the reservation object with all required details
+    // Save the reservation in the database
     const hotelReservation = new hotelReservationsModel({
       userId: tourist.userId,
-      hotelName: offerData.hotel.name || "N/A",
-      hotelAddress: offerData.hotel.address || "N/A",
-      checkInDate: offerData.checkInDate || "N/A",
-      checkOutDate: offerData.checkOutDate || "N/A",
-      totalPrice: offerData.price?.total || "N/A",
-      currency: offerData.price?.currency || "N/A",
-      roomType: offerData.room?.description?.text || "N/A",
-      guests: offerData.guests?.adults || 0,
-      cancellationPolicy: offerData.policies?.cancellations || [],
+      hotelName,
+      checkInDate,
+      checkOutDate,
+      priceTotal,
+      currency,
+      guests,
+      cityCode,
+      numberOfRooms,
+      availability,
+      offerId,
     });
 
     await hotelReservation.save();
@@ -284,7 +292,7 @@ const bookHotel = async (req, res) => {
       reservation: hotelReservation,
     });
   } catch (error) {
-    console.error("Error booking hotel:", error.message);
+    console.error("Error booking hotel:", error);
     return res
       .status(500)
       .json({ message: "Server error", error: error.message });

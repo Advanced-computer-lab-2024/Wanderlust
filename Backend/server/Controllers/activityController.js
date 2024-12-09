@@ -1,6 +1,5 @@
 const Activity = require("../Models/Activity.js");
 const { default: mongoose, get } = require("mongoose");
-const { findById } = require("../Models/tourGuide.js");
 const ActivityCatModel = require("../Models/ActivityCat.js");
 const Booking = require("../Models/Booking.js");
 const User = require("../Models/user");

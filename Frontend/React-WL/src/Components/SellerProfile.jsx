@@ -123,7 +123,7 @@ if (profilePicture) {
     <div className="bg-gray-100 min-h-screen py-8">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-end items-center mb-8">
-          <div className="flex items-center text-indigo-600 cursor-pointer" onClick={() => setShowSettings(!showSettings)}>
+          <div className="flex items-center text-blue-600 cursor-pointer" onClick={() => setShowSettings(!showSettings)}>
             <Settings className="w-6 h-6 mr-1" />
             <span className="text-lg font-semibold">Settings</span>
           </div>
@@ -145,7 +145,7 @@ if (profilePicture) {
                   <div className="ml-6">
                     {!isEditing ? (
                       <>
-                        <h2 className="text-2xl font-semibold text-indigo-600">{profile.username}</h2>
+                        <h2 className="text-2xl font-semibold text-blue-600">{profile.username}</h2>
                         <p className="text-gray-600 mt-2">{profile.description || "No description available"}</p>
                       </>
                     ) : (
@@ -181,14 +181,16 @@ if (profilePicture) {
                     </div>
                   </div>
                 </div>
-                <button onClick={toggleEdit} className="btn btn-primary mr-4">
-                  {isEditing ? 'Cancel' : 'Edit'}
+                <div className="flex justify-end mt-4  space-x-4">
+                <button onClick={toggleEdit} className="bg-blue-600 text-white py-2 px-4 rounded-md">
+                  {isEditing ? 'Cancel' : ' Update Profile'}
                 </button>
                 {isEditing && (
-                  <button onClick={handleUpdate} className="btn btn-success">
+                  <button onClick={handleUpdate} className="bg-blue-600 text-white py-2 px-4 rounded-md">
                     Save Changes
                   </button>
                 )}
+                </div>
               </div>
             </div>
           </div>
@@ -327,19 +329,21 @@ const SettingsPopup = ({ profile, onClose }) => {
             </div>
           )}
         </div>
+        <div className="mt-4 flex justify-between space-x-4">
 
         <button
           onClick={onClose}
-          className="mt-4 bg-red-600 text-white rounded px-4 py-2 mr-2"
+          className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md"
         >
           Close
         </button>
         <button
           onClick={handleDeleteAccount}
-          className="mt-4 bg-red-600 text-white rounded px-4 py-2"
+          className="bg-red-600 text-white py-2 px-4 rounded-md"
         >
           Delete Account
         </button>
+        </div>
       </div>
     </div>
   );
