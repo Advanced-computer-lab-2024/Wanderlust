@@ -57,6 +57,7 @@ import SearchHotelsPage from "./Pages/Tourist/SearchHotelsPage";
 import TourguideNotifPage from "./Pages/Tourguide/TourguideNotifPage";
 import AdvertiserNotifPage from "./Pages/Advertiser/AdvertiserNotifPage";
 import SearchFlightsPage from "./Pages/Tourist/SearchFlights";
+import ForgetPasswordPage from "./Pages/ForgetPasswordpage";
 import "./App.css";
 
 const App = () => {
@@ -81,6 +82,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgetpassword" element={<ForgetPasswordPage />} />
         {/* Admin Routes */}
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/addadmin" element={<AddAdminPage />} />

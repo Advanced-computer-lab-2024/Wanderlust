@@ -86,6 +86,19 @@ const CartCheckout = ({ totalAmount }) => {
           setSuccess(true);
           break;
 
+        case "COD":
+          await axios.post(
+            "http://localhost:8000/api/tourist/cart/checkout",
+            { paymentMethod: "cod", totalAmount: finalPrice },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+              },
+            }
+          );
+          setSuccess(true);
+          break;
+
         case "Card":
           const { data } = await axios.post(
             "http://localhost:8000/api/tourist/cart/checkout",

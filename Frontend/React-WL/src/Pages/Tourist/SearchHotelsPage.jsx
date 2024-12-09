@@ -1,6 +1,6 @@
 import TouristNavBar from "../../Components/NavBars/TouristNavBar";
 import SearchHotels from "../../Components/SearchHotels";
-const TouristCartPage = () => {
+const SearchHotelsPage = () => {
   return (
     <>
       <TouristNavBar />
@@ -17,4 +17,4 @@ const TouristCartPage = () => {
   );
 };
 
-export default TouristCartPage;
+export default SearchHotelsPage;

@@ -127,6 +127,12 @@ app.delete("/deleteLocation/:id", deleteLocation);
 app.get("/getLocation/:id", getLocationById);
 
 app.post("/login", login);
+
+const { sendOtp,verifyOtp,resetPassword } = require('./Controllers/authController');
+
+app.post("/sendOtp", sendOtp);
+app.post("/verifyOtp", verifyOtp);
+app.post("/resetPassword", resetPassword);
 //createLocation,
 //getLocations,
 //updateLocation,
