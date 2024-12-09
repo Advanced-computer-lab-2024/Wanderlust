@@ -119,7 +119,7 @@ const TourGuideProfile = () => {
   const handleSaveProfile = async () => {
     if (profilePicture) {
       const formData = new FormData();
-      formData.append('file', profilePicture); // Append the file
+       // Append the file
       formData.append('userId', profile.userId);
     try {
       console.log('Sending update request with:', {
