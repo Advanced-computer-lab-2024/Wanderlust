@@ -2,7 +2,7 @@
 const SellerModel = require('../Models/Seller.js');
 const { default: mongoose } = require('mongoose');
 const User = require("../Models/user");
-
+const Products = require("../Models/Products.js");
 //u have to sign up first and get the id given
 //http://localhost:8000/api/seller/createSeller/userId
 const createSeller = async (req, res) => {
@@ -78,7 +78,41 @@ const getSellerById = async (req, res) => {
         res.status(500).json({ message: 'Error retrieving Seller', error });
     }
 };
-
-module.exports = { createSeller, getSellers, getSellerById, updateSeller };
+const getSellerRevenue = async (req, res) => {
+    try {
+      const token = req.headers.authorization.split(" ")[1];
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+      const sellerId = decodedToken.id;
+  
+      const products = await Products.find({ seller: sellerId }).populate('seller', 'username');
+  
+      let totalRevenue = 0;
+      let appRevenue = 0;
+      let allProducts = [];
+  
+      // Calculate revenue for each product
+      for (const product of products) {
+        const productRevenue = product.sales.reduce((sum, sale) => sum + (product.price * sale.quantity), 0);
+        totalRevenue += productRevenue;
+        appRevenue += productRevenue * 0.1; // 10% app rate
+        allProducts = allProducts.concat({
+          name: product.name,
+          creator: product.seller && product.seller.userId ? product.seller.userId.username : 'Unknown',
+        });
+      }
+  
+      res.status(200).json({
+        totalRevenue,
+        appRevenue,
+        numberOfProducts: allProducts.length,
+        products: allProducts,
+        generatedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Error fetching seller revenue:", error);
+      res.status(500).json({ error: "Failed to fetch seller revenue. Please try again later." });
+    }
+  };
+module.exports = { createSeller, getSellers, getSellerById, updateSeller,getSellerRevenue };
 
  
