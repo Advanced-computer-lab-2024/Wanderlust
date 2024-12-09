@@ -54,6 +54,8 @@ import AdminCreatePromocodePage from "./Pages/AdminCreatePromocodePage";
 import AdminViewSalesReport from "./Pages/AdminViewSalesReport";
 import Guide from "./Components/Guide";
 import SearchHotelsPage from "./Pages/Tourist/SearchHotelsPage";
+import TourguideNotifPage from "./Pages/Tourguide/TourguideNotifPage";
+import AdvertiserNotifPage from "./Pages/Advertiser/AdvertiserNotifPage";
 import "./App.css";
 
 const App = () => {
@@ -152,6 +154,10 @@ const App = () => {
           path="/SalesReportTourGuide"
           element={<SalesReportTourGuide />}
         />
+        <Route
+          path="/TourguideNotifications"
+          element={<TourguideNotifPage />}
+        />
 
         {/* Seller Routes */}
         <Route path="/SellerProfile" element={<SellerProfilePage />} />
@@ -165,9 +171,17 @@ const App = () => {
           path="/AdvertiserActivities"
           element={<AdvertiserActivitiesPage />}
         />
+          <Route
+          path="/AdvertiserNotifications"
+          element={<AdvertiserNotifPage />}
+        />
         <Route
           path="/SalesReportAdvertiser"
           element={<SalesReportAdvertiser />}
+        />
+        <Route
+          path="/AdvertiserNotifications"
+          element={<AdvertiserNotifPage />}
         />
 
         {/* Tourism Governor Routes */}

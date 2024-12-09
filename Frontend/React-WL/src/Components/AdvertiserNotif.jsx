@@ -1,8 +1,9 @@
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
-const TouristNotif = () => {
+const AdvertiserNotif = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,30 +19,15 @@ const TouristNotif = () => {
 
     setLoading(true);
     try {
-      let response1;
-      try {
-        response1 = await axios.get('http://localhost:8000/api/tourist/getNotification', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      } catch (error) {
-        console.error('Error fetching notifications from getNotification:', error);
-        response1 = { data: [] }; // Fallback to empty data
-      }
-
-      const response2 = await axios.get('http://localhost:8000/api/tourist/getNotificationsAll', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await axios.get('http://localhost:8000/api/advertiser/getNotifications', {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (response2.status === 200) {
-        const combinedNotifications = [...response1.data, ...response2.data];
-        setNotifications(combinedNotifications);
-        console.log(combinedNotifications);
+      if (response.status === 200) {
+        setNotifications(response.data);
+        console.log(response.data);
       } else {
-        setError('Failed to fetch notifications');
+        setError('Failed to fetch notifications: ' + response.data.message);
       }
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -57,7 +43,7 @@ const TouristNotif = () => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto bg-white rounded-lg shadow-lg">
-      <h2 className="text-3xl font-bold text-blue-900 mb-6 text-center">Upcoming Events</h2>
+      <h2 className="text-3xl font-bold text-blue-900 mb-6 text-center">My Notifications</h2>
 
       {loading ? (
         <div className="flex justify-center items-center h-64">
@@ -81,9 +67,9 @@ const TouristNotif = () => {
                       {/* Hyperlink for event name */}
                       <Link
                           to={
-                            notification.eventType === 'itinerary'
-                              ? `/ItineraryTourist`
-                              : `/ActivityTourist`
+                            notification.eventType === 'activity'
+                              ? `/ActivityAdvertiser`
+                              : `/`
                           }
                           className="text-blue-500 hover:underline"
                         >
@@ -107,4 +93,4 @@ const TouristNotif = () => {
   );
 };
 
-export default TouristNotif;
+export default AdvertiserNotif;
