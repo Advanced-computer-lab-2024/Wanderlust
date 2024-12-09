@@ -84,7 +84,7 @@ const getSellerRevenue = async (req, res) => {
       const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
       const sellerId = decodedToken.id;
   
-      const products = await Product.find({ seller: sellerId }).populate({
+      const products = await Products.find({ seller: sellerId }).populate({
         path: 'seller',
         populate: {
           path: 'userId',
