@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const User = require("./user");
+
 const hotelReservationsSchema = new Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -9,25 +9,42 @@ const hotelReservationsSchema = new Schema({
   },
   hotelName: {
     type: String,
+    required: true,
   },
   hotelAddress: {
-    type: {
-      description: {
-        type: String,
-      },
-      countryCode: {
-        type: String,
-      },
+    description: {
+      type: String,
+      required: true,
+    },
+    countryCode: {
+      type: String,
+      required: true,
     },
   },
-
-  checkIn: {
+  checkInDate: {
     type: Date,
+    required: true,
   },
-  checkOut: {
+  checkOutDate: {
     type: Date,
+    required: true,
   },
-
+  guests: {
+    type: Number,
+    required: true,
+  },
+  priceTotal: {
+    type: String,
+    required: true,
+  },
+  currency: {
+    type: String,
+    required: true,
+  },
+  offerId: {
+    type: String,
+    required: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
