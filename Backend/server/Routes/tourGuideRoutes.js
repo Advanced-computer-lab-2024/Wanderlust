@@ -13,6 +13,8 @@ const {
   filterTouristReportByMonth,
   checkForFlagged,
 } = require("../Controllers/tourGuideController");
+const { createSystemNotification,sendUpcomingActivityNotifications, sendUpcomingItineraryNotifications, requestNotification,getNotificationsAll } = require("../Controllers/NotificationController");
+
 
 router.put("/createtgprofile/:userId", createTourGuideProfile);
 router.get("/gettgprofile", getTourGuide);
@@ -24,5 +26,6 @@ router.get("/salesreport/filter", filterSalesReport);
 router.get("/touristreport/:tourGuideId", getTouristReport);
 router.get("/touristreport/filter/:tourGuideId", filterTouristReportByMonth);
 router.get("/checkflagged/:tourGuideId", checkForFlagged);
+router.get('/getNotifications', getNotificationsAll);
 
 module.exports = router;
