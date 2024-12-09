@@ -10,6 +10,7 @@ const Notification = require('../Models/Notification'); // Assuming you have a N
 const Advertiser = require("../Models/Advertiser.js");
 const Activity = require("../Models/Activity.js");
 const Itinerary = require("../Models/Itinerary.js");
+const Products = require("../Models/Products.js");
 //npm install jsonwebtoken
 const jwt = require("jsonwebtoken");
 
@@ -309,40 +310,67 @@ const addTourismGovernor = async (req, res) => {
 };
 const getAllSalesReport = async (req, res) => {
   try {
-    // Fetch all advertisers and tour guides
-    const advertisers = await Advertiser.find();
-    const tourGuides = await tourguideModel.find();
+    // Fetch all advertisers, tour guides, and products
+    const advertisers = await Advertiser.find().populate('userId', 'username');
+    const tourGuides = await tourguideModel.find().populate('userId', 'username');
+    const products = await Products.find().populate({
+      path: 'seller',
+      populate: {
+        path: 'userId',
+        select: 'username'
+      }
+    });
 
     let totalRevenue = 0;
     let appRevenue = 0;
     let allActivities = [];
     let allItineraries = [];
+    let allProducts = [];
 
     // Fetch sales report for each advertiser
     for (const advertiser of advertisers) {
       const activities = await Activity.find({ advertiserId: advertiser._id });
-      const advertiserRevenue = activities.reduce((sum, activity) => sum + activity.revenue, 0);
+      const advertiserRevenue = activities.reduce((sum, activity) => sum + (activity.price * activity.touristCount), 0);
       totalRevenue += advertiserRevenue;
       appRevenue += advertiserRevenue * 0.1; // 10% app rate
-      allActivities = allActivities.concat(activities);
+      allActivities = allActivities.concat(activities.map(activity => ({
+        name: activity.name,
+        creator: advertiser.userId.username,
+      })));
     }
 
     // Fetch sales report for each tour guide
     for (const tourGuide of tourGuides) {
-      const itineraries = await Itinerary.find({ creator: tourGuide._id, isActive: true });
-      const tourGuideRevenue = itineraries.reduce((sum, itinerary) => sum + itinerary.price, 0);
+      const itineraries = await Itinerary.find({ creator: tourGuide._id });
+      const tourGuideRevenue = itineraries.reduce((sum, itinerary) => sum + (itinerary.price * itinerary.touristCount), 0);
       totalRevenue += tourGuideRevenue;
       appRevenue += tourGuideRevenue * 0.1; // 10% app rate
-      allItineraries = allItineraries.concat(itineraries);
+      allItineraries = allItineraries.concat(itineraries.map(itinerary => ({
+        title: itinerary.title,
+        creator: tourGuide.userId.username,
+      })));
+    }
+
+    // Fetch sales report for each product
+    for (const product of products) {
+      const productRevenue = product.sales.reduce((sum, sale) => sum + (product.price * sale.quantity), 0);
+      totalRevenue += productRevenue;
+      appRevenue += productRevenue * 0.1; // 10% app rate
+      allProducts = allProducts.concat({
+        name: product.name,
+        creator: product.seller && product.seller.userId ? product.seller.userId.username : 'Unknown',
+      });
     }
 
     res.status(200).json({
       totalRevenue,
       appRevenue,
-      currency: "USD", // Replace with actual currency if applicable
       numberOfItineraries: allItineraries.length,
+      numberOfActivities: allActivities.length,
+      numberOfProducts: allProducts.length,
       itineraries: allItineraries,
       activities: allActivities,
+      products: allProducts,
       generatedAt: new Date().toISOString(),
     });
   } catch (error) {
