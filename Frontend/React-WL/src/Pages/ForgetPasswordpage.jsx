@@ -60,6 +60,7 @@ const ForgetPasswordPage = () => {
             />
           </div>
           <button className="btn btn-primary" onClick={handleSendOtp}>Send OTP</button>
+          <button className="btn btn-secondary ml-2" onClick={() => navigate('/login')}>Back to Login</button>
         </div>
       )}
       {step === 2 && (
@@ -75,6 +76,7 @@ const ForgetPasswordPage = () => {
             />
           </div>
           <button className="btn btn-primary" onClick={handleVerifyOtp}>Verify OTP</button>
+          <button className="btn btn-secondary ml-2" onClick={() => navigate('/login')}>Back to Login</button>
         </div>
       )}
       {step === 3 && (
@@ -90,6 +92,7 @@ const ForgetPasswordPage = () => {
             />
           </div>
           <button className="btn btn-primary" onClick={handleResetPassword}>Reset Password</button>
+          <button className="btn btn-secondary ml-2" onClick={() => navigate('/login')}>Back to Login</button>
         </div>
       )}
       {step === 4 && (
