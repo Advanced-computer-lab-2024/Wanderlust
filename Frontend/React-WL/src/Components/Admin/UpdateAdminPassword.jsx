@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
+import '../../assets/adminstyle.css'
 
 const UpdateAdminPassword = () => {
     const [formData, setFormData] = useState({
@@ -84,7 +84,7 @@ const UpdateAdminPassword = () => {
                             required
                         />
                     </div>
-                    <button type="submit" className="btn btn-primary">Update Password</button>
+                    <button type="submit" className="btn btn-primary w-100">Update Password</button>
                 </form>
             </div>
         </div>

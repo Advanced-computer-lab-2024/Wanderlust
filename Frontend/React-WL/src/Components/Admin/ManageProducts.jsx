@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Modal from 'react-modal';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import '../../assets/adminstyle.css'
 const ManageProducts = () => {
     const [products, setProducts] = useState([]);
     const [formData, setFormData] = useState({
@@ -359,7 +359,7 @@ const [confirmDeleteProductId, setConfirmDeleteProductId] = useState(null);
               ))}</td>
               <td>{product.seller ? product.seller.username : 'Unknown'}</td>
               <td>
-                <button className="btn btn-info" onClick={() => openModal(product)}>Manage</button>
+                <button className="btn btn-primary" onClick={() => openModal(product)}>Manage</button>
               </td>
             </tr>
           ))}

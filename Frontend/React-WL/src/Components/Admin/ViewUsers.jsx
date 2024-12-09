@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import '../../assets/adminstyle.css'
 const ViewUsers = () => {
     const [users, setUsers] = useState([]);
     const [statistics, setStatistics] = useState({
