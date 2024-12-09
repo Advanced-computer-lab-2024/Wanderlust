@@ -7,6 +7,8 @@ const Tourist = require('../Models/Tourist');
 const Activity = require('../Models/Activity');
 const Itinerary = require('../Models/Itinerary');
 const jwt = require('jsonwebtoken');
+const Tourguide = require('../Models/tourGuide');
+const Advertiser = require('../Models/Advertiser');
 
 const fs = require("fs");
 const path = require("path");
@@ -224,7 +226,7 @@ const requestNotification = async (req, res) => {
   }
 };
 
-const getNotifications = async (req, res) => {
+const getNotificationsAll = async (req, res) => {
   try {
     const authHeader = req.header("Authorization");
     if (!authHeader) {
@@ -243,9 +245,11 @@ const getNotifications = async (req, res) => {
 
     console.log("Decoded token:", decoded);
 
-    // Check if the user is a tourist
+    // Check if the user is a tourist, tourguide, or advertiser
     const tourist = await Tourist.findOne({ _id: decoded.id });
-    const userId = tourist ? tourist.userId : decoded.id;
+    const tourguide = await Tourguide.findOne({ _id: decoded.id });
+    const advertiser = await Advertiser.findOne({ _id: decoded.id });
+    const userId = tourist ? tourist.userId : tourguide ? tourguide.userId : advertiser ? advertiser.userId : decoded.id;
     console.log("User ID:", userId);
 
     // Fetch notifications for the user
