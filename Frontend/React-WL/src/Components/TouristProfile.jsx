@@ -72,12 +72,31 @@ const TouristProfile = () => {
       };
 
       setProfile(combinedData);
+
+      // Check if the promo was already received today
+      const lastPromoDate = localStorage.getItem("lastPromoDate");
+      const today = new Date().toISOString().split('T')[0];
+
+      if (lastPromoDate !== today) {
+        // Call receiveBirthdayPromo
+        await axios.post("http://localhost:8000/api/tourist/receiveBirthdayPromo", {}, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
+        });
+        localStorage.setItem("lastPromoDate", today);
+      }
     } catch (error) {
       console.error("Error fetching profile:", error);
       setError(error);
     } finally {
       setLoading(false);
     }
+  };
+
+
+
+  const ViewComplaints = () => {
+    // Navigate to the Complaints Tourist component
+    navigate('/ComplaintsTourist');
   };
 
   const fetchPreferenceTags = async () => {
@@ -179,14 +198,14 @@ const TouristProfile = () => {
         
           {/* Right side with Settings */}
           
-          <div className="flex items-center text-indigo-600 cursor-pointer ml-auto" onClick={toggleSettings}>
+          <div className="flex items-center text-blue-600 cursor-pointer ml-auto" onClick={toggleSettings}>
             <Settings className="w-6 h-6 mr-1" />
             <span className="text-lg font-semibold">Settings</span>
           </div>
         </div>
 
         {/* Redeem Button Section Below Points */}
-        
+      
 
         {/* Preference Popup */}
         {showPreference && (
@@ -273,12 +292,18 @@ const TouristProfile = () => {
                     value={profile.wallet.toFixed(2)}
                   />
                 </div>
-                <div className="flex justify-end mt-4">
+                <div className="flex justify-end mt-4  space-x-4">
                 <button
-      onClick={redeemPoints}
-      className="bg-indigo-600 text-white py-2 px-4 rounded-md"
+      onClick={ViewComplaints}
+      className="bg-blue-600 text-white py-2 px-4 rounded-md"
     >
-      Redeem
+      View Complaints
+    </button>
+                <button
+      onClick={toggleSettings}
+      className="bg-blue-600 text-white py-2 px-4 rounded-md"
+    >
+      Redeem Points
     </button>
     </div>
 

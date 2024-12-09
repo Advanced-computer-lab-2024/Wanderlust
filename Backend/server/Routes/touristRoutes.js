@@ -107,7 +107,7 @@ router.post(
   usePromoCode
 );
 router.post(
-  "/receiveBirthdayPromo/:touristId",
+  "/receiveBirthdayPromo",
   authenticateUser,
   tourist,
   receiveBirthdayPromo
