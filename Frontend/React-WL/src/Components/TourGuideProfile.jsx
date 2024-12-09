@@ -174,7 +174,7 @@ const TourGuideProfile = () => {
     };
   if (loading) return (
     <div className="flex justify-center items-center h-64">
-      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
     </div>
   );
 
@@ -191,7 +191,7 @@ const TourGuideProfile = () => {
     <>
     <div className="bg-gray-100 min-h-screen py-8">
       <div className="max-w-6xl mx-auto px-4 flex justify-between items-center">
-        <div className="flex items-center text-indigo-600 cursor-pointer ml-auto" onClick={toggleSettings}>
+        <div className="flex items-center text-blue-600 cursor-pointer ml-auto" onClick={toggleSettings}>
           <Settings className="w-6 h-6 mr-1" />
           <span className="text-lg font-semibold">Settings</span>
         </div>
@@ -206,7 +206,7 @@ const TourGuideProfile = () => {
     <div className="flex items-center justify-between mb-6">
       {/* Profile Picture and Info */}
       <div className="flex items-center">
-        <div className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center">
+        <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center">
           {profile.photoURL ? (
             <img
               src={profile.photoURL}
@@ -214,12 +214,12 @@ const TourGuideProfile = () => {
               className="w-full h-full object-cover"
             />
           ) : (
-            <User className="w-12 h-12 text-indigo-600" />
+            <User className="w-12 h-12 text-blue-600" />
           )}
         </div>
         <div className="ml-6">
           {info && (
-            <h2 className="text-2xl font-semibold text-indigo-600">
+            <h2 className="text-2xl font-semibold text-blue-600">
               {info.username}
             </h2>
           )}
@@ -245,7 +245,7 @@ const TourGuideProfile = () => {
     <div className="flex justify-end mt-4">
     <button
       onClick={handleUpdateProfile}
-      className="bg-indigo-600 text-white py-2 px-4 rounded-md"
+      className="bg-blue-600 text-white py-2 px-4 rounded-md"
     >
       Update Profile
     </button>
@@ -318,7 +318,7 @@ const TourGuideProfile = () => {
                     )}
                     <button
                       onClick={uploadProfileImage}
-                      className="bg-indigo-600 text-white py-2 px-4 rounded-md ml-2"
+                      className="bg-blue-600 text-white py-2 px-4 rounded-md ml-2"
                     >
                       Upload
                     </button>
@@ -327,7 +327,7 @@ const TourGuideProfile = () => {
                 <div className="flex justify-end space-x-2">
                   <button
                     onClick={handleSaveProfile}
-                    className="bg-indigo-600 text-white py-2 px-4 rounded-md"
+                    className="bg-blue-600 text-white py-2 px-4 rounded-md"
                   >
                     Save Profile
                   </button>
@@ -414,9 +414,9 @@ const SettingsPopup = ({ profile, username, onClose }) => {
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="absolute inset-0 bg-black opacity-50" onClick={onClose}></div>
       <div className="bg-white rounded-lg shadow-lg p-6 z-10">
-        <h3 className="text-xl font-semibold text-indigo-600 mb-4">Settings</h3>
+        <h3 className="text-xl font-semibold text-blue-600 mb-4">Settings</h3>
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-indigo-600 mb-2">Account Details</h4>
+          <h4 className="text-lg font-semibold text-blue-600 mb-2">Account Details</h4>
           <div className="mb-2">
             <label className="block text-gray-600">Username</label>
             {profile && <p className="text-gray-800">{profile.username}</p>}
@@ -443,7 +443,7 @@ const SettingsPopup = ({ profile, username, onClose }) => {
           <div className="mt-4 mb-4">
             <button
               onClick={() => setShowChangePasswordFields(!showChangePasswordFields)}
-              className="bg-indigo-600 text-white py-2 px-4 rounded-md">
+              className="bg-blue-600 text-white py-2 px-4 rounded-md">
               Change Password
             </button>
           </div>
@@ -482,7 +482,7 @@ const SettingsPopup = ({ profile, username, onClose }) => {
               )}
               <button
                 onClick={handleChangePassword}
-                className="bg-indigo-600 text-white py-2 px-4 rounded-md">
+                className="bg-blue-600 text-white py-2 px-4 rounded-md">
                 Update Password
               </button>
             </div>
