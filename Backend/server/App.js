@@ -36,11 +36,10 @@ const app = express();
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
-
+// configurations
 cron.schedule('0 * * * *', () => {
   sendNotifications();
 });
-// configurations
 
 // Cloudinary
 cloudinary.config({

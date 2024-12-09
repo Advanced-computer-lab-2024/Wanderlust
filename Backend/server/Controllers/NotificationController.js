@@ -7,6 +7,8 @@ const Tourist = require('../Models/Tourist');
 const Activity = require('../Models/Activity');
 const Itinerary = require('../Models/Itinerary');
 const jwt = require('jsonwebtoken');
+const Tourguide = require('../Models/tourGuide');
+const Advertiser = require('../Models/Advertiser');
 
 const fs = require("fs");
 const path = require("path");
@@ -256,6 +258,45 @@ const getNotifications = async (req, res) => {
   }
 };
 
+const getNotificationsAll = async (req, res) => {
+  try {
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+
+    // Validate Bearer token format
+    if (!authHeader.startsWith("Bearer ")) {
+      return res.status(400).json({ message: "Invalid Authorization header format" });
+    }
+
+    const token = authHeader.replace("Bearer ", "").trim();
+
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    console.log("Decoded token:", decoded);
+
+    // Check if the user is a tourist, tourguide, or advertiser
+    const tourist = await Tourist.findOne({ _id: decoded.id });
+    const tourguide = await Tourguide.findOne({ _id: decoded.id });
+    const advertiser = await Advertiser.findOne({ _id: decoded.id });
+    const userId = tourist ? tourist.userId : tourguide ? tourguide.userId : advertiser ? advertiser.userId : decoded.id;
+    console.log("User ID:", userId);
+
+    // Fetch notifications for the user
+    const notifications = await Notification.find({ userId: decoded.id }).sort({ createdAt: -1 });
+
+    res.status(200).json(notifications);
+  } catch (error) {
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+    console.error("Error fetching notifications:", error.message);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
+
 
 module.exports = {
   createNotification,
@@ -263,5 +304,6 @@ module.exports = {
   sendMail,
   createSystemNotification, 
   requestNotification,
-  getNotifications
+  getNotifications,
+  getNotificationsAll
 };

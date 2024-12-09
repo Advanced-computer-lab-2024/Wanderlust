@@ -72,12 +72,31 @@ const TouristProfile = () => {
       };
 
       setProfile(combinedData);
+
+      // Check if the promo was already received today
+      const lastPromoDate = localStorage.getItem("lastPromoDate");
+      const today = new Date().toISOString().split('T')[0];
+
+      if (lastPromoDate !== today) {
+        // Call receiveBirthdayPromo
+        await axios.post("http://localhost:8000/api/tourist/receiveBirthdayPromo", {}, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
+        });
+        localStorage.setItem("lastPromoDate", today);
+      }
     } catch (error) {
       console.error("Error fetching profile:", error);
       setError(error);
     } finally {
       setLoading(false);
     }
+  };
+
+
+
+  const ViewComplaints = () => {
+    // Navigate to the Complaints Tourist component
+    navigate('/ComplaintsTourist');
   };
 
   const fetchPreferenceTags = async () => {
@@ -174,34 +193,19 @@ const TouristProfile = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen py-8">
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4 flex justify-between items-center">
 
-        <div className="flex justify-between items-center mb-3">
+        
           {/* Right side with Settings */}
-          <div className="flex items-center text-blue-600 space-x-1">
-            <span className="text-lg font-semibold">Rank:</span>
-            <Award className={`w-6 h-6 ${getBadgeColor(profile.badge)}`} />
-          </div>
-          <div className="flex items-center text-blue-600 space-x-1">
-            <BarChart2 className="w-6 h-6" />
-            <span className="text-lg font-semibold">Points: {profile.points.toFixed(2)}</span>
-          </div>
-          <div className="flex items-center text-blue-600 space-x-1">
-            <Wallet className="w-6 h-6" />
-            <span className="text-lg font-semibold">Wallet: ${profile.wallet.toFixed(2)}</span>
-          </div>
-          <div className="flex items-center text-blue-600 cursor-pointer" onClick={toggleSettings}>
+          
+          <div className="flex items-center text-blue-600 cursor-pointer ml-auto" onClick={toggleSettings}>
             <Settings className="w-6 h-6 mr-1" />
             <span className="text-lg font-semibold">Settings</span>
           </div>
         </div>
 
         {/* Redeem Button Section Below Points */}
-        <div className="flex justify-start mb-4">
-          <button className="ml-20 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" onClick={redeemPoints}>
-            Redeem 
-          </button>
-        </div>
+      
 
         {/* Preference Popup */}
         {showPreference && (
@@ -271,29 +275,44 @@ const TouristProfile = () => {
 
                 {/* Statistics */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <StatCard
+            icon={<Award className={`w-8 h-8 ${getBadgeColor(profile.badge)}`} />}
+            title="Rank"  
+            value={profile.badge || 'N/A'}
+            badgeColor={getBadgeColor(profile.badge)}
+          />
                   <StatCard
-                    icon={<Clock className="w-8 h-8 text-blue-500" />}
-                    title="Trips Taken"
-                    value={profile.tripsTaken || 0}
+                    icon={<BarChart2 className="w-8 h-8 text-blue-500" />}
+                    title="Points"
+                    value= {profile.points.toFixed(2)}
                   />
                   <StatCard
-                    icon={<Briefcase className="w-8 h-8 text-blue-500" />}
-                    title="Favorite Destinations"
-                    value={profile.favoriteDestinations?.length || 0}
-                  />
-                  <StatCard
-                    icon={<Award className="w-8 h-8 text-blue-500" />}
-                    title="Reviews Written"
-                    value={profile.reviewsCount || 0}
+                    icon={<Wallet className="w-8 h-8 text-blue-500" />}
+                    title="Wallet"
+                    value={profile.wallet.toFixed(2)}
                   />
                 </div>
+                <div className="flex justify-end mt-4  space-x-4">
+                <button
+      onClick={ViewComplaints}
+      className="bg-blue-600 text-white py-2 px-4 rounded-md"
+    >
+      View Complaints
+    </button>
+                <button
+      onClick={toggleSettings}
+      className="bg-blue-600 text-white py-2 px-4 rounded-md"
+    >
+      Redeem Points
+    </button>
+    </div>
 
               </div>
             </div>
           </div>
         </Card>
       </div>
-    </div>
+    
   );
 };
 
