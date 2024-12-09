@@ -279,14 +279,18 @@ const getNotificationsAll = async (req, res) => {
 
     let userId;
     if (await Tourist.findOne({ _id: decoded.id })) {
-      userId = decoded.id;
+      tourist= await Tourist.findOne({ _id: decoded.id });
+      userId = tourist.userId;
     } else if (await Tourguide.findOne({ _id: decoded.id })) {
-      userId = decoded.id;
+      tourguide= await Tourguide.findOne({ _id: decoded.id });
+      userId = tourguide.userId;
     } else if (await Advertiser.findOne({ _id: decoded.id })) {
-      userId = decoded.id;
+      Advertiser= await Advertiser.findOne({ _id: decoded.id });
+      userId = Advertiser.userId;
     } else {
       userId = decoded.id;
     }
+    console.log("Decoded ID:", decoded.id);
     console.log("User ID:", userId);
 
     // Fetch notifications for the user

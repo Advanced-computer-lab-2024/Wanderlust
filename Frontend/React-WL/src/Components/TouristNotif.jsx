@@ -37,6 +37,8 @@ const TouristNotif = () => {
       });
 
       if (response2.status === 200) {
+        console.log(token);
+
         const combinedNotifications = [...response1.data, ...response2.data];
         setNotifications(combinedNotifications);
         console.log(combinedNotifications);
