@@ -1029,6 +1029,53 @@ const getPromoCodeId = async (req, res) => {
   }
 };
 
+
+const sendUpcomingEventReminder = async (req, res) => {
+  try {
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    const user = await User.findById(tourist.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    // Fetch events linked to the tourist that are occurring soon (e.g., within 7 days)
+    const today = new Date();
+    const upcomingDate = new Date();
+    upcomingDate.setDate(today.getDate() + 7); // 7 days from today
+
+    const upcomingEvents = await Notification.find({
+      userId: tourist._id,
+      eventDate: { $gte: today, $lte: upcomingDate }, // Ensure eventDate exists in the Notification model
+    });
+
+    if (upcomingEvents.length === 0) {
+      return res.status(200).json({ message: "No upcoming events to remind" });
+    }
+    // Prepare and send email without event details
+    const title = `Reminder: Upcoming Events`;
+    const message = `Hello ${user.username},\n\nYou have upcoming events scheduled within the next 7 days. Please check your account for more details.\n\nBest regards, Your Travel App Team`;
+
+    await sendMail(user.email, user.username, title, message);
+
+    return res.status(200).json({ message: "Upcoming event reminder email sent successfully" });
+  } catch (error) {
+    console.error("Error sending event reminders:", error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+
 module.exports = {
   getTourist,
   createTourist,
@@ -1057,4 +1104,5 @@ module.exports = {
   receiveBirthdayPromo,
   testOutOfStockNotification,
   getPromoCodeId,
+  sendUpcomingEventReminder
 };
