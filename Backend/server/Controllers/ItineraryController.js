@@ -12,6 +12,7 @@ const touristModel = require("../Models/Tourist"); // Add this line to import to
 const jwt = require("jsonwebtoken");
 
 const { getExchangeRates, convertCurrency } = require("./currencyConverter");
+const { checkForFlagged } = require("./tourGuideController");
 
 const createItinerary = async (req, res) => {
   const {
@@ -592,14 +593,23 @@ const generateShareLink = async (req, res) => {
 // Flag an itinerary as inappropriate (admin only)
 const flagItinerary = async (req, res) => {
   try {
+    console.log("Flag itinerary controller hit");
     const { id } = req.params;
+    console.log(`Itinerary ID: ${id}`);
     const itinerary = await Itinerary.findById(id);
     if (!itinerary) {
+      console.log("Itinerary not found");
       return res.status(404).json({ message: "Itinerary not found" });
     }
 
     itinerary.flagged = true;
     await itinerary.save();
+
+    // Call checkForFlagged endpoint
+    console.log("Calling checkForFlagged");
+    await checkForFlagged({ params: { tourGuideId: itinerary.creator } }, res);
+
+    console.log("Itinerary flagged successfully");
     res
       .status(200)
       .json({ message: "Itinerary flagged successfully", itinerary });

@@ -24,7 +24,7 @@ router.get('/userStatistics',adminController.getUserStatistics);
 router.post('/createPromoCode', adminController.createPromoCode);
 router.get('/getNotifications', adminController.getNotifications);
 router.get('/promoCodes', adminController.getPromoCodes);
-
+router.get('/allSalesReport', adminController.getAllSalesReport);
 router.post("/login", login);
 router.post("/updatepassword", authenticateUser, updatePassword);
 router.get("/getLoggedInUser", getLoggedInUser);

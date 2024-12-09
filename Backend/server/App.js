@@ -103,7 +103,8 @@ app.use("/api/advertiser", advertiserRoutes);
 app.use("/api/itinerary", itineraryRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/hotel", hotelRoutes);
-app.use("/api", flightRoutes);
+
+app.use("/api/flights", flightRoutes);
 app.listen(3000, () => {
   console.log("Server running on port 3000");
 });

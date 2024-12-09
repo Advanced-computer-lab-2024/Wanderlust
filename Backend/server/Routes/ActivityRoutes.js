@@ -25,6 +25,7 @@ const {
   flagActivity,
   unflagActivity,
 } = require("../Controllers/activityController");
+const { checkForFlagged } = require("../Controllers/advertiserController");
 
 router.post("/createActivity", authenticateUser, createActivity);
 router.get("/getActivity", getActivity);
@@ -46,7 +47,7 @@ router.post("/saveActivity", saveActivity);
 router.post("/unsaveActivity", unsaveActivity);
 router.get("/savedActivities", getSavedActivities);
 //flag an activity
-router.put("/activity/:id/flag", authenticateUser, admin, flagActivity);
+router.put("/activity/:id/flag", authenticateUser, admin, flagActivity, checkForFlagged);
 //unflag an activity
 router.put("/activity/:id/unflag", authenticateUser, admin, unflagActivity);
 

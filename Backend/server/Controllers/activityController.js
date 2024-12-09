@@ -8,6 +8,7 @@ const { convertCurrency } = require("./currencyConverter");
 const touristModel = require("../Models/Tourist");
 const { updatePointsOnPayment, updateBadge } = require("./touristController");
 const { sendReceipt } = require("./NotificationController");
+const { checkForFlagged } = require("./advertiserController");
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Use your Stripe Secret Key
 const jwt = require("jsonwebtoken");
@@ -679,9 +680,10 @@ const flagActivity = async (req, res) => {
 
     activity.flagged = true;
     await activity.save();
-    res
-      .status(200)
-      .json({ message: "Activity flagged successfully", activity });
+    res.status(200).json({ message: "Activity flagged successfully", activity });
+
+    // Call checkForFlagged after flagging the activity
+    await checkForFlagged(req, res);
   } catch (error) {
     console.error("Error flagging activity:", error);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -699,9 +701,7 @@ const unflagActivity = async (req, res) => {
 
     activity.flagged = false;
     await activity.save();
-    res
-      .status(200)
-      .json({ message: "Activity unflagged successfully", activity });
+    res.status(200).json({ message: "Activity unflagged successfully", activity });
   } catch (error) {
     console.error("Error unflagging activity:", error);
     res.status(500).json({ message: "Server error", error: error.message });

@@ -7,7 +7,9 @@ const sellerModel = require("../Models/Seller.js");
 const User = require("../Models/user");
 const PromoCode = require("../Models/PromoCode"); 
 const Notification = require('../Models/Notification'); // Assuming you have a Notification model
-
+const Advertiser = require("../Models/Advertiser.js");
+const Activity = require("../Models/Activity.js");
+const Itinerary = require("../Models/Itinerary.js");
 //npm install jsonwebtoken
 const jwt = require("jsonwebtoken");
 
@@ -305,6 +307,49 @@ const addTourismGovernor = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+const getAllSalesReport = async (req, res) => {
+  try {
+    // Fetch all advertisers and tour guides
+    const advertisers = await Advertiser.find();
+    const tourGuides = await tourguideModel.find();
+
+    let totalRevenue = 0;
+    let appRevenue = 0;
+    let allActivities = [];
+    let allItineraries = [];
+
+    // Fetch sales report for each advertiser
+    for (const advertiser of advertisers) {
+      const activities = await Activity.find({ advertiserId: advertiser._id });
+      const advertiserRevenue = activities.reduce((sum, activity) => sum + activity.revenue, 0);
+      totalRevenue += advertiserRevenue;
+      appRevenue += advertiserRevenue * 0.1; // 10% app rate
+      allActivities = allActivities.concat(activities);
+    }
+
+    // Fetch sales report for each tour guide
+    for (const tourGuide of tourGuides) {
+      const itineraries = await Itinerary.find({ creator: tourGuide._id, isActive: true });
+      const tourGuideRevenue = itineraries.reduce((sum, itinerary) => sum + itinerary.price, 0);
+      totalRevenue += tourGuideRevenue;
+      appRevenue += tourGuideRevenue * 0.1; // 10% app rate
+      allItineraries = allItineraries.concat(itineraries);
+    }
+
+    res.status(200).json({
+      totalRevenue,
+      appRevenue,
+      currency: "USD", // Replace with actual currency if applicable
+      numberOfItineraries: allItineraries.length,
+      itineraries: allItineraries,
+      activities: allActivities,
+      generatedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Error fetching all sales report:", error);
+    res.status(500).json({ error: "Failed to fetch all sales report. Please try again later." });
+  }
+};
 
 module.exports = {
   createAdmin,
@@ -318,4 +363,5 @@ module.exports = {
   createPromoCode,
   getNotifications,
   getPromoCodes,
+  getAllSalesReport,
 };

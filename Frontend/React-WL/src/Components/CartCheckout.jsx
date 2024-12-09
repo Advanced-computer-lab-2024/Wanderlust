@@ -3,28 +3,80 @@ import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import ErrorPopupComponent from "./ErrorPopupComponent";
+
+const fetchPromoCodeId = async (input) => {
+  try {
+    const response = await axios.post(
+      "http://localhost:8000/api/tourist/getPromoCodeId",
+      { code: input },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+        },
+      }
+    );
+    return response.data.promoCodeId;
+  } catch (err) {
+    console.error("Error fetching promo code:", err);
+    return null;
+  }
+};
 
 const CartCheckout = ({ totalAmount }) => {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [discountedPrice, setDiscountedPrice] = useState(null);
+  const [redeemSuccess, setRedeemSuccess] = useState(false);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
+
+  const handleRedeem = async () => {
+    const promoId = await fetchPromoCodeId(promoCode);
+    if (promoId) {
+      try {
+        const response = await axios.post(
+          "http://localhost:8000/api/tourist/usePromoCode",
+          { promoCodeId: promoId, orderAmount: totalAmount },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            },
+          }
+        );
+        const { discount, newTotalAmount } = response.data;
+        setDiscountedPrice(newTotalAmount.toFixed(2));
+        setRedeemSuccess(true);
+      } catch (error) {
+        setErrorMessage("Failed to apply promo code");
+        setShowErrorPopup(true);
+      }
+    } else {
+      setErrorMessage("Invalid promo code");
+      setShowErrorPopup(true);
+    }
+  };
 
   const handleConfirmOrder = async () => {
     setError(null);
     setLoading(true);
     setSuccess(false);
 
+    const finalPrice = redeemSuccess ? discountedPrice : totalAmount;
+
     try {
       switch (paymentMethod) {
         case "Wallet":
           await axios.post(
             "http://localhost:8000/api/tourist/cart/checkout",
-            { paymentMethod: "wallet", totalAmount },
+            { paymentMethod: "wallet", totalAmount: finalPrice },
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
@@ -37,7 +89,7 @@ const CartCheckout = ({ totalAmount }) => {
         case "Card":
           const { data } = await axios.post(
             "http://localhost:8000/api/tourist/cart/checkout",
-            { paymentMethod: "card", totalAmount },
+            { paymentMethod: "card", totalAmount: finalPrice },
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
@@ -55,7 +107,7 @@ const CartCheckout = ({ totalAmount }) => {
 
           await axios.post(
             "http://localhost:8000/api/tourist/cart/paymentSuccess",
-            { paymentIntentId: paymentIntent.id, totalAmount },
+            { paymentIntentId: paymentIntent.id, totalAmount: finalPrice },
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
@@ -98,7 +150,14 @@ const CartCheckout = ({ totalAmount }) => {
         <div className="mb-6 text-center">
           <p className="text-lg font-semibold text-gray-700">
             Total Amount:{" "}
-            <span className="text-green-600">${totalAmount.toFixed(2)}</span>
+            {discountedPrice ? (
+              <>
+                <span className="line-through text-red-600">${totalAmount.toFixed(2)}</span>
+                <span className="text-green-600"> ${discountedPrice}</span>
+              </>
+            ) : (
+              <span className="text-green-600">${totalAmount.toFixed(2)}</span>
+            )}
           </p>
         </div>
 
@@ -148,6 +207,26 @@ const CartCheckout = ({ totalAmount }) => {
           </div>
         )}
 
+        {/* Promo Code Section */}
+        <div className="mt-4 flex items-center space-x-2">
+          <input
+            type="text"
+            placeholder="Enter Promo Code"
+            className="border p-2 rounded-md flex-grow"
+            value={promoCode}
+            onChange={(e) => setPromoCode(e.target.value)}
+          />
+          <button
+            className={`px-2 py-1 rounded-md text-xs ${
+              redeemSuccess ? "bg-green-500 text-white" : "bg-custom text-white"
+            }`}
+            onClick={handleRedeem}
+            disabled={redeemSuccess}
+          >
+            {redeemSuccess ? "Redeemed" : "Redeem"}
+          </button>
+        </div>
+
         {/* Confirm Payment Button */}
         <div className="mt-6">
           <button
@@ -177,6 +256,12 @@ const CartCheckout = ({ totalAmount }) => {
             <p>Error: {error}</p>
           </div>
         )}
+
+        <ErrorPopupComponent
+          errorMessage={errorMessage}
+          show={showErrorPopup}
+          handleClose={() => setShowErrorPopup(false)}
+        />
       </div>
     </div>
   );
