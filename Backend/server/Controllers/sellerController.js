@@ -2,6 +2,7 @@
 const SellerModel = require('../Models/Seller.js');
 const { default: mongoose } = require('mongoose');
 const User = require("../Models/user");
+const jwt = require('jsonwebtoken');
 const Products = require("../Models/Products.js");
 //u have to sign up first and get the id given
 //http://localhost:8000/api/seller/createSeller/userId
