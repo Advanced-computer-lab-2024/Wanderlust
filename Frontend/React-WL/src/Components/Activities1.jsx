@@ -265,6 +265,12 @@ const Activities1 = ({
     handleCloseModal();
   };
 
+  
+
+//   if (activity.advertiserId !== userId) {
+//     return null;}
+
+
 return (
     <section className="bg-blue-50 px-4 py-10">
         <div className="container mx-auto flex flex-col lg:flex-row">
@@ -379,7 +385,7 @@ return (
                 <div className="flex flex-col space-y-6">
   {activities.length > 0 ? (
     activities
-      .filter((activity) => activity.advertiserId === userId) // Filter activities by advertiserId
+       
       .map((activity) => (
         <Activity
           key={activity.id}
