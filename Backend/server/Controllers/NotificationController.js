@@ -243,8 +243,13 @@ const getNotifications = async (req, res) => {
 
     console.log("Decoded token:", decoded);
 
+    // Check if the user is a tourist
+    const tourist = await Tourist.findOne({ _id: decoded.id });
+    const userId = tourist ? tourist.userId : decoded.id;
+    console.log("User ID:", userId);
+
     // Fetch notifications for the user
-    const notifications = await Notification.find({ userId: decoded.id }).sort({ createdAt: -1 });
+    const notifications = await Notification.find({ userId:userId}).sort({ createdAt: -1 });
 
     res.status(200).json(notifications);
   } catch (error) {

@@ -19,9 +19,7 @@ const TouristNotif = () => {
     setLoading(true);
     try {
       const response = await axios.get('http://localhost:8000/api/tourist/getNotifications', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.status === 200) {
@@ -44,7 +42,7 @@ const TouristNotif = () => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto bg-white rounded-lg shadow-lg">
-      <h2 className="text-3xl font-bold text-blue-900 mb-6 text-center">Upcoming Events</h2>
+      <h2 className="text-3xl font-bold text-blue-900 mb-6 text-center">My Notifications</h2>
 
       {loading ? (
         <div className="flex justify-center items-center h-64">

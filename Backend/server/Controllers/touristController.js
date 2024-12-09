@@ -970,10 +970,14 @@ const usePromoCode = async (req, res) => {
 
 const receiveBirthdayPromo = async (req, res) => {
   try {
-    const { touristId } = req.params;
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const tourist = await touristModel.findById(touristId);
-    console.log(tourist);
+    const tourist = await touristModel.findOne({ _id: decoded.id });
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
     }

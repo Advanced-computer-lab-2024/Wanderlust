@@ -72,6 +72,18 @@ const TouristProfile = () => {
       };
 
       setProfile(combinedData);
+
+      // Check if the promo was already received today
+      const lastPromoDate = localStorage.getItem("lastPromoDate");
+      const today = new Date().toISOString().split('T')[0];
+
+      if (lastPromoDate !== today) {
+        // Call receiveBirthdayPromo
+        await axios.post("http://localhost:8000/api/tourist/receiveBirthdayPromo", {}, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` }
+        });
+        localStorage.setItem("lastPromoDate", today);
+      }
     } catch (error) {
       console.error("Error fetching profile:", error);
       setError(error);
