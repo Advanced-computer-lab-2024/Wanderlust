@@ -19,7 +19,7 @@ const AdvertiserNotif = () => {
 
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/advertiser/getNotifications', {
+      const response = await axios.get('http://localhost:8000/api/advertiser/getNotificationsAll', {
         headers: { Authorization: `Bearer ${token}` },
       });
 

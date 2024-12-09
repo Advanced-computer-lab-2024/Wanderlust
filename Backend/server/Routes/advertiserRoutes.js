@@ -15,7 +15,7 @@ router.get("/getAdvertiser", getAdvertiser);
 router.get("/getAdvertiserByUsername", getAdvertiserByUsername);
 router.put("/updateAdvertiser", updateAdvertiser);
 router.get("/checkForFlagged/:advertiserId", checkForFlagged);
-router.get('/getNotifications', getNotificationsAll);
+router.get('/getNotificationsAll', getNotificationsAll);
 
 
 module.exports = router;
