@@ -304,5 +304,6 @@ module.exports = {
   sendMail,
   createSystemNotification, 
   requestNotification,
-  getNotifications
+  getNotifications,
+  getNotificationsAll
 };

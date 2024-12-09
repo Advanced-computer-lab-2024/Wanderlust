@@ -31,7 +31,7 @@ const {
 
 const { authenticateUser } = require("../Controllers/authController");
 const tourist = require("../Middleware/touristMiddleware");
-const { createSystemNotification,sendUpcomingActivityNotifications, sendUpcomingItineraryNotifications, requestNotification,getNotificationsAll } = require("../Controllers/NotificationController");
+const { createSystemNotification, requestNotification,getNotificationsAll,getNotifications } = require("../Controllers/NotificationController");
 
 const router = express.Router();
 
@@ -118,6 +118,7 @@ router.post("/getPromoCodeId", authenticateUser, tourist, getPromoCodeId);
 
 router.post('/requestNotification', requestNotification);
 router.get('/getNotifications', getNotificationsAll);
+router.get('/getNotification', getNotifications);
 
 
 module.exports = router;

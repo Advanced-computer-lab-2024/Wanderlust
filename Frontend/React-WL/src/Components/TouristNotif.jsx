@@ -18,7 +18,7 @@ const TouristNotif = () => {
 
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/tourist/getNotifications', {
+      const response = await axios.get('http://localhost:8000/api/tourist/getNotification', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
