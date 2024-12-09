@@ -56,6 +56,7 @@ import Guide from "./Components/Guide";
 import SearchHotelsPage from "./Pages/Tourist/SearchHotelsPage";
 import TourguideNotifPage from "./Pages/Tourguide/TourguideNotifPage";
 import AdvertiserNotifPage from "./Pages/Advertiser/AdvertiserNotifPage";
+import SearchFlightsPage from "./Pages/Tourist/SearchFlights";
 import "./App.css";
 
 const App = () => {
@@ -196,6 +197,8 @@ const App = () => {
 
         {/* Search Hotels */}
         <Route path="/SearchHotelsPage" element={<SearchHotelsPage />} />
+         {/* Search Hotels */}
+         <Route path="/SearchFlightsPage" element={<SearchFlightsPage />} />
       </Routes>
     </Router>
   );

@@ -99,6 +99,55 @@ const getItinerary = async (req, res) => {
   }
 };
 
+const getItineraryAdmin = async (req, res) => {
+  const { currency } = req.query; // Get the selected currency from query parameters
+  try {
+    const itineraries = await Itinerary.find({
+      $or: [
+        { isActive: true },
+        { flagged: true },
+        { flagged: false, isActive: false }
+      ]
+    }).populate({
+      path: "activities",
+      populate: { path: "category tags" },
+    });
+
+    const itinerariesWithStatus = itineraries.map(itinerary => {
+      const itineraryObj = itinerary.toObject();
+      itineraryObj.status = itinerary.isActive ? 'Active' : 'Inactive';
+      return itineraryObj;
+    });
+
+    if (currency) {
+      const convertedItineraries = await Promise.all(
+        itinerariesWithStatus.map(async (item) => {
+          const convertedItem = item; // Already a plain JavaScript object
+          convertedItem.price = await convertCurrency(
+            convertedItem.price,
+            currency
+          ); // Convert itinerary price to selected currency
+
+          // Convert prices of activities within the itinerary
+          convertedItem.activities = await Promise.all(
+            convertedItem.activities.map(async (activity) => {
+              activity.price = await convertCurrency(activity.price, currency);
+              return activity;
+            })
+          );
+
+          return convertedItem;
+        })
+      );
+      return res.status(200).json(convertedItineraries);
+    }
+
+    res.status(200).json(itinerariesWithStatus);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const getItineraryGuest = async (req, res) => {
   try {
     const itinerary = await Itinerary.find().populate({
@@ -775,4 +824,5 @@ module.exports = {
   saveItinerary,
   unsaveItinerary,
   getSavedItineraries,
+  getItineraryAdmin,
 };
