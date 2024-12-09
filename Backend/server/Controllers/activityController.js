@@ -9,6 +9,7 @@ const touristModel = require("../Models/Tourist");
 const { updatePointsOnPayment, updateBadge } = require("./touristController");
 const { sendReceipt } = require("./NotificationController");
 const { checkForFlagged } = require("./advertiserController");
+const Tag = require("../Models/PreferenceTag"); // Ensure Tag model is required
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Use your Stripe Secret Key
 const jwt = require("jsonwebtoken");
@@ -26,13 +27,26 @@ const createActivity = async (req, res) => {
     tags,
     specialDiscounts,
     bookingOpen,
-    picture,
     description,
   } = req.body;
+  console.log(req.body);
   try {
     const token = req.headers.authorization.split(" ")[1];
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     const advertiserId = decodedToken.id;
+
+    // Find category ID
+    const categoryDoc = await ActivityCatModel.findOne({ name: category });
+    const categoryId = categoryDoc ? categoryDoc._id : null;
+
+    // Find tag IDs
+    const tagIds = await Promise.all(
+      tags.map(async (tagName) => {
+        const tag = await Tag.findOne({ name: tagName });
+        return tag ? tag._id : null;
+      })
+    );
+    console.log(tagIds);
 
     const activity = await Activity.create({
       name,
@@ -42,12 +56,11 @@ const createActivity = async (req, res) => {
       lng,
       price,
       duration,
-      category,
-      tags,
+      category: categoryId, // Include category ID
+      tags: tagIds.filter((id) => id !== null), // Include only valid tag IDs
       specialDiscounts,
       bookingOpen,
       advertiserId, // Automatically include advertiserId
-      picture,
       description,
     });
     const populatedActivity = await Activity.findById(activity._id)
@@ -55,6 +68,7 @@ const createActivity = async (req, res) => {
       .populate("tags");
     res.status(200).json(populatedActivity);
   } catch (error) {
+    console.log(error);
     res.status(400).json({ error: error.message });
   }
 };

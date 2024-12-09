@@ -95,9 +95,11 @@ const ActivitySchema = new Schema({
   },
   picture: {
     type: String,
+    required: false
   },
   description: {
     type: String,
+    required: false
   },
   touristCount:{
     type: Number,
