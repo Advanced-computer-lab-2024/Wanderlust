@@ -38,18 +38,44 @@ const SearchHotels = () => {
       setLoading(false);
     }
   };
-  const handleBookHotel = async (offerId) => {
+  const handleBookHotel = async (hotel) => {
     try {
+      const {
+        hotelName,
+        checkInDate,
+        checkOutDate,
+        priceTotal,
+        currency,
+        guests,
+        cityCode,
+        numberOfRooms,
+        availability,
+        offerId,
+      } = hotel;
+
+      // Send all the necessary data to the backend
       const response = await axios.post(
         "http://localhost:8000/api/hotel/bookHotel",
-        { offerId }, // Pass the correct offer ID
+        {
+          hotelName,
+          checkInDate,
+          checkOutDate,
+          priceTotal,
+          currency,
+          guests,
+          cityCode,
+          numberOfRooms,
+          availability,
+          offerId,
+        },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
           },
         }
       );
-      alert(`Successfully booked ${response.data.reservation.hotelName}`);
+
+      alert("Hotel booked successfully!");
     } catch (error) {
       console.error(
         "Error booking hotel:",
@@ -57,7 +83,7 @@ const SearchHotels = () => {
       );
       alert(
         error.response?.data?.message ||
-          "An error occurred while booking the hotel"
+          "Failed to book hotel. Please try again."
       );
     }
   };
@@ -168,7 +194,7 @@ const SearchHotels = () => {
                   {hotel.availability ? "Yes" : "No"}
                 </p>
                 <button
-                  onClick={() => handleBookHotel(hotel.offerId)}
+                  onClick={() => handleBookHotel(hotel)}
                   className="bg-custom text-white px-2 py-1 rounded-md text-xs mt-2 transition duration-300 ease-in-out transform hover:bg-blue-600"
                 >
                   Book
