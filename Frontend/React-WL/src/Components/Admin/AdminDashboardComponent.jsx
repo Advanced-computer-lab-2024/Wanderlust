@@ -67,6 +67,9 @@ const AdminDashboardComponent = () => {
     const handleCreatePromoCode = () => {
         navigate('/createpromocode');
       };
+    const handleViewSales = () => {
+        navigate('/viewallsalesreport');
+      };
     return (
       <div className="p-4">
       <div className="mb-4">
@@ -199,6 +202,19 @@ const AdminDashboardComponent = () => {
               <h5 className="card-title">View and manage all itineraries</h5>
               <button className="btn btn-primary mt-2" onClick={handleManageItinerary}>
                 View Itineraries
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="card p-0">
+            <div className="card-header">
+              <i className="fas fa-dollar me-2"></i> View Sales Report
+            </div>
+            <div className="card-body">
+              <h5 className="card-title">View a sales report containing all my revenue</h5>
+              <button className="btn btn-primary mt-2" onClick={handleViewSales}>
+                View Report
               </button>
             </div>
           </div>
