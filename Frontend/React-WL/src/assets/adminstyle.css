@@ -1,0 +1,55 @@
+:root {
+    --tw-bg-opacity: 1; /* Default fully opaque */
+  }
+  
+.btn-primary {
+    background-color: rgb(0 59 149 / var(--tw-bg-opacity)) !important;
+    border-color: rgb(0 59 149 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .btn-primary:hover,
+  .btn-primary:active {
+    background-color: rgb(0 59 149 / var(--tw-bg-opacity)) !important;
+    border-color: rgb(0 59 149 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .btn-primary:focus {
+    background-color: rgb(0, 59, 149) !important; /* Solid color */
+    border-color: rgb(0, 59, 149) !important; /* Solid color */
+    outline: 2px solid rgb(0, 59, 149); /* Optional: Add visible focus outline */
+    outline-offset: 2px;
+  }
+  /* Applies to Bootstrap tables */
+.table thead th {
+    background-color: rgb(0, 59, 149) !important;
+    color: white !important; /* Optional: Make text readable on the dark background */
+    border-color: rgb(0, 59, 149) !important; /* Matches the border to the header */
+  }
+  
+  /* Applies to regular tables */
+  table thead th {
+    background-color: rgb(0, 59, 149) !important;
+    color: white !important; /* Optional */
+    border-color: rgb(0, 59, 149) !important;
+  }
+  
+  /* Additional styling for table header cells */
+  thead th {
+    text-align: center; /* Optional: Center align text */
+    font-weight: bold; /* Optional: Make headers bold */
+  }
+  /* Applies to all tables globally */
+table {
+    border-radius: 8px; /* Adjust the value for more or less rounding */
+    overflow: hidden; /* Ensures the corners of content inside the table match the border radius */
+    border-collapse: separate; /* Ensures border radius is applied correctly */
+  }
+  
+  /* Ensures Bootstrap tables respect the rounding */
+  .table {
+    border-radius: 8px !important;
+    overflow: hidden !important;
+  }
+  
+  /* Optional: Remove gaps between borders for Bootstrap tables */
+ 

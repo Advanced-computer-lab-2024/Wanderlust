@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import '../../assets/adminstyle.css'
 const CreatePromocode = () => {
   const [code, setCode] = useState('');
   const [discount, setDiscount] = useState('');

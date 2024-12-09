@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import '../../assets/adminstyle.css'
 const AddAdmin = () => {
     const [formData, setFormData] = useState({
         name: '',
@@ -90,7 +91,7 @@ const AddAdmin = () => {
                         required
                     />
                 </div>
-                <button type="submit" className="w-full bg-indigo-600 text-white p-2 rounded-md">
+                <button type="submit" className="w-full bg-custom text-white p-2 rounded-md">
                     Add Admin
                 </button>
             </form>

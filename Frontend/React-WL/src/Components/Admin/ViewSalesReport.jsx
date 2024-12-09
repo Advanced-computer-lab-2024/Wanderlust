@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import '../../assets/adminstyle.css'
 const ViewSalesReport = () => {
   const [salesReport, setSalesReport] = useState(null);
   const [loading, setLoading] = useState(true);
