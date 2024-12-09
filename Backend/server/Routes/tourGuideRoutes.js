@@ -26,6 +26,6 @@ router.get("/salesreport/filter", filterSalesReport);
 router.get("/touristreport/:tourGuideId", getTouristReport);
 router.get("/touristreport/filter/:tourGuideId", filterTouristReportByMonth);
 router.get("/checkflagged/:tourGuideId", checkForFlagged);
-router.get('/getNotifications', getNotificationsAll);
+router.get('/getNotificationsAll', getNotificationsAll);
 
 module.exports = router;

@@ -5,7 +5,7 @@ import { DollarSign, Users, TrendingUp, Calendar } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
 const AdvertiserSales = () => {
-  const [Activity, setActivity] = useState([]);
+  const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
@@ -25,19 +25,22 @@ const AdvertiserSales = () => {
 
   useEffect(() => {
     if (user) {
-      fetchActivity();
+      fetchActivities();
     }
   }, [user]);
 
   const fetchUser = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/admin/getLoggedInUser", {
+      const response = await axios.get("/api/admin/getLoggedInUser", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
         }
       });
       
       setUser(response.data);
+      
+
+      
     } catch (error) {
       console.error("Error fetching profile:", error);
       setError(error);
@@ -45,36 +48,36 @@ const AdvertiserSales = () => {
       setLoading(false);
     }
   };
-
-  const fetchActivity = async () => {
+  
+  const fetchActivities = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/Activity/getActivity');
+      const response = await axios.get('http://localhost:8000/api/activity/getActivity', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
+        }
+      });
+  
+      const data = response.data;
+      console.log(data);
       
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-  
-      const data = await response.json();
-  
-      // Filter itineraries created by the current user
-      const filteredItineraries = data.filter(Activity => 
-        Activity.creator === user._id || 
-        Activity.creator === String(user._id) || 
-        Activity.creatorId === user._id || 
-        Activity.creatorId === String(user._id)
+      // Filter Activities created by the current user
+      const filteredActivities = data.filter(activity => 
+        activity.advertiserId !== user._id || 
+        activity.advertiserId === String(user._id)
       );
+      
 
       // Calculate total revenue
-      const calculatedTotalRevenue = filteredItineraries.reduce((total, item) => {
+      const calculatedTotalRevenue = filteredActivities.reduce((total, item) => {
         const revenue = item.price * item.touristCount;
         return total + revenue;
       }, 0);
 
       // Group tourists by month
-      const monthlyTouristData = calculateMonthlyTourists(filteredItineraries);
+      const monthlyTouristData = calculateMonthlyTourists(filteredActivities);
 
       setTotalRevenue(calculatedTotalRevenue);
-      setActivity(filteredItineraries);
+      setActivities(filteredActivities);
       setMonthlyTourists(monthlyTouristData);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -84,7 +87,7 @@ const AdvertiserSales = () => {
     }
   }
 
-  const calculateMonthlyTourists = (itineraries) => {
+  const calculateMonthlyTourists = (activities) => {
     // Create a map to store tourists by month
     const monthlyTouristsMap = new Array(12).fill(0).map((_, index) => ({
       month: monthNames[index],
@@ -93,10 +96,9 @@ const AdvertiserSales = () => {
     }));
 
     // Populate the map
-    itineraries.forEach(item => {
-      // Assuming timeline.start is a date string
-      const startDate = new Date(item.timeline.start);
-      const monthIndex = startDate.getMonth();
+    activities.forEach(item => {
+      const activityDate = new Date(item.date);
+      const monthIndex = activityDate.getMonth();
       
       monthlyTouristsMap[monthIndex].tourists += item.touristCount;
       monthlyTouristsMap[monthIndex].revenue += item.price * item.touristCount;
@@ -105,22 +107,22 @@ const AdvertiserSales = () => {
     return monthlyTouristsMap;
   }
 
-  // Filter itineraries and monthly tourists based on selected month
+  // Filter Activities and monthly tourists based on selected month
   const filteredData = selectedMonth === 'All' 
     ? {
-        itineraries: Activity,
+        activities: activities,
         monthlyTourists: monthlyTourists
       }
     : {
-        itineraries: Activity.filter(item => {
-          const startDate = new Date(item.timeline.start);
-          return monthNames[startDate.getMonth()] === selectedMonth;
+        activities: activities.filter(item => {
+          const activityDate = new Date(item.date);
+          return monthNames[activityDate.getMonth()] === selectedMonth;
         }),
         monthlyTourists: monthlyTourists.filter(m => m.month === selectedMonth)
       };
 
-  const totalFilteredTourists = filteredData.itineraries.reduce((total, item) => total + item.touristCount, 0);
-  const filteredTotalRevenue = filteredData.itineraries.reduce((total, item) => total + (item.price * item.touristCount), 0);
+  const totalFilteredTourists = filteredData.activities.reduce((total, item) => total + item.touristCount, 0);
+  const filteredTotalRevenue = filteredData.activities.reduce((total, item) => total + (item.price * item.touristCount), 0);
 
   if (loading) return (
     <div className="flex justify-center items-center h-64">
@@ -136,7 +138,6 @@ const AdvertiserSales = () => {
   );
 
   return (
-    <>
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-4xl font-bold text-indigo-700 mb-8">Activity Sales Report</h1>
       
@@ -187,7 +188,7 @@ const AdvertiserSales = () => {
           <div>
             <p className="text-gray-600 text-sm">Avg Activity Price</p>
             <p className="text-2xl font-bold text-purple-600">
-              ${(filteredTotalRevenue / (filteredData.itineraries.length || 1)).toLocaleString()}
+              ${(filteredTotalRevenue / (filteredData.activities.length || 1)).toLocaleString()}
             </p>
           </div>
         </div>
@@ -230,13 +231,13 @@ const AdvertiserSales = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredData.itineraries.map((item) => {
+              {filteredData.activities.map((item) => {
                 const revenue = item.price * item.touristCount;
                 return (
                   <tr key={item._id} className="hover:bg-gray-50">
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.title}</td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.name}</td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(item.timeline.start).toLocaleDateString()}
+                      {new Date(item.date).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${item.price.toLocaleString()}</td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{item.touristCount}</td>
@@ -249,8 +250,6 @@ const AdvertiserSales = () => {
         </div>
       </Card>
     </div>
-     
-        </>
   );
 };
 

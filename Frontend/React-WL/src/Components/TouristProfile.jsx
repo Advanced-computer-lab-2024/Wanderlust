@@ -141,27 +141,28 @@ const TouristProfile = () => {
   };
 
   const redeemPoints = async () => {
-    const username = profile.username;  
+    const username = profile.username;
     console.log(profile.points);
-    if(profile.points < 10000){
+    if (profile.points < 10000) {
       alert("Insufficient Points");
-    }
-    else{
+      return; // Exit the function if points are insufficient
+    } else {
       alert("Points Redeemed Successfully");
     }
-
+  
     try {
       const response = await fetch(`http://localhost:8000/api/tourist/redeemPoints/${username}`, {
-        method: 'PUT', 
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
         },
       });
-
+  
       if (!response.ok) {
         throw new Error('Failed to redeem points');
       }
-
+  
       const data = await response.json();
       console.log('Redeemed successfully:', data);
       setProfile((prevProfile) => ({
@@ -172,9 +173,10 @@ const TouristProfile = () => {
     } catch (error) {
       console.error('Error:', error);
       // Show error notification
-      alert("Insufficient Points");
+      alert("Error redeeming points");
     }
   };
+  
 
   if (loading)
     return (
@@ -300,7 +302,7 @@ const TouristProfile = () => {
       View Complaints
     </button>
                 <button
-      onClick={toggleSettings}
+      onClick={redeemPoints}
       className="bg-blue-600 text-white py-2 px-4 rounded-md"
     >
       Redeem Points

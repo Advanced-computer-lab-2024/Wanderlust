@@ -25,6 +25,7 @@ const {
   saveItinerary,
   unsaveItinerary,
   getSavedItineraries,
+  getItineraryAdmin
 } = require("../Controllers/ItineraryController");
 const { checkForFlagged } = require("../Controllers/tourGuideController");
 
@@ -43,6 +44,7 @@ router.delete("/cancelItineraryBooking/:bookingId", cancelItineraryBooking);
 router.post("/:itineraryId/comments", addComment);
 router.put("/:id/activateDeactivate", activateDeactivateItinerary);
 router.get("/itineraries/:itineraryId/share", generateShareLink);
+router.get("/itineraryAdmin", getItineraryAdmin);
 //flag as inappropriate
 router.put("/itinerary/:id/flag", authenticateUser, admin, flagItinerary,checkForFlagged);
 //unflag as inappropriate

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -19,13 +18,14 @@ const TourguideNotif = () => {
 
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/tourguide/getNotifications', {
+      const response = await axios.get('http://localhost:8000/api/tourGuide/getNotificationsAll', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.status === 200) {
         setNotifications(response.data);
         console.log(response.data);
+        console.log(token);
       } else {
         setError('Failed to fetch notifications: ' + response.data.message);
       }
@@ -66,11 +66,7 @@ const TourguideNotif = () => {
                     <p className="font-medium text-blue-800">
                       {/* Hyperlink for event name */}
                       <Link
-                          to={
-                            notification.eventType === 'itinerary'
-                              ? `/ItineraryTourguide`
-                              : `/ActivityTourguide`
-                          }
+                          to="/ItineraryTourguide"
                           className="text-blue-500 hover:underline"
                         >
                           {notification.message}
