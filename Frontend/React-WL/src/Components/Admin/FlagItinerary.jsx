@@ -65,23 +65,25 @@ const FlagItinerary = () => {
   );
 
   return (
-    <div className="container py-4">
+    <div className="container py-4 w-75">
       <div className="mb-4">
         <h1 className='text-2xl font-bold mb-6'>Itineraries</h1>
       </div>
-      <div className="d-flex flex-wrap gap-3">
+      <div className="row">
         {itineraries.map(itinerary => (
-          <div key={itinerary._id} className="bg-white rounded-xl shadow-md p-6 md:w-1/3">
-            <h2 className="text-xl font-bold">{itinerary.title}</h2>
-            <p className="text-gray-700">{itinerary.description}</p>
-            <p className="text-gray-700">Price: ${itinerary.price}</p>
-            <p className="text-gray-700">Date: {new Date(itinerary.date).toLocaleDateString()}</p>
-            <button
-              className={`btn ${itinerary.flagged ? 'btn-danger' : 'btn-warning'} mt-2`}
-              onClick={() => itinerary.flagged ? handleUnflagItinerary(itinerary._id) : handleFlagItinerary(itinerary._id)}
-            >
-              {itinerary.flagged ? 'Unflag as Inappropriate' : 'Flag as Inappropriate'}
-            </button>
+          <div key={itinerary._id} className="col-md-4 mb-4">
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-xl font-bold">{itinerary.title}</h2>
+              <p className="text-gray-700">{itinerary.description}</p>
+              <p className="text-gray-700">Price: ${itinerary.price}</p>
+              <p className="text-gray-700">Date: {new Date(itinerary.date).toLocaleDateString()}</p>
+              <button
+                className={`btn ${itinerary.flagged ? 'btn-danger' : 'btn-primary'} mt-2`}
+                onClick={() => itinerary.flagged ? handleUnflagItinerary(itinerary._id) : handleFlagItinerary(itinerary._id)}
+              >
+                {itinerary.flagged ? 'Unflag as Inappropriate' : 'Flag as Inappropriate'}
+              </button>
+            </div>
           </div>
         ))}
       </div>

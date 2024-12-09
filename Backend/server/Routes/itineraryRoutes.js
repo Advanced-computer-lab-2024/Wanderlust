@@ -44,7 +44,7 @@ router.post("/:itineraryId/comments", addComment);
 router.put("/:id/activateDeactivate", activateDeactivateItinerary);
 router.get("/itineraries/:itineraryId/share", generateShareLink);
 //flag as inappropriate
-router.put("itinerary/:id/flag", authenticateUser, admin, flagItinerary,checkForFlagged);
+router.put("/itinerary/:id/flag", authenticateUser, admin, flagItinerary,checkForFlagged);
 //unflag as inappropriate
 router.put("/itinerary/:id/unflag", authenticateUser, admin, unflagItinerary);
 // Tourist rate an itinerary they followed
