@@ -1,5 +1,5 @@
 const axios = require("axios");
-const flightReservationsModel = require("../Models/flight");
+const flightReservationsModel = require("../Models/Flight");
 const User = require("../Models/user");
 const jwt = require("jsonwebtoken");
 
@@ -36,9 +36,20 @@ const generateAccessToken = async () => {
 };
 
 const searchFlightOffers = async (req, res) => {
-  const { originLocationCode, destinationLocationCode, departureDate, returnDate, adults } = req.body;
+  const {
+    originLocationCode,
+    destinationLocationCode,
+    departureDate,
+    returnDate,
+    adults,
+  } = req.body;
 
-  if (!originLocationCode || !destinationLocationCode || !departureDate || !adults) {
+  if (
+    !originLocationCode ||
+    !destinationLocationCode ||
+    !departureDate ||
+    !adults
+  ) {
     return res.status(400).json({ message: "Missing required parameters" });
   }
 
@@ -66,7 +77,9 @@ const searchFlightOffers = async (req, res) => {
     return res.status(200).json(response.data);
   } catch (error) {
     console.error("Error in searchFlightOffers:", error.message);
-    return res.status(500).json({ message: "Server error", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
   }
 };
 
@@ -94,7 +107,9 @@ const priceFlightOffer = async (req, res) => {
     return res.status(200).json(response.data);
   } catch (error) {
     console.error("Error in priceFlightOffer:", error.message);
-    return res.status(500).json({ message: "Server error", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
   }
 };
 
@@ -102,7 +117,9 @@ const createFlightOrder = async (req, res) => {
   const { flightOffer } = req.body;
 
   if (!flightOffer) {
-    return res.status(400).json({ message: "Flight offer is required for booking" });
+    return res
+      .status(400)
+      .json({ message: "Flight offer is required for booking" });
   }
 
   try {
@@ -143,7 +160,9 @@ const createFlightOrder = async (req, res) => {
     return res.status(200).json(flightReservation);
   } catch (error) {
     console.error("Error in createFlightOrder:", error.message);
-    return res.status(500).json({ message: "Server error", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
   }
 };
 

@@ -130,10 +130,6 @@ const CartCheckout = ({ totalAmount }) => {
           setSuccess(true);
           break;
 
-        case "COD":
-          setSuccess(true);
-          break;
-
         default:
           throw new Error("Please select a payment method.");
       }
