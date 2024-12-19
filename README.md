@@ -99,6 +99,82 @@ By adhering to these coding standards, we ensure that our codebase remains clean
   
 </details>
 
+<details>
+<summary>upcoming</summary>
+  
+  ![Home Page](screenshots/upcoming.png)
+  
+</details>
+
+<details>
+  
+<summary>prefrence</summary>
+  
+  ![Signup Page](screenshots/prefrence.png)
+  
+</details>
+
+<details>
+<summary>complaint</summary>
+  
+  ![Login Page](screenshots/complaint.png)
+  
+</details>
+
+<details>
+  
+<summary>Cart</summary>
+  
+  ![Cart](screenshots/cart.png)
+  
+</details>
+
+<details>
+<summary>wishlist</summary>
+  
+  ![Locations Page](screenshots/wishlist.png)
+  
+</details>
+
+<details>
+<summary>orders</summary>
+  
+  ![Home Page](screenshots/orders.png)
+  
+</details>
+
+<details>
+  
+<summary>myorders</summary>
+  
+  ![Signup Page](screenshots/myorders.png)
+  
+</details>
+
+<details>
+<summary>itenraries</summary>
+  
+  ![Login Page](screenshots/itenraries.png)
+  
+</details>
+
+<details>
+  
+<summary>products</summary>
+  
+  ![Cart](screenshots/products.png)
+  
+</details>
+
+<details>
+<summary>profile</summary>
+  
+  ![Locations Page](screenshots/profile.png)
+  
+</details>
+
+
+
 
 ## Tech/Framework Used
 Our project leverages a modern tech stack to deliver a seamless and efficient experience for users. The following technologies and frameworks are used:
