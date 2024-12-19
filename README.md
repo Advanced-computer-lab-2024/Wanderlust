@@ -506,6 +506,63 @@ Currently, testing is performed manually using Postman for API endpoints. Automa
     }
     ```
 
+- **Example 3: update Loctaion**
+  - **Endpoint:** `http://localhost:3000/api/location/create`
+  - **Method:** POST
+
+- **Example 4: Get Loctaion**
+  - **Endpoint:** `http://localhost:3000/api/location/getall`
+  - **Method:** GET
+
+- **Example 5: Create Loctaion**
+  - **Endpoint:** `http://localhost:3000/api/location/update/60d5f9b8f8d2c9b8f8d2c9b8`
+  - **Method:** POST
+
+- **Example 6: Delete Location**
+  - **Endpoint:** `http://localhost:8000/api/location/delete/60d5f9b8f8d2c9b8f8d2c9b8`
+  - **Method:** DELETE
+ 
+- **Example 7: Create Tourist**
+  - **Endpoint:** `http://localhost:8000/api/tourist/create`
+  - **Method:** POST
+
+- **Example 8: Get Tourist**
+  - **Endpoint:** `http://localhost:8000/api/tourist/get`
+  - **Method:** GET
+
+- **Example 9: Delete Tourist**
+  - **Endpoint:** `http://localhost:8000/api/tourist/update`
+  - **Method:** PUT
+  - 
+- **Example 10: Delete Tourist**
+  - **Endpoint:** `http://localhost:8000/api/tourist/delete`
+  - **Method:** DELETE
+  
+- **Example 11: Add products to wishlist**
+  - **Endpoint:** `http://localhost:8000/api/wishlist/add`
+  - **Method:** PUT
+    
+- **Example 12: Get wishlist**
+  - **Endpoint:** `http://localhost:8000/api/wishlist/get`
+  - **Method:** GET
+
+- **Example 13: Remove Products from  wishlist**
+  - **Endpoint:** `http://localhost:8000/api/wishlist/remove/60d5f9b8f8d2c9b8f8d2c9b8`
+  - **Method:** PUT
+
+- **Example 14: Create Activity**
+  - **Endpoint:** `http://localhost:8000/api/activity/create`
+  - **Method:** POST
+ 
+- **Example 15: Get activity by id=**
+  - **Endpoint:** `http://localhost:8000/api/activity/getactivity/60d5f9b8f8d2c9b8f8d2c9b8`
+  - **Method:** PUT
+
+- **Example 16: Update activity**
+  - **Endpoint:** `http://localhost:8000/api/activity/update/60d5f9b8f8d2c9b8f8d2c9b8`
+  - **Method:** PUT
+
+
 ### Future Testing Plans
 
 - Implement unit and integration tests using Jest and Supertest.
