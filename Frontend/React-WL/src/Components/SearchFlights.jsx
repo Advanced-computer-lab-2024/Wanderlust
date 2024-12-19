@@ -2,18 +2,19 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Search } from "lucide-react";
 
-const SearchHotels = () => {
+const SearchFlights = () => {
+  const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
-  const [checkInDate, setCheckInDate] = useState("");
-  const [checkOutDate, setCheckOutDate] = useState("");
-  const [guests, setGuests] = useState(1);
-  const [hotels, setHotels] = useState([]);
+  const [departureDate, setDepartureDate] = useState("");
+  const [returnDate, setReturnDate] = useState("");
+  const [adults, setAdults] = useState(1);
+  const [flights, setFlights] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSearch = async () => {
-    if (!destination || !checkInDate || !checkOutDate || !guests) {
-      setError("Please fill in all the fields.");
+    if (!origin || !destination || !departureDate || !adults) {
+      setError("Please fill in all the required fields.");
       return;
     }
 
@@ -21,52 +22,51 @@ const SearchHotels = () => {
     setError("");
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/hotel/searchHotels",
+        "http://localhost:8000/api/flight/searchFlights",
         {
           params: {
+            origin,
             destination,
-            checkInDate,
-            checkOutDate,
-            guests,
+            departureDate,
+            returnDate,
+            adults,
           },
         }
       );
-      setHotels(response.data);
+      setFlights(response.data);
     } catch (err) {
-      setError(err.response?.data?.message || "Error fetching hotels");
+      setError(err.response?.data?.message || "Error fetching flights");
     } finally {
       setLoading(false);
     }
   };
-  const handleBookHotel = async (hotel) => {
+
+  const handleBookFlight = async (flight) => {
     try {
       const {
-        hotelName,
-        checkInDate,
-        checkOutDate,
-        priceTotal,
+        airline,
+        origin,
+        destination,
+        departureDate,
+        returnDate,
+        price,
         currency,
-        guests,
-        cityCode,
-        numberOfRooms,
-        availability,
-        offerId,
-      } = hotel;
+        adults,
+        flightId,
+      } = flight;
 
-      // Send all the necessary data to the backend
       const response = await axios.post(
-        "http://localhost:8000/api/hotel/bookHotel",
+        "http://localhost:8000/api/flight/bookFlight",
         {
-          hotelName,
-          checkInDate,
-          checkOutDate,
-          priceTotal,
+          airline,
+          origin,
+          destination,
+          departureDate,
+          returnDate,
+          price,
           currency,
-          guests,
-          cityCode,
-          numberOfRooms,
-          availability,
-          offerId,
+          adults,
+          flightId,
         },
         {
           headers: {
@@ -75,15 +75,11 @@ const SearchHotels = () => {
         }
       );
 
-      alert("Hotel booked successfully!");
+      alert("Flight booked successfully!");
     } catch (error) {
-      console.error(
-        "Error booking hotel:",
-        error.response?.data || error.message
-      );
+      console.error("Error booking flight:", error.response?.data || error.message);
       alert(
-        error.response?.data?.message ||
-          "Failed to book hotel. Please try again."
+        error.response?.data?.message || "Failed to book flight. Please try again."
       );
     }
   };
@@ -91,15 +87,27 @@ const SearchHotels = () => {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
       <h2 className="text-3xl font-bold text-custom mb-6 text-center">
-        Search Hotels
+        Search Flights
       </h2>
 
       <div className="mb-6 flex items-center space-x-4">
+        {/* Origin */}
+        <div className="flex items-center flex-1">
+          <input
+            type="text"
+            placeholder="Origin (City Code)"
+            value={origin}
+            onChange={(e) => setOrigin(e.target.value)}
+            className="border border-gray-300 p-2 w-full rounded-lg"
+            required
+          />
+        </div>
+
         {/* Destination */}
         <div className="flex items-center flex-1">
           <input
             type="text"
-            placeholder="Enter destination"
+            placeholder="Destination (City Code)"
             value={destination}
             onChange={(e) => setDestination(e.target.value)}
             className="border border-gray-300 p-2 w-full rounded-lg"
@@ -107,39 +115,38 @@ const SearchHotels = () => {
           />
         </div>
 
-        {/* Check-in Date */}
+        {/* Departure Date */}
         <div className="flex items-center flex-1">
           <input
             type="date"
-            value={checkInDate}
-            onChange={(e) => setCheckInDate(e.target.value)}
+            value={departureDate}
+            onChange={(e) => setDepartureDate(e.target.value)}
             className="border border-gray-300 p-2 w-full rounded-lg"
             required
           />
         </div>
 
-        {/* Check-out Date */}
+        {/* Return Date */}
         <div className="flex items-center flex-1">
           <input
             type="date"
-            value={checkOutDate}
-            onChange={(e) => setCheckOutDate(e.target.value)}
+            value={returnDate}
+            onChange={(e) => setReturnDate(e.target.value)}
             className="border border-gray-300 p-2 w-full rounded-lg"
-            required
           />
         </div>
 
-        {/* Guests */}
+        {/* Adults */}
         <div className="flex items-center flex-1">
           <select
-            value={guests}
-            onChange={(e) => setGuests(e.target.value)}
+            value={adults}
+            onChange={(e) => setAdults(e.target.value)}
             className="border border-gray-300 p-2 w-full rounded-lg"
             required
           >
             {[...Array(10).keys()].map((n) => (
               <option key={n + 1} value={n + 1}>
-                {n + 1} Guest{n > 0 && "s"}
+                {n + 1} Adult{n > 0 && "s"}
               </option>
             ))}
           </select>
@@ -164,37 +171,35 @@ const SearchHotels = () => {
         </div>
       )}
 
-      {/* Hotel Results */}
-      {hotels.length > 0 && (
+      {/* Flight Results */}
+      {flights.length > 0 && (
         <div className="mt-8">
           <h2 className="text-xl font-bold text-gray-800 mb-4">
-            Available Hotels
+            Available Flights
           </h2>
           <ul className="space-y-4">
-            {hotels.map((hotel, index) => (
+            {flights.map((flight, index) => (
               <li
                 key={index}
                 className="p-4 border rounded shadow-md hover:shadow-lg relative"
               >
                 <div className="mb-2">
-                  <h3 className="text-lg font-bold">{hotel.hotelName}</h3>
+                  <h3 className="text-lg font-bold">{flight.airline}</h3>
                 </div>
                 <p className="text-gray-500 text-sm">
-                  Check-in: {hotel.checkInDate} | Check-out:{" "}
-                  {hotel.checkOutDate}
+                  Origin: {flight.origin} | Destination: {flight.destination}
                 </p>
                 <p className="text-gray-500 text-sm">
-                  Guests: {hotel.guests} | Rooms: {hotel.numberOfRooms}
+                  Departure: {flight.departureDate} | Return: {flight.returnDate || "N/A"}
                 </p>
                 <p className="text-gray-500 text-sm">
-                  Price: {hotel.priceTotal} {hotel.currency}
+                  Price: {flight.price} {flight.currency}
                 </p>
                 <p className="text-gray-500 text-sm">
-                  City Code: {hotel.cityCode} | Available:{" "}
-                  {hotel.availability ? "Yes" : "No"}
+                  Adults: {flight.adults} | Flight ID: {flight.flightId}
                 </p>
                 <button
-                  onClick={() => handleBookHotel(hotel)}
+                  onClick={() => handleBookFlight(flight)}
                   className="bg-custom text-white px-2 py-1 rounded-md text-xs mt-2 transition duration-300 ease-in-out transform hover:bg-blue-600"
                 >
                   Book
@@ -208,4 +213,4 @@ const SearchHotels = () => {
   );
 };
 
-export default SearchHotels;
+export default SearchFlights;

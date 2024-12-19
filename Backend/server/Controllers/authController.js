@@ -6,12 +6,87 @@ const touristModel = require('../Models/Tourist.js');
 const advertiserModel = require('../Models/Advertiser'); 
 const sellerModel = require('../Models/Seller.js');
 const actualUserModel = require('../Models/user.js');
-const userSchema = require('../Models/user.js');
+const crypto = require('crypto');
+const User = require('../Models/user');
+const Admin = require('../Models/Admin');
 const itineraryModel = require('../Models/Itinerary.js');
 const bookingModel = require('../Models/Booking.js');
+const { sendMail } = require('./NotificationController'); // Adjust the path to your notificationController
 
 const axios = require('axios');
-
+const otpStore = {};
+const sendOtp = async (req, res) => {
+    const { email } = req.body;
+    try {
+      console.log(`Looking for user with email: ${email}`);
+      let user = await User.findOne({ email });
+      let userType = 'User';
+  
+      if (!user) {
+        user = await Admin.findOne({ email });
+        userType = 'Admin';
+      }
+  
+      if (!user) {
+        console.log('User not found');
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      console.log(`${userType} found:`, user);
+  
+      const otp = crypto.randomInt(100000, 999999).toString();
+      otpStore[email] = otp;
+  
+      const message = `Your OTP for password reset is ${otp}`;
+      await sendMail(email, user.name || user.username, 'OTP for Password Reset', message);
+  
+      res.status(200).json({ message: 'OTP sent to your email' });
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  };
+  
+  // Verify OTP
+  const verifyOtp = (req, res) => {
+    const { email, otp } = req.body;
+    if (otpStore[email] && otpStore[email] === otp) {
+      delete otpStore[email]; // Remove OTP after verification
+      res.status(200).json({ message: 'OTP verified' });
+    } else {
+      res.status(400).json({ message: 'Invalid OTP' });
+    }
+  };
+  
+  // Reset Password
+  const resetPassword = async (req, res) => {
+    const { email, newPassword } = req.body;
+    try {
+      let user = await User.findOne({ email });
+      let userType = 'User';
+  
+      if (!user) {
+        user = await Admin.findOne({ email });
+        userType = 'Admin';
+      }
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(newPassword)) {
+        return res.status(400).json({ message: 'New password must be at least 6 characters long and contain both letters and numbers.' });
+      }
+  
+      user.password = newPassword;
+      await user.save();
+  
+      res.status(200).json({ message: 'Password reset successfully' });
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  };
 //routings in admin routing file
 //if you wanna test in postman 1)login 2)copy given token 3)header add key=Authorization value= Bearer copied_token 4)write normal json
 
@@ -361,4 +436,7 @@ module.exports = {
     getLoggedInUser,
     getLoggedInInfo,
     acceptTerms,
+    sendOtp,
+  verifyOtp,
+  resetPassword,
 };

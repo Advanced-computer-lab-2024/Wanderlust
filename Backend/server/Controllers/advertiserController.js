@@ -239,6 +239,43 @@ const checkForFlagged = async (req, res) => {
   }
 };
 
+const getNotifications = async (req, res) => {
+  try {
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+
+    // Validate Bearer token format
+    if (!authHeader.startsWith("Bearer ")) {
+      return res.status(400).json({ message: "Invalid Authorization header format" });
+    }
+
+    const token = authHeader.replace("Bearer ", "").trim();
+
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    console.log("Decoded token:", decoded);
+
+    // Check if the user is an advertiser
+    const advertiser = await Advertiser.findOne({ _id: decoded.id });
+    const userId = advertiser ? advertiser.userId : decoded.id;
+    console.log("User ID:", userId);
+
+    // Fetch notifications for the user
+    const notifications = await Notification.find({ userId:userId}).sort({ createdAt: -1 });
+
+    res.status(200).json(notifications);
+  } catch (error) {
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+    console.error("Error fetching notifications:", error.message);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
+
 module.exports = {
   createAdvertiser,
   getAdvertiser,
@@ -248,7 +285,8 @@ module.exports = {
   filterSalesReport,
   getTouristReport,
   filterTouristReportByMonth,
-  checkForFlagged
+  checkForFlagged,
+  getNotifications
 };
 
 // const deleteAdvertiser = async (req, res) => {

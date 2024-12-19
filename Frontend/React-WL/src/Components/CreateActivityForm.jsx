@@ -19,6 +19,7 @@ const CreateActivityForm = ({ onClose, onSubmit }) => {
     tags: [],
     specialDiscounts: '',
     bookingOpen: true,
+    description: '', // Add description field
   });
 
 
@@ -61,10 +62,10 @@ const CreateActivityForm = ({ onClose, onSubmit }) => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, files } = e.target;
     setFormData((prevState) => ({
       ...prevState,
-      [name]: value,
+      [name]: files ? files[0] : value, // Handle file input
     }));
   };
 
@@ -91,6 +92,7 @@ const CreateActivityForm = ({ onClose, onSubmit }) => {
     if (!formData.category) errors.category = 'Category is required';
     if (formData.tags.length === 0) errors.tags = 'At least one tag is required';
     if (!formData.specialDiscounts) errors.specialDiscounts = 'Special discounts are required';
+    if (!formData.description) errors.description = 'Description is required'; // Add description validation
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -99,7 +101,15 @@ const CreateActivityForm = ({ onClose, onSubmit }) => {
     e.preventDefault();
     if (!validateForm()) return;
     try {
-      await axios.post('/api/activity/createActivity', formData);
+      console.log('formData:', formData);
+ // Append picture to form data
+      const response = await axios.post('http://localhost:8000/api/activity/createActivity', formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+            
+          },
+        });
       onSubmit?.();
       onClose?.();
     } catch (error) {
@@ -262,6 +272,18 @@ const CreateActivityForm = ({ onClose, onSubmit }) => {
                 />
               </div>
 
+              <div className="flex items-center space-x-2 bg-gray-50 rounded-lg p-4">
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  placeholder="Enter activity description"
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-custom text-xl"
+                  required
+                />
+              </div>
+
+
               <div className="flex items-center justify-between bg-gray-50 rounded-lg p-4">
                 <div className="flex items-center space-x-2">
                   <Calendar className="text-custom" size={20} />
@@ -298,6 +320,7 @@ const CreateActivityForm = ({ onClose, onSubmit }) => {
               <button
                 type="submit"
                 className="px-6 py-2 bg-custom text-white rounded-lg hover:bg-custom transition duration-300"
+                onClick={handleSubmit}
               >
                 Create Activity
               </button>

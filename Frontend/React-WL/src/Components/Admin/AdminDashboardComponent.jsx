@@ -4,7 +4,7 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
+import '../../assets/adminstyle.css'
 
 const AdminDashboardComponent = () => {
     const [notificationsCount, setNotificationsCount] = useState(0);

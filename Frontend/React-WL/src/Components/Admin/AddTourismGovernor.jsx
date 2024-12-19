@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import '../../assets/adminstyle.css'
 const AddTourismGovernor = () => {
     const [formData, setFormData] = useState({
         username: "",
@@ -61,7 +61,7 @@ const AddTourismGovernor = () => {
                         required
                     />
                 </div>
-                <button type="submit" className="w-full bg-indigo-600 text-white p-2 rounded-md">
+                <button type="submit" className="w-full bg-custom text-white p-2 rounded-md">
                     Add Tourism Governor
                 </button>
             </form>

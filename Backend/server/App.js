@@ -6,7 +6,6 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 const cloudinary = require("cloudinary").v2;
 const cron = require('node-cron');
-
 //Make sure to add your MongoDB URI in the .env file as MONGO_URI="your mongodb uri"
 //Check db connection links in README file
 
@@ -36,11 +35,13 @@ const app = express();
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
-
+// configurations
 cron.schedule('0 * * * *', () => {
   sendNotifications();
 });
-// configurations
+cron.schedule('30 4 * * *', () => {
+  sendUpcomingEventNotifications();
+});
 
 // Cloudinary
 cloudinary.config({
@@ -126,6 +127,12 @@ app.delete("/deleteLocation/:id", deleteLocation);
 app.get("/getLocation/:id", getLocationById);
 
 app.post("/login", login);
+
+const { sendOtp,verifyOtp,resetPassword } = require('./Controllers/authController');
+
+app.post("/sendOtp", sendOtp);
+app.post("/verifyOtp", verifyOtp);
+app.post("/resetPassword", resetPassword);
 //createLocation,
 //getLocations,
 //updateLocation,

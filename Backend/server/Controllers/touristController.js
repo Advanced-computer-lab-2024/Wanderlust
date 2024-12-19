@@ -463,66 +463,70 @@ const changeCartItemQuantity = async (req, res) => {
 const processPayment = async (totalAmount, touristId, paymentMethod) => {
   try {
     const tourist = await touristModel.findById(touristId);
-    if (paymentMethod === "wallet") {
-      // Wallet payment
-      if (tourist.wallet < totalAmount) {
-        console.log("Insufficient wallet balance");
-        return { success: false, message: "Insufficient wallet balance" };
-      }
+    if (!tourist) {
+      return { success: false, message: "Tourist not found" };
+    }
 
-      // Deduct from wallet and update booking
-      tourist.wallet -= totalAmount;
-      await tourist.save();
-
-      console.log("Payment successful using wallet");
-      const postPaymentResult = await postPaymentSuccess(
-        tourist._id,
-        totalAmount
-      );
-      if (!postPaymentResult.success) {
-        console.log(
-          "Post-payment processing failed",
-          postPaymentResult.message
+    switch (paymentMethod) {
+      case "wallet":
+        if (tourist.wallet < totalAmount) {
+          return { success: false, message: "Insufficient wallet balance" };
+        }
+        tourist.wallet -= totalAmount;
+        await tourist.save();
+        const walletPostPayment = await postPaymentSuccess(
+          tourist._id,
+          totalAmount
         );
-      } else {
-        console.log("Post-payment processing successful");
-      }
+        if (!walletPostPayment.success) {
+          return {
+            success: false,
+            message: walletPostPayment.message,
+          };
+        }
+        return { success: true, message: "Payment successful using wallet" };
 
-      return { success: true, message: "Payment successful using wallet" };
-    } else if (paymentMethod === "card") {
-      // Stripe payment
-      try {
-        const paymentIntent = await stripe.paymentIntents.create({
-          amount: totalAmount * 100, // Convert to cents
-          currency: tourist.currency,
-          automatic_payment_methods: {
-            enabled: true,
-            allow_redirects: "never",
-          },
-        });
-        console.log("Payment processing successful");
-        return {
-          success: true,
-          clientSecret: paymentIntent.client_secret,
-          message: "Payment processing successful",
-        };
-      } catch (error) {
-        console.log("Payment processing failed", error.message);
-        return {
-          success: false,
-          message: "Payment processing failed",
-          error: error.message,
-        };
-      }
-    } else {
-      console.log("Invalid payment method");
-      return { success: false, message: "Invalid payment method" };
+      case "cod":
+        const codPostPayment = await postPaymentSuccess(
+          tourist._id,
+          totalAmount
+        );
+        if (!codPostPayment.success) {
+          return {
+            success: false,
+            message: codPostPayment.message,
+          };
+        }
+        return { success: true, message: "Payment successful using COD" };
+
+      case "card":
+        try {
+          const paymentIntent = await stripe.paymentIntents.create({
+            amount: totalAmount * 100, // Convert to cents
+            currency: tourist.currency,
+            automatic_payment_methods: { enabled: true },
+          });
+          return {
+            success: true,
+            clientSecret: paymentIntent.client_secret,
+            message: "Payment processing successful",
+          };
+        } catch (error) {
+          return {
+            success: false,
+            message: "Payment processing failed",
+            error: error.message,
+          };
+        }
+
+      default:
+        return { success: false, message: "Invalid payment method" };
     }
   } catch (error) {
-    console.log("Payment processing failed", error.message);
     return { success: false, message: error.message };
   }
 };
+
 //checkout my order
 /*
   need to implement a payment processing function @ali Mousa 
@@ -536,43 +540,40 @@ const checkoutOrder = async (req, res) => {
     if (!authHeader) {
       return res.status(401).json({ message: "Authorization header missing" });
     }
+
     const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const tourist = await touristModel
       .findOne({ _id: decoded.id })
       .populate("cart.product");
+
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
     }
 
-    if (tourist.cart.length === 0) {
+    if (!tourist.cart || tourist.cart.length === 0) {
       return res.status(400).json({ message: "Cart is empty" });
     }
 
-    // Assuming you have a payment processing function
     const paymentResult = await processPayment(
       totalAmount,
       tourist._id,
       paymentMethod
     );
+
     if (!paymentResult.success) {
-      return res
-        .status(400)
-        .json({ message: paymentResult.message, totalAmount });
+      return res.status(400).json({ message: paymentResult.message });
     }
+
     if (paymentMethod === "card" && paymentResult.clientSecret) {
-      return res.json({
+      return res.status(200).json({
         clientSecret: paymentResult.clientSecret,
         message: "Proceed with card payment",
-        totalAmount,
       });
     }
-    if (paymentResult.success) {
-      return res
-        .status(200)
-        .json({ message: paymentResult.message, totalAmount });
-    }
+
+    return res.status(200).json({ message: paymentResult.message });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -583,20 +584,23 @@ const postPaymentSuccess = async (touristId, totalAmount) => {
     const tourist = await touristModel
       .findOne({ _id: touristId })
       .populate("cart.product");
-    if (!tourist) {
-      return { success: false, message: "Tourist not found" };
+
+    if (!tourist || !tourist.cart || tourist.cart.length === 0) {
+      return { success: false, message: "Cart is empty or tourist not found" };
     }
-    // Update points on payment
+
     await updatePointsOnPayment(touristId, totalAmount);
-
-    // Update badge
     updateBadge(tourist);
-    await tourist.save();
 
-    // Perform post-payment actions
-    // Reduce product quantity after successful payment
     for (const item of tourist.cart) {
       const product = await productModel.findById(item.product);
+
+      if (!product) {
+        return {
+          success: false,
+          message: `Product with ID ${item.product} not found`,
+        };
+      }
 
       product.quantity -= item.quantity;
 
@@ -606,17 +610,16 @@ const postPaymentSuccess = async (touristId, totalAmount) => {
           message: `Insufficient stock for product: ${product.name}`,
         };
       }
+
       await product.save();
+
       if (product.quantity === 0) {
-        // Create a notification for the admin
         const adminUsers = await Admin.find({});
         const message = `The product ${product.name} is out of stock.`;
-
         for (const admin of adminUsers) {
           await createNotification(admin._id, message, "admin");
         }
 
-        // Create a notification for the seller
         const seller = await Seller.findById(product.seller);
         if (seller) {
           const sellerMessage = `Your product ${product.name} is out of stock.`;
@@ -624,7 +627,7 @@ const postPaymentSuccess = async (touristId, totalAmount) => {
         }
       }
     }
-    // Save the order to order history
+
     const order = {
       items: tourist.cart.map((item) => ({
         product: item.product._id,
@@ -634,23 +637,17 @@ const postPaymentSuccess = async (touristId, totalAmount) => {
       totalAmount,
       date: new Date(),
     };
-    tourist.orderHistory.push(order);
 
-    // Clear the cart after successful payment
+    tourist.orderHistory.push(order);
     tourist.cart = [];
     await tourist.save();
 
-    return {
-      success: true,
-      message: "Order checked out successfully",
-      order,
-    };
+    return { success: true, message: "Order checked out successfully", order };
   } catch (error) {
-    return {
-      message: error.message,
-    };
+    return { success: false, message: error.message };
   }
 };
+
 const cardPaymentSuccess = async (req, res) => {
   try {
     const { paymentIntentId, totalAmount } = req.body;
@@ -970,10 +967,14 @@ const usePromoCode = async (req, res) => {
 
 const receiveBirthdayPromo = async (req, res) => {
   try {
-    const { touristId } = req.params;
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const tourist = await touristModel.findById(touristId);
-    console.log(tourist);
+    const tourist = await touristModel.findOne({ _id: decoded.id });
     if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
     }
@@ -1025,6 +1026,53 @@ const getPromoCodeId = async (req, res) => {
   }
 };
 
+
+const sendUpcomingEventReminder = async (req, res) => {
+  try {
+    const authHeader = req.header("Authorization");
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const tourist = await touristModel.findOne({ _id: decoded.id });
+    if (!tourist) {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    const user = await User.findById(tourist.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    // Fetch events linked to the tourist that are occurring soon (e.g., within 7 days)
+    const today = new Date();
+    const upcomingDate = new Date();
+    upcomingDate.setDate(today.getDate() + 7); // 7 days from today
+
+    const upcomingEvents = await Notification.find({
+      userId: tourist._id,
+      eventDate: { $gte: today, $lte: upcomingDate }, // Ensure eventDate exists in the Notification model
+    });
+
+    if (upcomingEvents.length === 0) {
+      return res.status(200).json({ message: "No upcoming events to remind" });
+    }
+    // Prepare and send email without event details
+    const title = `Reminder: Upcoming Events`;
+    const message = `Hello ${user.username},\n\nYou have upcoming events scheduled within the next 7 days. Please check your account for more details.\n\nBest regards, Your Travel App Team`;
+
+    await sendMail(user.email, user.username, title, message);
+
+    return res.status(200).json({ message: "Upcoming event reminder email sent successfully" });
+  } catch (error) {
+    console.error("Error sending event reminders:", error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+
 module.exports = {
   getTourist,
   createTourist,
@@ -1053,4 +1101,5 @@ module.exports = {
   receiveBirthdayPromo,
   testOutOfStockNotification,
   getPromoCodeId,
+  sendUpcomingEventReminder
 };

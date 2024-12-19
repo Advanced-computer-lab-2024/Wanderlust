@@ -154,7 +154,7 @@ const TouristBookmarks = () => {
   };
 
   return (
-    <div className="p-5 max-w-3xl mx-auto">
+    <div className="p-6 max-w-4xl mx-auto bg-white rounded-lg shadow-lg">
       <h2 className="text-3xl font-bold text-blue-900 mb-6 text-center">My Saved Spots</h2>
       {loading ? (
           

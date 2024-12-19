@@ -165,6 +165,10 @@ const Login = () => {
                         <Link to="/register" className="text-indigo-600 hover:underline">
                             Sign Up
                         </Link>
+                        <p className="text-gray-600"></p>
+                        <Link to="/forgetpassword" className="text-indigo-600 hover:underline">
+                            Forget Password
+                        </Link>
                     </div>
                 </div>
                 {/* Right - Text Section */}

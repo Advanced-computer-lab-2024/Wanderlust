@@ -54,6 +54,10 @@ import AdminCreatePromocodePage from "./Pages/AdminCreatePromocodePage";
 import AdminViewSalesReport from "./Pages/AdminViewSalesReport";
 import Guide from "./Components/Guide";
 import SearchHotelsPage from "./Pages/Tourist/SearchHotelsPage";
+import TourguideNotifPage from "./Pages/Tourguide/TourguideNotifPage";
+import AdvertiserNotifPage from "./Pages/Advertiser/AdvertiserNotifPage";
+import SearchFlightsPage from "./Pages/Tourist/SearchFlights";
+import ForgetPasswordPage from "./Pages/ForgetPasswordpage";
 import "./App.css";
 
 const App = () => {
@@ -78,6 +82,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgetpassword" element={<ForgetPasswordPage />} />
         {/* Admin Routes */}
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/addadmin" element={<AddAdminPage />} />
@@ -152,6 +157,10 @@ const App = () => {
           path="/SalesReportTourGuide"
           element={<SalesReportTourGuide />}
         />
+        <Route
+          path="/TourguideNotifications"
+          element={<TourguideNotifPage />}
+        />
 
         {/* Seller Routes */}
         <Route path="/SellerProfile" element={<SellerProfilePage />} />
@@ -165,9 +174,17 @@ const App = () => {
           path="/AdvertiserActivities"
           element={<AdvertiserActivitiesPage />}
         />
+          <Route
+          path="/AdvertiserNotifications"
+          element={<AdvertiserNotifPage />}
+        />
         <Route
           path="/SalesReportAdvertiser"
           element={<SalesReportAdvertiser />}
+        />
+        <Route
+          path="/AdvertiserNotifications"
+          element={<AdvertiserNotifPage />}
         />
 
         {/* Tourism Governor Routes */}
@@ -182,6 +199,8 @@ const App = () => {
 
         {/* Search Hotels */}
         <Route path="/SearchHotelsPage" element={<SearchHotelsPage />} />
+         {/* Search Hotels */}
+         <Route path="/SearchFlightsPage" element={<SearchFlightsPage />} />
       </Routes>
     </Router>
   );

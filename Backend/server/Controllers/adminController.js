@@ -378,6 +378,96 @@ const getAllSalesReport = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch all sales report. Please try again later." });
   }
 };
+const filterSalesReport = async (req, res) => {
+  try {
+    const { product, startDate, endDate, month, year } = req.query;
+
+    // Fetch all advertisers, tour guides, and products
+    const advertisers = await Advertiser.find().populate('userId', 'username');
+    const tourGuides = await tourguideModel.find().populate('userId', 'username');
+    let productsQuery = {};
+    if (product) {
+      productsQuery.name = { $regex: product, $options: 'i' }; // Case-insensitive regex match
+    }
+    const products = await Products.find(productsQuery).populate({
+      path: 'seller',
+      populate: {
+        path: 'userId',
+        select: 'username'
+      }
+    });
+
+    let totalRevenue = 0;
+    let appRevenue = 0;
+    let allActivities = [];
+    let allItineraries = [];
+    let allProducts = [];
+
+    // Fetch sales report for each advertiser
+    for (const advertiser of advertisers) {
+      let activitiesQuery = { advertiserId: advertiser._id };
+      if (startDate && endDate) {
+        activitiesQuery.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
+      }
+      const activities = await Activity.find(activitiesQuery);
+      const advertiserRevenue = activities.reduce((sum, activity) => sum + (activity.price * activity.touristCount), 0);
+      totalRevenue += advertiserRevenue;
+      appRevenue += advertiserRevenue * 0.1; // 10% app rate
+      allActivities = allActivities.concat(activities.map(activity => ({
+        name: activity.name,
+        creator: advertiser.userId ? advertiser.userId.username : 'Unknown',
+      })));
+    }
+
+    // Fetch sales report for each tour guide
+    for (const tourGuide of tourGuides) {
+      let itinerariesQuery = { creator: tourGuide._id };
+      if (startDate && endDate) {
+        itinerariesQuery.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
+      }
+      const itineraries = await Itinerary.find(itinerariesQuery);
+      const tourGuideRevenue = itineraries.reduce((sum, itinerary) => sum + (itinerary.price * itinerary.touristCount), 0);
+      totalRevenue += tourGuideRevenue;
+      appRevenue += tourGuideRevenue * 0.1; // 10% app rate
+      allItineraries = allItineraries.concat(itineraries.map(itinerary => ({
+        title: itinerary.title,
+        creator: tourGuide.userId ? tourGuide.userId.username : 'Unknown',
+      })));
+    }
+
+    // Fetch sales report for each product
+    for (const product of products) {
+      const productRevenue = product.sales.reduce((sum, sale) => {
+        if (startDate && endDate && (new Date(sale.date) < new Date(startDate) || new Date(sale.date) > new Date(endDate))) {
+          return sum;
+        }
+        return sum + (product.price * sale.quantity);
+      }, 0);
+      totalRevenue += productRevenue;
+      appRevenue += productRevenue * 0.1; // 10% app rate
+      allProducts = allProducts.concat({
+        name: product.name,
+        creator: product.seller && product.seller.userId ? product.seller.userId.username : 'Unknown',
+      });
+    }
+
+    res.status(200).json({
+      totalRevenue,
+      appRevenue,
+      currency: "USD", // Replace with actual currency if applicable
+      numberOfItineraries: allItineraries.length,
+      numberOfActivities: allActivities.length,
+      numberOfProducts: allProducts.length,
+      itineraries: allItineraries,
+      activities: allActivities,
+      products: allProducts,
+      generatedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Error fetching filtered sales report:", error);
+    res.status(500).json({ error: "Failed to fetch filtered sales report. Please try again later." });
+  }
+};
 
 module.exports = {
   createAdmin,
@@ -392,4 +482,5 @@ module.exports = {
   getNotifications,
   getPromoCodes,
   getAllSalesReport,
+  filterSalesReport,
 };

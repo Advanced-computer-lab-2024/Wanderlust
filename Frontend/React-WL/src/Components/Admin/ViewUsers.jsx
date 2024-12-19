@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import '../../assets/adminstyle.css'
 const ViewUsers = () => {
     const [users, setUsers] = useState([]);
     const [statistics, setStatistics] = useState({
@@ -59,7 +59,7 @@ const ViewUsers = () => {
     };
 
     return (
-        <div className="container">
+        <div className="container w-75">
       <div className="mx-auto text-center mb-4 mt-4 rounded shadow p-4 w-25">
         <h2 className='text-2xl font-bold mb-6'>User Statistics</h2>
         <p><strong>Total Users:</strong> {statistics.totalUsers}</p>

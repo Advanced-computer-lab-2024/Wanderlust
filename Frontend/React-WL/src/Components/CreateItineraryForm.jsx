@@ -28,6 +28,7 @@ const CreateItineraryForm = ({ onClose, onSubmit }) => {
   const [validationErrors, setValidationErrors] = useState({});
 
   const languages = ['English', 'Spanish', 'French', 'German'];
+  const accessibilityOptions = ['Wheelchair Accessible', 'Visual Assistance', 'Hearing Assistance'];
 
   useEffect(() => {
     fetchActivities();
@@ -156,10 +157,9 @@ const CreateItineraryForm = ({ onClose, onSubmit }) => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8000/api/itinerary/createitinerary', formData, {
+      const response = await axios.post('http://localhost:8000/api/itinerary/createItinerary', formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
-          'Content-Type': 'application/json',
         },
       });
       
@@ -285,6 +285,24 @@ const CreateItineraryForm = ({ onClose, onSubmit }) => {
                   required
                 />
               </div>
+            </div>
+
+            <div className="flex items-center space-x-2 bg-gray-50 rounded-lg p-4">
+              <Users className="text-indigo-500" size={20} />
+              <select
+                name="accessibility"
+                value={formData.accessibility}
+                onChange={handleChange}
+                className="flex-1 bg-transparent border-none focus:outline-none"
+                required
+              >
+                <option value="">Select Accessibility</option>
+                {accessibilityOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 

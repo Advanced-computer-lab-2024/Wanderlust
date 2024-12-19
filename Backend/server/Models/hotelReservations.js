@@ -11,16 +11,12 @@ const hotelReservationsSchema = new Schema({
     type: String,
     required: true,
   },
-  hotelAddress: {
-    description: {
-      type: String,
-      required: true,
-    },
-    countryCode: {
-      type: String,
-      required: true,
-    },
+
+  cityCode: {
+    type: String,
+    required: true,
   },
+
   checkInDate: {
     type: Date,
     required: true,
@@ -39,6 +35,14 @@ const hotelReservationsSchema = new Schema({
   },
   currency: {
     type: String,
+    required: true,
+  },
+  numberOfRooms: {
+    type: Number,
+    required: true,
+  },
+  availability: {
+    type: Boolean,
     required: true,
   },
   offerId: {

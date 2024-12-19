@@ -25,13 +25,14 @@ const {
   usePromoCode,
   receiveBirthdayPromo,
   testOutOfStockNotification,
-  getPromoCodeId
+  getPromoCodeId,
+  sendUpcomingEventReminder
 
 } = require("../Controllers/touristController");
 
 const { authenticateUser } = require("../Controllers/authController");
 const tourist = require("../Middleware/touristMiddleware");
-const { createSystemNotification,sendUpcomingActivityNotifications, sendUpcomingItineraryNotifications, requestNotification,getNotifications } = require("../Controllers/NotificationController");
+const { createSystemNotification, requestNotification,getNotificationsAll,getNotifications } = require("../Controllers/NotificationController");
 
 const router = express.Router();
 
@@ -107,7 +108,7 @@ router.post(
   usePromoCode
 );
 router.post(
-  "/receiveBirthdayPromo/:touristId",
+  "/receiveBirthdayPromo",
   authenticateUser,
   tourist,
   receiveBirthdayPromo
@@ -117,7 +118,14 @@ router.post("/getPromoCodeId", authenticateUser, tourist, getPromoCodeId);
 
 
 router.post('/requestNotification', requestNotification);
-router.get('/getNotifications', getNotifications);
+router.get('/getNotificationsAll', getNotificationsAll);
+router.get('/getNotification', getNotifications);
+router.post(
+  "/sendUpcomingEventReminder",
+  authenticateUser,
+  tourist,
+  sendUpcomingEventReminder
+);
 
 
 module.exports = router;

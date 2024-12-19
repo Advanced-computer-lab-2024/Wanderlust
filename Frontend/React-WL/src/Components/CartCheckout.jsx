@@ -86,6 +86,19 @@ const CartCheckout = ({ totalAmount }) => {
           setSuccess(true);
           break;
 
+        case "COD":
+          await axios.post(
+            "http://localhost:8000/api/tourist/cart/checkout",
+            { paymentMethod: "cod", totalAmount: finalPrice },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+              },
+            }
+          );
+          setSuccess(true);
+          break;
+
         case "Card":
           const { data } = await axios.post(
             "http://localhost:8000/api/tourist/cart/checkout",
@@ -114,10 +127,6 @@ const CartCheckout = ({ totalAmount }) => {
               },
             }
           );
-          setSuccess(true);
-          break;
-
-        case "COD":
           setSuccess(true);
           break;
 
@@ -152,7 +161,9 @@ const CartCheckout = ({ totalAmount }) => {
             Total Amount:{" "}
             {discountedPrice ? (
               <>
-                <span className="line-through text-red-600">${totalAmount.toFixed(2)}</span>
+                <span className="line-through text-red-600">
+                  ${totalAmount.toFixed(2)}
+                </span>
                 <span className="text-green-600"> ${discountedPrice}</span>
               </>
             ) : (
